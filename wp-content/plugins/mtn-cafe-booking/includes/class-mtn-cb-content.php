@@ -66,6 +66,13 @@ final class MTN_CB_Content {
 		echo '<p><label for="' . esc_attr( $key ) . '"><strong>' . esc_html( $label ) . '</strong></label><br>';
 		if ( 'textarea' === $type ) {
 			echo '<textarea class="widefat" rows="3" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '">' . esc_textarea( $value ) . '</textarea>';
+		} elseif ( 'cafe_select' === $type ) {
+			$cafes = get_posts( array( 'post_type' => 'mtn_cafe', 'post_status' => 'publish', 'posts_per_page' => 200, 'orderby' => 'title', 'order' => 'ASC' ) );
+			echo '<select class="widefat" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '"><option value="0">' . esc_html__( 'انتخاب کافه', 'mtn-cafe-booking' ) . '</option>';
+			foreach ( $cafes as $cafe ) {
+				echo '<option value="' . (int) $cafe->ID . '" ' . selected( absint( $value ), (int) $cafe->ID, false ) . '>' . esc_html( get_the_title( $cafe ) ) . ' (#' . (int) $cafe->ID . ')</option>';
+			}
+			echo '</select>';
 		} elseif ( 'checkbox' === $type ) {
 			echo '<input type="checkbox" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" value="1" ' . checked( (bool) $value, true, false ) . '> ' . esc_html__( 'فعال', 'mtn-cafe-booking' );
 		} else {
@@ -95,7 +102,7 @@ final class MTN_CB_Content {
 
 	public static function render_event_meta_box( $post ) {
 		self::meta_box_nonce();
-		self::field( $post->ID, 'mtn_cafe_id', __( 'شناسه کافه منتشرشده', 'mtn-cafe-booking' ), 'number', __( 'شناسه نوشته کافه‌ای که این رویداد در آن برگزار می‌شود.', 'mtn-cafe-booking' ) );
+		self::field( $post->ID, 'mtn_cafe_id', __( 'کافه میزبان', 'mtn-cafe-booking' ), 'cafe_select' );
 		self::field( $post->ID, 'mtn_event_capacity', __( 'ظرفیت کل نفرات (۰ = بدون سقف تنظیم‌شده)', 'mtn-cafe-booking' ), 'number' );
 		self::field( $post->ID, 'mtn_min_party_size', __( 'حداقل نفرات هر رزرو', 'mtn-cafe-booking' ), 'number' );
 		self::field( $post->ID, 'mtn_max_party_size', __( 'حداکثر نفرات هر رزرو', 'mtn-cafe-booking' ), 'number' );
@@ -106,7 +113,7 @@ final class MTN_CB_Content {
 
 	public static function render_table_meta_box( $post ) {
 		self::meta_box_nonce();
-		self::field( $post->ID, 'mtn_cafe_id', __( 'شناسه کافه', 'mtn-cafe-booking' ), 'number' );
+		self::field( $post->ID, 'mtn_cafe_id', __( 'کافه میزبان', 'mtn-cafe-booking' ), 'cafe_select' );
 		self::field( $post->ID, 'mtn_table_capacity', __( 'ظرفیت میز (نفر)', 'mtn-cafe-booking' ), 'number' );
 		self::field( $post->ID, 'mtn_table_active', __( 'میز قابل رزرو است؟', 'mtn-cafe-booking' ), 'checkbox' );
 	}
