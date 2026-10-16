@@ -27,11 +27,19 @@ final class MTN_CB_Finance {
 	}
 
 	public static function on_booking_status_changed( $booking, $next_status, $actor_id = 0, $reason = '' ) {
-		$trigger_status = isset( $booking->commission_trigger_status ) && in_array( $booking->commission_trigger_status, array( 'confirmed', 'completed' ), true ) ? $booking->commission_trigger_status : 'confirmed';
-		if ( $trigger_status !== $next_status || empty( $booking->id ) ) {
+		if ( empty( $booking->id ) ) {
 			return;
 		}
-		self::accrue_commission( absint( $booking->id ), absint( $actor_id ) );
+		$trigger_status = isset( $booking->commission_trigger_status ) && in_array( $booking->commission_trigger_status, array( 'confirmed', 'completed' ), true ) ? $booking->commission_trigger_status : 'confirmed';
+		if ( $trigger_status === $next_status ) {
+			self::accrue_commission( absint( $booking->id ), absint( $actor_id ) );
+		}
+		$cancellation_statuses = array( 'cancelled_by_customer', 'cancelled_by_cafe', 'cancelled_by_admin' );
+		$reverse_for_cancellation = in_array( $next_status, $cancellation_statuses, true ) && ! empty( $booking->commission_reverse_on_cancellation );
+		$reverse_for_no_show = 'no_show' === $next_status && ! empty( $booking->commission_reverse_on_no_show );
+		if ( $reverse_for_cancellation || $reverse_for_no_show ) {
+			self::reverse_commission( absint( $booking->id ), absint( $actor_id ), $next_status, $reason );
+		}
 	}
 
 	public static function accrue_commission( $booking_id, $actor_id = 0 ) {
@@ -62,7 +70,7 @@ final class MTN_CB_Finance {
 				'amount' => number_format( $amount, 2, '.', '' ),
 				'currency' => $currency,
 				'reference' => $booking->booking_code,
-				'note' => __( 'کارمزد ثابت رزرو تکمیل‌شده', 'mtn-cafe-booking' ),
+				'note' => __( 'کارمزد ثابت رزرو واجد شرایط', 'mtn-cafe-booking' ),
 				'actor_id' => absint( $actor_id ),
 				'created_at' => current_time( 'mysql', true ),
 			),
@@ -80,6 +88,47 @@ final class MTN_CB_Finance {
 			array( '%d' )
 		);
 		do_action( 'mtn_cb_commission_accrued', $booking, $amount, $currency );
+		return true;
+	}
+
+	public static function reverse_commission( $booking_id, $actor_id, $status, $reason = '' ) {
+		global $wpdb;
+		$booking = MTN_CB_Bookings::get_by_id( $booking_id );
+		if ( ! $booking ) {
+			return new WP_Error( 'mtn_commission_booking_missing', __( 'رزرو برای اصلاح کارمزد پیدا نشد.', 'mtn-cafe-booking' ) );
+		}
+		$entry_key = 'commission_booking_' . absint( $booking_id );
+		$commission = $wpdb->get_row( $wpdb->prepare( 'SELECT amount, currency FROM ' . self::ledger_table() . ' WHERE entry_key = %s', $entry_key ) );
+		if ( ! $commission || (float) $commission->amount <= 0 ) {
+			return true;
+		}
+		$reversal_key = 'commission_reversal_booking_' . absint( $booking_id );
+		$existing = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::ledger_table() . ' WHERE entry_key = %s', $reversal_key ) );
+		if ( $existing ) {
+			return true;
+		}
+		$details = sprintf( 'برگشت خودکار کارمزد به دلیل وضعیت %1$s%2$s', sanitize_key( $status ), '' !== trim( (string) $reason ) ? ': ' . sanitize_textarea_field( $reason ) : '' );
+		$inserted = $wpdb->insert(
+			self::ledger_table(),
+			array(
+				'entry_key' => $reversal_key,
+				'booking_id' => absint( $booking_id ),
+				'cafe_id' => absint( $booking->cafe_id ),
+				'entry_type' => 'commission_reversal',
+				'amount' => number_format( -1 * abs( (float) $commission->amount ), 2, '.', '' ),
+				'currency' => sanitize_text_field( $commission->currency ),
+				'reference' => $booking->booking_code,
+				'note' => $details,
+				'actor_id' => absint( $actor_id ),
+				'created_at' => current_time( 'mysql', true ),
+			),
+			array( '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s' )
+		);
+		if ( false === $inserted ) {
+			$existing = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::ledger_table() . ' WHERE entry_key = %s', $reversal_key ) );
+			return $existing ? true : new WP_Error( 'mtn_ledger_reversal_failed', __( 'ثبت برگشت کارمزد انجام نشد.', 'mtn-cafe-booking' ) );
+		}
+		do_action( 'mtn_cb_commission_reversed', $booking, $commission, $status, absint( $actor_id ) );
 		return true;
 	}
 
