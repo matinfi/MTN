@@ -29,7 +29,7 @@ The plugin schedules a five-minute WP-Cron event to expire stale pending booking
 ## Before production
 
 - Verify `GET_LOCK` behavior and timeout handling on the actual database/hosting platform.
-- Run schema upgrades from versions 1–10 on disposable database copies.
+- Run schema upgrades from versions 1–12 on disposable database copies.
 - Validate login, REST nonce behavior, cafe-owner isolation, cancellation, table assignment, finance balance and CSV export permissions.
 - Confirm backups and a tested rollback procedure.
 - Configure the site mailer before using invitations and notifications. For optional SMS OTP, define `MTN_CB_TWILIO_ACCOUNT_SID`, `MTN_CB_TWILIO_AUTH_TOKEN` and `MTN_CB_TWILIO_FROM` in `wp-config.php` or a secret-injection layer; never commit credentials. Assign each user's E.164 phone to their WordPress account from the administrator profile. Verify live SMS delivery, throttling and login cookies on staging. WhatsApp Business API remains optional for v1.
