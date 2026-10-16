@@ -16,7 +16,7 @@ The repository's CI currently checks PHP syntax and the booking wizard JavaScrip
 2. Install the plugin ZIP and activate it; install/activate the theme ZIP separately.
 3. Confirm the plugin schema migration reaches version 8 and that the booking, ledger, settlement and audit tables exist.
 4. Save Settings → Permalinks once if the cafe/event archive routes return 404.
-5. Configure brand, currency, fixed commission, booking expiry, reservation duration and table-selection mode. Currency is intentionally locked after the first booking or ledger entry.
+5. Configure brand, currency, fixed commission, booking expiry, reservation duration, customer cancellation cutoff and table-selection mode. A zero-minute cancellation cutoff allows customer cancellation until the reservation start; positive values block cancellation inside that many minutes. Currency is intentionally locked after the first booking or ledger entry.
 6. Create a cafe and set its city, address, contact details, music genre and optional owner user. Saving an owner assigns the cafe-manager role.
 7. Create and publish active tables. Create and publish events with a cafe, date, start time, optional end time, party limits and capacity.
 8. Verify /cafes/, /events/, /book/, /my-account/ and /cafe-dashboard/.
