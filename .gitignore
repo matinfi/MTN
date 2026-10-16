@@ -1,0 +1,11 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+vendor/
+node_modules/
+.phpunit.cache/
+coverage/
+*.log
+*.sql
+wp-config.php
