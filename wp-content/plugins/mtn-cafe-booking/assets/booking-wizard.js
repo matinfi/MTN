@@ -280,6 +280,8 @@
           act('تأیید', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/confirm', false);
           act('رد', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/reject', true);
         } else if (booking.status === 'confirmed') {
+          act('تکمیل شد', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/complete', false);
+          act('عدم مراجعه', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/no-show', false);
           act('لغو رزرو', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/cancel', true);
         } else {
           actions.textContent = '—';
