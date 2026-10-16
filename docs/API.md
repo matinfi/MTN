@@ -103,7 +103,7 @@ Cancels a pending or confirmed booking for a cafe managed by the current user (o
 
 `POST /cafe/bookings/{id}/reject`
 
-Optional JSON field: `reason` (plain text). Only the assigned cafe owner or an administrator may reject. The reason is saved as the current cafe note; append-only status history is not implemented yet.
+Optional JSON field: `reason` (plain text). Only the assigned cafe owner or an administrator may reject. The reason is saved as the current cafe note and an append-only audit event.
 
 ## Finance behavior
 
