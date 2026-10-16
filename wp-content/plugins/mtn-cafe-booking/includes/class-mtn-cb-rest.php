@@ -93,6 +93,44 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
+			'/catalog',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'catalog' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		register_rest_route(
+			self::NS,
+			'/availability',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'availability' ),
+				'permission_callback' => '__return_true',
+				'args' => array(
+					'cafe_id' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
+					'event_id' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
+					'party_size' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
+					'booking_at' => array( 'required' => true, 'sanitize_callback' => 'sanitize_text_field' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
+			'/my/bookings',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'my_bookings' ),
+				'permission_callback' => static function () {
+					return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای مشاهده رزروها وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) );
+				},
+			)
+		);
+
+		register_rest_route(
+			self::NS,
 			'/health',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -102,6 +140,57 @@ final class MTN_CB_Rest {
 				'permission_callback' => '__return_true',
 			)
 		);
+	}
+
+	public static function catalog() {
+		$cafe_posts = get_posts( array(
+			'post_type' => 'mtn_cafe',
+			'post_status' => 'publish',
+			'posts_per_page' => 100,
+			'orderby' => 'title',
+			'order' => 'ASC',
+		) );
+		$cafes = array();
+		foreach ( $ cafe_posts as $cafe ) {
+			$cafes[] = array( 'id' => (int) $cafe->ID, 'name' => get_the_title( $cafe ), 'url' => get_permalink( $cafe ), 'description' => wp_strip_all_tags( get_the_excerpt( $cafe ) ) );
+		}
+		$event_posts = get_posts( array(
+			'post_type' => 'mtn_event',
+			'post_status' => 'publish',
+			'posts_per_page' => 200,
+			'orderby' => 'date',
+			'order' => 'DESC',
+		) );
+		$events = array();
+		foreach ( $event_posts as $event ) {
+			$cafe_id = absint( get_post_meta( $event->ID, 'mtn_cafe_id', true ) );
+			$cafe = get_post( $cafe_id );
+			if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status ) {
+				continue;
+			}
+			$events[] = array(
+				'id' => (int) $event->ID,
+				'name' => get_the_title( $event ),
+				'cafe_id' => $cafe_id,
+				'cafe_name' => get_the_title( $cafe ),
+				'url' => get_permalink( $event ),
+				'description' => wp_strip_all_tags( get_the_excerpt( $event ) ),
+				'min_party_size' => absint( get_post_meta( $event->ID, 'mtn_min_party_size', true ) ),
+				'max_party_size' => absint( get_post_meta( $event->ID, 'mtn_max_party_size', true ) ) ?: 100,
+			);
+		}
+		return rest_ensure_response( array( 'cafes' => $cafes, 'events' => $events, 'timezone' => wp_timezone_string(), 'booking_mode' => get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) );
+	}
+
+	public static function availability( WP_REST_Request $request ) {
+		$result = MTN_CB_Bookings::get_availability( $request->get_params() );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( $result );
+	}
+
+	public static function my_bookings() {
+		global $wpdb;
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . MTN_CB_Bookings::table_name() . ' WHERE user_id = %d ORDER BY created_at DESC LIMIT 100', get_current_user_id() ) );
+		return rest_ensure_response( array_map( array( __CLASS__, 'public_booking' ), $rows ) );
 	}
 
 	public static function create_booking( WP_REST_Request $request ) {
