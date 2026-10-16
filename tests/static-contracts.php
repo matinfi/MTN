@@ -44,7 +44,9 @@ if ( false === strpos( $bookings, "get_option( 'mtn_cb_customer_cancel_cutoff_mi
 }
 
 if ( false === strpos( $content, "if ( current_user_can( 'manage_options' ) )" ) ||
-	false === strpos( $content, '$keys[] = \'mtn_cafe_owner_id\';' ) ) {
+	false === strpos( $content, '$keys[] = \'mtn_cafe_owner_id\';' ) ||
+	false === strpos( $content, 'public static function user_can_manage_cafe' ) ||
+	false === strpos( $content, 'mtn_cafe_manager_ids' ) ) {
 	fwrite( STDERR, "Cafe owner assignment privilege guard is missing.\n" );
 	exit( 1 );
 }
