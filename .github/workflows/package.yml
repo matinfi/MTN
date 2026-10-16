@@ -1,0 +1,47 @@
+name: Build installable packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: none
+      - name: PHP syntax check
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' files < <(find wp-content -type f -name '*.php' -print0)
+          test "${#files[@]}" -gt 0
+          for file in "${files[@]}"; do php -l "$file"; done
+      - name: Create installable ZIP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd wp-content/plugins
+          zip -qr ../../../dist/mtn-cafe-booking.zip mtn-cafe-booking
+          cd ../../themes
+          zip -qr ../../../dist/mtn-cafe-theme.zip mtn-cafe-theme
+          cd ../../..
+          test -s dist/mtn-cafe-booking.zip
+          test -s dist/mtn-cafe-theme.zip
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mtn-wordpress-packages
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 14
