@@ -64,6 +64,30 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
+			'/bookings/(?P<id>\\d+)/checkin-token',
+			array(
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => array( __CLASS__, 'issue_checkin_token' ),
+				'permission_callback' => static function () {
+					return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای دریافت کد اعلام حضور وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) );
+				},
+				'args' => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
+			'/cafe/check-in',
+			array(
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => array( __CLASS__, 'check_in_customer' ),
+				'permission_callback' => array( __CLASS__, 'can_access_cafe_dashboard' ),
+				'args' => array( 'token' => array( 'required' => true, 'sanitize_callback' => 'sanitize_text_field' ) ),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
 			'/bookings/(?P<id>\d+)/cancel',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -420,6 +444,16 @@ final class MTN_CB_Rest {
 		}
 		$reason = $request->get_param( 'reason' );
 		$result = MTN_CB_Bookings::transition( $booking->id, 'rejected', get_current_user_id(), is_string( $reason ) ? $reason : '' );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
+	}
+
+	public static function issue_checkin_token( WP_REST_Request $request ) {
+		$result = MTN_CB_Bookings::issue_checkin_token( absint( $request['id'] ), get_current_user_id() );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( $result );
+	}
+
+	public static function check_in_customer( WP_REST_Request $request ) {
+		$result = MTN_CB_Bookings::check_in_with_token( $request->get_param( 'token' ), get_current_user_id() );
 		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
 	}
 
