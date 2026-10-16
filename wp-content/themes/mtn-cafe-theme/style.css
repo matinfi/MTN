@@ -36,7 +36,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 /* Booking flow and directory cards */
 .mtn-booking-panel{max-width:900px;margin:2rem auto;padding:clamp(1rem,3vw,2rem);background:var(--mtn-surface);border:1px solid #302e38;border-radius:var(--mtn-radius)}
 .mtn-booking-panel h2{margin:.25rem 0 .5rem}.mtn-booking-form label{display:block;margin-bottom:.35rem;font-weight:700}
-.mtn-booking-form input,.mtn-booking-form select,.mtn-booking-form textarea{width:100%;min-height:46px;padding:.7rem .8rem;border:1px solid #494652;border-radius:10px;background:#111116;color:var(--mtn-text);font:inherit}
+.mtn-booking-form input,.mtn-booking-form select,.mtn-booking-form textarea{width:100%;min-height:46px;padding:.7rem .8rem;border:1px solid #77717f;border-radius:10px;background:#111116;color:var(--mtn-text);font:inherit}
 .mtn-booking-form textarea{resize:vertical}.mtn-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem 1rem}
 .mtn-booking-actions{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}.mtn-booking-actions button{border:0;cursor:pointer;font:inherit}.mtn-booking-actions button:disabled{opacity:.45;cursor:not-allowed}
 .mtn-booking-status{padding:.65rem .8rem;border-radius:9px;background:#25242c}.mtn-booking-status[data-state="success"]{border:1px solid #477b5c}.mtn-booking-status[data-state="error"]{border:1px solid #a54d4d}
@@ -50,7 +50,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 .mtn-checkin-form{display:grid;gap:.5rem;margin:1rem 0;padding:1rem;border:1px solid #383640;border-radius:10px}
 .mtn-checkin-form label{font-weight:700}
-.mtn-checkin-form input{width:100%;min-height:46px;padding:.7rem .8rem;border:1px solid #494652;border-radius:10px;background:#111116;color:var(--mtn-text);font:inherit}
+.mtn-checkin-form input{width:100%;min-height:46px;padding:.7rem .8rem;border:1px solid #77717f;border-radius:10px;background:#111116;color:var(--mtn-text);font:inherit}
 .mtn-checkin-token{display:grid;gap:.35rem;white-space:normal;padding:.75rem;border:1px solid #477b5c;border-radius:10px;max-width:100%}
 .mtn-checkin-token code{overflow-wrap:anywhere;user-select:all}
 
