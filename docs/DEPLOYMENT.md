@@ -8,7 +8,7 @@
 - HTTPS for login, customer sessions and authenticated REST requests
 - A valid WordPress timezone configured before publishing event schedules
 
-The repository's CI currently checks PHP syntax and the booking wizard JavaScript syntax. It does not run WordPress integration tests, browser tests, load tests or a security review.
+The repository's CI checks PHP syntax, booking-wizard JavaScript syntax and static source contracts. It does not run WordPress integration tests, browser tests, load tests or a security review.
 
 ## Install on staging
 
