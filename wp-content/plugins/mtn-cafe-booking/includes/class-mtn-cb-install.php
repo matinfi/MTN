@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '7';
+	const DB_VERSION = '8';
 
 	public static function activate() {
 		global $wpdb;
@@ -71,6 +71,7 @@ final class MTN_CB_Install {
 		$settlements_table = $wpdb->prefix . 'mtn_settlements';
 		$settlements_sql = "CREATE TABLE {$settlements_table} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			request_key varchar(64) NULL DEFAULT NULL,
 			cafe_id bigint(20) unsigned NOT NULL,
 			amount decimal(12,2) NOT NULL DEFAULT 0.00,
 			currency varchar(8) NOT NULL DEFAULT '',
@@ -81,6 +82,7 @@ final class MTN_CB_Install {
 			created_at datetime NOT NULL,
 			paid_at datetime NULL,
 			PRIMARY KEY  (id),
+			UNIQUE KEY request_key (request_key),
 			KEY cafe_date (cafe_id,created_at),
 			KEY status (status)
 		) {$collate};";
