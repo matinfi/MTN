@@ -35,6 +35,7 @@ require_once MTN_CB_PATH . 'includes/class-mtn-cb-statements.php';
 
 register_activation_hook( __FILE__, array( 'MTN_CB_Install', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
+add_action( 'init', array( 'MTN_CB_Install', 'ensure_default_pages' ), 20 );
 
 add_filter(
 	'cron_schedules',
