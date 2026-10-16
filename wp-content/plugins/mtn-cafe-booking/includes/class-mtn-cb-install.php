@@ -46,7 +46,8 @@ final class MTN_CB_Install {
 			KEY user_status (user_id,status),
 			KEY cafe_date (cafe_id,booking_at),
 			KEY cafe_table_date (cafe_id,table_id,booking_at,status),
-			KEY event_date (event_id,booking_at)
+			KEY event_date (event_id,booking_at),
+			KEY checkin_token_hash (checkin_token_hash)
 		) {$collate};";
 
 		dbDelta( $sql );
