@@ -139,6 +139,7 @@
         idempotencyKey = '';
         lastAvailability = null;
         form.reset();
+        updateEvents();
         resetAvailability();
         setStatus(root, 'درخواست رزرو ثبت شد. کد پیگیری: ' + booking.booking_code + ' — وضعیت: در انتظار تأیید کافه.', 'success');
       } catch (error) {
@@ -160,12 +161,40 @@
       const table = el('table', 'mtn-bookings-table');
       const head = el('thead');
       const headerRow = el('tr');
-      ['کد پیگیری', 'زمان رزرو (UTC)', 'تعداد', 'وضعیت'].forEach((label) => headerRow.append(el('th', '', label)));
+      ['کد پیگیری', 'زمان رزرو (UTC)', 'تعداد', 'وضعیت', 'عملیات'].forEach((label) => headerRow.append(el('th', '', label)));
       head.append(headerRow);
       const body = el('tbody');
+      const statusLabels = {
+        pending_cafe: 'در انتظار تأیید', confirmed: 'تأیید شده', rejected: 'رد شده',
+        cancelled_by_customer: 'لغو توسط مشتری', cancelled_by_cafe: 'لغو توسط کافه',
+        cancelled_by_admin: 'لغو توسط مدیر', expired: 'منقضی شده', completed: 'تکمیل شده', no_show: 'عدم مراجعه'
+      };
       bookings.forEach((booking) => {
         const row = el('tr');
-        [booking.booking_code, booking.booking_at, text(booking.party_size), booking.status].forEach((value) => row.append(el('td', '', text(value))));
+        [booking.booking_code, booking.booking_at, text(booking.party_size), statusLabels[booking.status] || booking.status].forEach((value) => row.append(el('td', '', text(value))));
+        const actionCell = el('td');
+        if (['pending_cafe', 'confirmed'].includes(booking.status)) {
+          const cancel = el('button', 'button', 'لغو رزرو');
+          cancel.type = 'button';
+          cancel.addEventListener('click', async () => {
+            if (!window.confirm('از لغو این رزرو مطمئن هستید؟')) return;
+            cancel.disabled = true;
+            try {
+              const updated = await request(api + 'bookings/' + encodeURIComponent(booking.id) + '/cancel', { method: 'POST', headers, credentials: 'same-origin', body: '{}' });
+              booking.status = updated.status;
+              row.cells[3].textContent = statusLabels[updated.status] || updated.status;
+              actionCell.replaceChildren(el('span', '', '—'));
+              setStatus(root, 'رزرو با موفقیت لغو شد.', 'success');
+            } catch (error) {
+              cancel.disabled = false;
+              setStatus(root, error.message, 'error');
+            }
+          });
+          actionCell.append(cancel);
+        } else {
+          actionCell.textContent = '—';
+        }
+        row.append(actionCell);
         body.append(row);
       });
       table.append(head, body);
