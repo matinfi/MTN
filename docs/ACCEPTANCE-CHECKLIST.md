@@ -21,10 +21,10 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Assign the cafe-manager role when an administrator saves an existing user as cafe owner.
 - [x] Cafe owner assignment through the cafe metadata editor.
 - [x] Object-level authorization for the configured cafe owner on booking read/action routes.
-- [ ] Staff invitations and multi-user cafe teams.
+- [ ] Staff invitation and invite-acceptance workflow.
 - [x] Administrator confirmation/rejection console with optional reason.
 - [x] Cafe-owner dashboard with confirmation, rejection reason, cancellation and manual table assignment actions.
-- [ ] Staff invitation and multi-user team management UI.
+- [x] Administrator-managed multi-user cafe team assignment for existing WordPress users; invitation workflow remains outstanding.
 - [x] Event date, start/end time and capacity metadata fields; booking is blocked until date and start time are valid.
 - [ ] Recurrence, media workflow and publication approval.
 - [x] Hierarchical cafe-location taxonomy supports nested country, city, area and neighborhood terms; administrators maintain the hierarchy.
