@@ -10,7 +10,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Table selection validates cafe association and configured capacity.
 - [x] Serialize booking writes per cafe using MySQL/MariaDB advisory locks.
 - [x] Enforce event headcount capacity and prevent overlapping reservations for a selected table.
-- [ ] Idempotency key for retried client requests.
+- [x] Optional per-user idempotency key with payload matching and duplicate-request recovery.
 - [ ] Full cancellation policy and expiration worker.
 - [ ] Append-only status history with actor, reason and timestamp.
 
