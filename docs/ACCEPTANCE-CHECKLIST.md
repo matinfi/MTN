@@ -53,7 +53,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Initial PHPUnit settings and cafe-team authorization tests plus a WordPress test-suite CI workflow. Full booking lifecycle and concurrency coverage remain outstanding.
 - [ ] Comprehensive REST permission and privacy tests, including cross-customer booking access and OTP abuse scenarios.
 - [ ] Concurrent booking tests against supported database engines.
-- [ ] Clean install, schema upgrade and backup/restore tests on the supported hosting/database stack.
-- [ ] Installable plugin/theme ZIPs tested on a clean WordPress installation.
+- [x] CI coverage configured for plugin schema installation, repeated schema-version upgrades, and a database backup/restore round trip on MySQL 8 and MariaDB 10.11. The workflow result still must pass and production-host backup/restore must be rehearsed.
+- [x] CI packages and extracts plugin/theme ZIPs into a clean WordPress test core, checks plugin schema activation and theme discoverability. The successful CI result must be confirmed before release.
 - [ ] Accessibility, responsive, security and performance review on supported devices and hosting.
 - [ ] Staging sign-off before production release.
