@@ -178,7 +178,7 @@ final class MTN_CB_Install {
 			flush_rewrite_rules();
 		}
 		self::ensure_roles();
-		self::ensure_default_pages();
+		// Default pages are created on init, after WordPress has initialized rewrite/permalink state.
 		add_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) );
 		add_option( 'mtn_cb_currency', 'TRY' );
 		add_option( 'mtn_cb_default_commission', '0' );
@@ -252,7 +252,6 @@ final class MTN_CB_Install {
 			self::activate();
 		}
 		self::ensure_roles();
-		self::ensure_default_pages();
 	}
 
 	public static function deactivate() {
