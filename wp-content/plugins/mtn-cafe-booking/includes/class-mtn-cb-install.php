@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '2';
+	const DB_VERSION = '3';
 
 	public static function activate() {
 		global $wpdb;
@@ -20,6 +20,7 @@ final class MTN_CB_Install {
 		$sql             = "CREATE TABLE {$table} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			booking_code varchar(32) NOT NULL,
+			idempotency_key varchar(64) NULL DEFAULT NULL,
 			user_id bigint(20) unsigned NOT NULL,
 			cafe_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			event_id bigint(20) unsigned NOT NULL DEFAULT 0,
@@ -38,6 +39,7 @@ final class MTN_CB_Install {
 			updated_at datetime NOT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY booking_code (booking_code),
+			UNIQUE KEY user_idempotency (user_id,idempotency_key),
 			KEY user_status (user_id,status),
 			KEY cafe_date (cafe_id,booking_at),
 			KEY cafe_table_date (cafe_id,table_id,booking_at,status),
