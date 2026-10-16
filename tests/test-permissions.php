@@ -77,4 +77,5 @@ class MTN_Cafe_Booking_Permission_Test extends WP_UnitTestCase {
 		$result = MTN_CB_Rest::can_manage_booking_request( $request );
 		$this->assertWPError( $result );
 		$this->assertSame( 403, $result->get_error_data()['status'] );
-	}}
+	}
+}
