@@ -14,6 +14,15 @@ final class MTN_CB_Event_Recurrence {
 		}
 	}
 
+	private static function next_date( $date, $frequency, $monthly_day ) {
+		if ( 'weekly' === $frequency ) {
+			return $date->modify( '+7 days' );
+		}
+		$month_start = $date->modify( 'first day of next month' );
+		$day = min( $monthly_day, (int) $month_start->format( 't' ) );
+		return $month_start->setDate( (int) $month_start->format( 'Y' ), (int) $month_start->format( 'n' ), $day );
+	}
+
 	public static function generate_occurrences() {
 		$timezone = wp_timezone();
 		$today = new DateTimeImmutable( 'today', $timezone );
@@ -39,21 +48,18 @@ final class MTN_CB_Event_Recurrence {
 				continue;
 			}
 			$monthly_day = (int) $next->format( 'j' );
+			$next = self::next_date( $next, $frequency, $monthly_day );
+			for ( $skip = 0; $skip < 5000 && $next <= $today; $skip++ ) {
+				$next = self::next_date( $next, $frequency, $monthly_day );
+			}
 			for ( $count = 0; $count < 60; $count++ ) {
-				if ( 'weekly' === $frequency ) {
-					$next = $next->modify( '+7 days' );
-				} else {
-					$month_start = $next->modify( 'first day of next month' );
-					$day = min( $monthly_day, (int) $month_start->format( 't' ) );
-					$next = $month_start->setDate( (int) $month_start->format( 'Y' ), (int) $month_start->format( 'n' ), $day );
-				}
 				if ( $next > $until || $next > $horizon ) {
 					break;
 				}
 				$date = $next->format( 'Y-m-d' );
 				$exists = get_posts( array(
 					'post_type' => 'mtn_event',
-					'post_status' => array( 'publish', 'draft', 'pending', 'private' ),
+					'post_status' => array( 'publish', 'draft', 'pending', 'private', 'trash' ),
 					'posts_per_page' => 1,
 					'fields' => 'ids',
 					'meta_query' => array(
@@ -87,6 +93,7 @@ final class MTN_CB_Event_Recurrence {
 					set_post_thumbnail( $clone_id, $thumbnail_id );
 				}
 				do_action( 'mtn_cb_recurring_event_created', $clone_id, $source->ID, $date );
+				$next = self::next_date( $next, $frequency, $monthly_day );
 			}
 		}
 	}
