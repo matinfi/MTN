@@ -124,6 +124,8 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_currency', 'TRY' );
 		add_option( 'mtn_cb_default_commission', '0' );
 		add_option( 'mtn_cb_commission_trigger_status', 'confirmed' );
+		add_option( 'mtn_cb_reverse_commission_on_cancellation', false );
+		add_option( 'mtn_cb_reverse_commission_on_no_show', false );
 		add_option( 'mtn_cb_booking_expiry_minutes', 30 );
 		add_option( 'mtn_cb_checkin_token_minutes', 15 );
 		add_option( 'mtn_cb_booking_duration_minutes', 120 );
