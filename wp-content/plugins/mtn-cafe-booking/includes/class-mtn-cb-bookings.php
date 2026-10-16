@@ -134,6 +134,8 @@ final class MTN_CB_Bookings {
 
 		// Release stale pending holds while the per-cafe advisory lock is held.
 		self::expire_pending_for_cafe_locked( $cafe_id );
+		$expiry_minutes = min( 1440, max( 5, absint( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ) ) );
+		$expiry_before = gmdate( 'Y-m-d H:i:s', time() - ( $expiry_minutes * MINUTE_IN_SECONDS ) );
 
 		$duration = absint( get_option( 'mtn_cb_booking_duration_minutes', 120 ) );
 		$duration = min( 720, max( 30, $duration ) );
@@ -148,8 +150,9 @@ final class MTN_CB_Bookings {
 		if ( $event_capacity ) {
 			$booked_people = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT COALESCE(SUM(party_size), 0) FROM ' . self::table_name() . " WHERE event_id = %d AND status IN ('pending_cafe','confirmed')",
-					$event_id
+					'SELECT COALESCE(SUM(party_size), 0) FROM ' . self::table_name() . " WHERE event_id = %d AND (status = 'confirmed' OR (status = 'pending_cafe' AND created_at >= %s))",
+					$event_id,
+					$expiry_before
 				)
 			);
 			if ( $booked_people + $party > $event_capacity ) {
@@ -161,9 +164,10 @@ final class MTN_CB_Bookings {
 		if ( $table_id ) {
 			$conflict = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT id FROM ' . self::table_name() . " WHERE cafe_id = %d AND table_id = %d AND status IN ('pending_cafe','confirmed') AND booking_at > %s AND booking_at < %s LIMIT 1",
+					'SELECT id FROM ' . self::table_name() . " WHERE cafe_id = %d AND table_id = %d AND (status = 'confirmed' OR (status = 'pending_cafe' AND created_at >= %s)) AND booking_at > %s AND booking_at < %s LIMIT 1",
 					$cafe_id,
 					$table_id,
+					$expiry_before,
 					$window_start,
 					$window_end
 				)
