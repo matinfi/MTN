@@ -483,6 +483,73 @@ final class MTN_CB_Bookings {
 		return $wpdb->get_results( $wpdb->prepare( 'SELECT id, booking_id, actor_id, event_type, from_status, to_status, details, created_at FROM ' . $wpdb->prefix . 'mtn_booking_events WHERE booking_id = %d ORDER BY id ASC', absint( $booking_id ) ) );
 	}
 
+	public static function issue_checkin_token( $booking_id, $user_id ) {
+		global $wpdb;
+		$booking = self::get_for_user( $booking_id, $user_id );
+		if ( ! $booking ) {
+			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
+		}
+		if ( 'confirmed' !== $booking->status || 'not_checked_in' !== $booking->checkin_status ) {
+			return new WP_Error( 'mtn_checkin_not_available', __( 'برای این رزرو امکان ایجاد کد اعلام حضور وجود ندارد.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+		}
+		$token = bin2hex( random_bytes( 32 ) );
+		$token_hash = hash( 'sha256', $token );
+		$minutes = min( 60, max( 5, absint( get_option( 'mtn_cb_checkin_token_minutes', 15 ) ) ) );
+		$expires_at = gmdate( 'Y-m-d H:i:s', time() + ( $minutes * MINUTE_IN_SECONDS ) );
+		$updated = $wpdb->update(
+			self::table_name(),
+			array( 'checkin_token_hash' => $token_hash, 'checkin_token_expires_at' => $expires_at, 'updated_at' => current_time( 'mysql', true ) ),
+			array( 'id' => absint( $booking_id ), 'status' => 'confirmed', 'checkin_status' => 'not_checked_in' ),
+			array( '%s', '%s', '%s' ),
+			array( '%d', '%s', '%s' )
+		);
+		if ( 1 !== $updated ) {
+			return new WP_Error( 'mtn_checkin_conflict', __( 'رزرو هم‌زمان تغییر کرده است؛ دوباره تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+		}
+		self::record_event( $booking_id, $user_id, 'checkin_token_issued', 'confirmed', 'confirmed', 'expires_at=' . $expires_at );
+		return array( 'token' => $token, 'expires_at' => $expires_at . ' UTC' );
+	}
+
+	public static function check_in_with_token( $token, $actor_id ) {
+		global $wpdb;
+		$token = is_string( $token ) ? trim( $token ) : '';
+		if ( ! preg_match( '/^[a-f0-9]{64}$/', $token ) ) {
+			return new WP_Error( 'mtn_checkin_invalid', __( 'کد اعلام حضور معتبر نیست یا منقضی شده است.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
+		}
+		$token_hash = hash( 'sha256', $token );
+		$booking = $wpdb->get_row( $wpdb->prepare(
+			'SELECT * FROM ' . self::table_name() . ' WHERE checkin_token_hash = %s LIMIT 1',
+			$token_hash
+		) );
+		if ( ! $booking ) {
+			return new WP_Error( 'mtn_checkin_invalid', __( 'کد اعلام حضور معتبر نیست یا منقضی شده است.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
+		}
+		if ( ! current_user_can( 'manage_options' ) && ( ! current_user_can( 'mtn_manage_cafes' ) || absint( get_post_meta( $booking->cafe_id, 'mtn_cafe_owner_id', true ) ) !== absint( $actor_id ) ) ) {
+			return new WP_Error( 'mtn_checkin_forbidden', __( 'دسترسی به ثبت حضور این کافه را ندارید.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
+		}
+		$now = current_time( 'mysql', true );
+		if ( 'confirmed' !== $booking->status || 'not_checked_in' !== $booking->checkin_status || empty( $booking->checkin_token_expires_at ) || $booking->checkin_token_expires_at < $now ) {
+			return new WP_Error( 'mtn_checkin_invalid', __( 'کد اعلام حضور معتبر نیست یا منقضی شده است.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+		}
+		$updated = $wpdb->query( $wpdb->prepare(
+			'UPDATE ' . self::table_name() . ' SET checkin_status = %s, checkin_token_hash = %s, checkin_token_expires_at = NULL, updated_at = %s WHERE id = %d AND status = %s AND checkin_status = %s AND checkin_token_hash = %s AND checkin_token_expires_at >= %s',
+			'checked_in',
+			'',
+			$now,
+			absint( $booking->id ),
+			'confirmed',
+			'not_checked_in',
+			$token_hash,
+			$now
+		) );
+		if ( 1 !== $updated ) {
+			return new WP_Error( 'mtn_checkin_conflict', __( 'این کد قبلاً استفاده شده یا منقضی شده است.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+		}
+		self::record_event( $booking->id, $actor_id, 'customer_checked_in', 'confirmed', 'confirmed', 'secure_token' );
+		do_action( 'mtn_cb_customer_checked_in', self::get_by_id( $booking->id ), absint( $actor_id ) );
+		return self::get_by_id( $booking->id );
+	}
+
 	public static function get_by_id( $id ) {
 		global $wpdb;
 		return $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', absint( $id ) ) );
