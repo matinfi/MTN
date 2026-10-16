@@ -62,9 +62,16 @@ final class MTN_CB_Bookings {
 		$cafe_id    = isset( $args['cafe_id'] ) ? absint( $args['cafe_id'] ) : 0;
 		$table_id   = isset( $args['table_id'] ) ? absint( $args['table_id'] ) : 0;
 		$booking_at = isset( $args['booking_at'] ) ? sanitize_text_field( $args['booking_at'] ) : '';
+		$idempotency_key = isset( $args['idempotency_key'] ) ? sanitize_text_field( $args['idempotency_key'] ) : '';
+		$idempotency_key = '' === $idempotency_key ? null : $idempotency_key;
+		$customer_note = isset( $args['customer_note'] ) ? sanitize_textarea_field( $args['customer_note'] ) : '';
 
 		if ( ! $user_id || $party < 1 || $party > 100 || ! $event_id || ! $cafe_id ) {
 			return new WP_Error( 'mtn_invalid_booking', __( 'اطلاعات رزرو معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+
+		if ( null !== $idempotency_key && ! preg_match( '/^[A-Za-z0-9._:-]{8,64}$/', $idempotency_key ) ) {
+			return new WP_Error( 'mtn_invalid_idempotency_key', __( 'کلید جلوگیری از ثبت تکراری معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
 
 		$local_date = self::parse_local_datetime( $booking_at );
@@ -103,6 +110,17 @@ final class MTN_CB_Bookings {
 			}
 		} else {
 			return new WP_Error( 'mtn_table_required', __( 'یک میز معتبر انتخاب کنید.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+
+		// A repeated key returns the original booking only when the request payload matches.
+		if ( null !== $idempotency_key ) {
+			$existing = self::get_by_idempotency_key( $user_id, $idempotency_key );
+			if ( $existing ) {
+				if ( self::matches_request( $existing, $cafe_id, $event_id, $table_id, $party, $booking_at_utc, $customer_note ) ) {
+					return $existing;
+				}
+				return new WP_Error( 'mtn_idempotency_conflict', __( 'این کلید قبلاً برای درخواست رزرو دیگری استفاده شده است.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			}
 		}
 
 		// Release expired pending holds before checking the event's remaining capacity.
@@ -165,6 +183,7 @@ final class MTN_CB_Bookings {
 			self::table_name(),
 			array(
 				'booking_code'          => $code,
+				'idempotency_key'       => $idempotency_key,
 				'user_id'               => $user_id,
 				'cafe_id'                => $cafe_id,
 				'event_id'               => $event_id,
@@ -178,10 +197,19 @@ final class MTN_CB_Bookings {
 				'created_at'             => $now,
 				'updated_at'             => $now,
 			),
-			array( '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
 
 		if ( false === $inserted ) {
+			if ( null !== $idempotency_key ) {
+				$existing = self::get_by_idempotency_key( $user_id, $idempotency_key );
+				if ( $existing && self::matches_request( $existing, $cafe_id, $event_id, $table_id, $party, $booking_at_utc, $customer_note ) ) {
+					return $existing;
+				}
+				if ( $existing ) {
+					return new WP_Error( 'mtn_idempotency_conflict', __( 'این کلید قبلاً برای درخواست رزرو دیگری استفاده شده است.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+				}
+			}
 			return new WP_Error( 'mtn_booking_failed', __( 'ثبت رزرو انجام نشد. دوباره تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 500 ) );
 		}
 
@@ -191,6 +219,26 @@ final class MTN_CB_Bookings {
 	public static function get_by_id( $id ) {
 		global $wpdb;
 		return $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', absint( $id ) ) );
+	}
+
+	private static function get_by_idempotency_key( $user_id, $key ) {
+		global $wpdb;
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT * FROM ' . self::table_name() . ' WHERE user_id = %d AND idempotency_key = %s LIMIT 1',
+				absint( $user_id ),
+				$key
+			)
+		);
+	}
+
+	private static function matches_request( $booking, $cafe_id, $event_id, $table_id, $party, $booking_at_utc, $customer_note ) {
+		return (int) $booking->cafe_id === (int) $cafe_id
+			&& (int) $booking->event_id === (int) $event_id
+			&& (int) $booking->table_id === (int) $table_id
+			&& (int) $booking->party_size === (int) $party
+			&& $booking->booking_at === $booking_at_utc
+			&& (string) $booking->customer_note === (string) $customer_note;
 	}
 
 	public static function get_for_user( $id, $user_id ) {
