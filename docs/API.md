@@ -105,6 +105,16 @@ Cancels a pending or confirmed booking for a cafe managed by the current user (o
 
 Optional JSON field: `reason` (plain text). Only the assigned cafe owner or an administrator may reject. The reason is saved as the current cafe note and an append-only audit event.
 
+## Secure customer check-in
+
+`POST /bookings/{id}/checkin-token`
+
+The authenticated customer who owns a confirmed booking can issue a one-time, random check-in token. Only the SHA-256 hash is stored. The response includes the plaintext token once and its UTC expiry; issuing another token invalidates the previous one. Token lifetime is configurable from 5 to 60 minutes (15 minutes by default).
+
+`POST /cafe/check-in`
+
+Requires an authenticated cafe manager assigned as the cafe owner or a WordPress administrator. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Multi-user cafe teams and automated notification of tokens are not implemented.
+
 ## Finance behavior
 
 The fixed commission amount, currency and trigger status are snapshotted when a booking is created. The central setting defaults to accruing commission on `confirmed`, with `completed` available as an alternative; later setting changes affect only new bookings. A no-show does not create a new commission entry, but if commission was accrued at confirmation, this version does not automatically reverse it. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
