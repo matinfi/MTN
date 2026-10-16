@@ -204,4 +204,69 @@
       setStatus(root, error.message, 'error');
     }
   });
+  document.querySelectorAll('[data-mtn-cafe-dashboard]').forEach(async (root) => {
+    const list = root.querySelector('.mtn-cafe-booking-list');
+    const labels = {
+      pending_cafe: 'در انتظار تأیید', confirmed: 'تأیید شده', rejected: 'رد شده',
+      cancelled_by_customer: 'لغو توسط مشتری', cancelled_by_cafe: 'لغو توسط کافه',
+      cancelled_by_admin: 'لغو توسط مدیر', expired: 'منقضی شده', completed: 'تکمیل شده', no_show: 'عدم مراجعه'
+    };
+    async function load() {
+      setStatus(root, 'در حال دریافت رزروها…', 'info');
+      const bookings = await request(api + 'cafe/bookings', { headers, credentials: 'same-origin' });
+      if (!bookings.length) {
+        list.replaceChildren(el('div', 'mtn-empty-state', 'رزروی برای کافه‌های تحت مدیریت شما وجود ندارد.'));
+        setStatus(root, 'فهرست به‌روز است.', 'success');
+        return;
+      }
+      const table = el('table', 'mtn-bookings-table');
+      const head = el('thead');
+      const headRow = el('tr');
+      ['کد', 'کافه', 'برنامه', 'زمان (UTC)', 'نفرات', 'وضعیت', 'عملیات'].forEach((label) => headRow.append(el('th', '', label)));
+      head.append(headRow);
+      const body = el('tbody');
+      bookings.forEach((booking) => {
+        const row = el('tr');
+        [booking.booking_code, booking.cafe_name, booking.event_name, booking.booking_at, text(booking.party_size), labels[booking.status] || booking.status].forEach((value) => row.append(el('td', '', text(value))));
+        const actions = el('td');
+        const act = (label, endpoint, reasonNeeded) => {
+          const button = el('button', 'button', label);
+          button.type = 'button';
+          button.addEventListener('click', async () => {
+            let reason = '';
+            if (reasonNeeded) reason = window.prompt('دلیل این تصمیم (اختیاری):', '') || '';
+            if (label === 'لغو رزرو' && !window.confirm('از لغو این رزرو مطمئن هستید؟')) return;
+            button.disabled = true;
+            try {
+              await request(api + endpoint, { method: 'POST', headers, credentials: 'same-origin', body: JSON.stringify({ reason }) });
+              setStatus(root, 'وضعیت رزرو به‌روزرسانی شد.', 'success');
+              await load();
+            } catch (error) {
+              button.disabled = false;
+              setStatus(root, error.message, 'error');
+            }
+          });
+          actions.append(button);
+        };
+        if (booking.status === 'pending_cafe') {
+          act('تأیید', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/confirm', false);
+          act('رد', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/reject', true);
+        } else if (booking.status === 'confirmed') {
+          act('لغو رزرو', 'cafe/bookings/' + encodeURIComponent(booking.id) + '/cancel', true);
+        } else {
+          actions.textContent = '—';
+        }
+        row.append(actions);
+        body.append(row);
+      });
+      table.append(head, body);
+      list.replaceChildren(table);
+      setStatus(root, 'رزروهای قابل مشاهده: ' + bookings.length, 'success');
+    }
+    try {
+      await load();
+    } catch (error) {
+      setStatus(root, error.message, 'error');
+    }
+  });
 })();
