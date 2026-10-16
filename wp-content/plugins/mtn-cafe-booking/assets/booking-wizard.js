@@ -229,13 +229,34 @@
       const table = el('table', 'mtn-bookings-table');
       const head = el('thead');
       const headRow = el('tr');
-      ['کد', 'کافه', 'برنامه', 'زمان (UTC)', 'نفرات', 'وضعیت', 'عملیات'].forEach((label) => headRow.append(el('th', '', label)));
+      ['کد', 'کافه', 'برنامه', 'زمان (UTC)', 'نفرات', 'میز', 'وضعیت', 'عملیات'].forEach((label) => headRow.append(el('th', '', label)));
       head.append(headRow);
       const body = el('tbody');
       bookings.forEach((booking) => {
         const row = el('tr');
-        [booking.booking_code, booking.cafe_name, booking.event_name, booking.booking_at, text(booking.party_size), labels[booking.status] || booking.status].forEach((value) => row.append(el('td', '', text(value))));
+        [booking.booking_code, booking.cafe_name, booking.event_name, booking.booking_at, text(booking.party_size), booking.table_name || (booking.table_id ? 'میز #' + booking.table_id : 'تخصیص‌نیافته'), labels[booking.status] || booking.status].forEach((value) => row.append(el('td', '', text(value))));
         const actions = el('td');
+        if (!booking.table_id && Array.isArray(booking.available_tables) && booking.available_tables.length && ['pending_cafe', 'confirmed'].includes(booking.status)) {
+          const tableSelect = el('select', 'mtn-table-assignment');
+          tableSelect.setAttribute('aria-label', 'انتخاب میز برای رزرو');
+          tableSelect.add(new Option('انتخاب میز', ''));
+          booking.available_tables.forEach((item) => tableSelect.add(new Option(item.name + ' (' + item.capacity + ' نفر)', String(item.id))));
+          const assign = el('button', 'button', 'تخصیص میز');
+          assign.type = 'button';
+          assign.addEventListener('click', async () => {
+            if (!tableSelect.value) { setStatus(root, 'ابتدا میز را انتخاب کنید.', 'error'); return; }
+            assign.disabled = true;
+            try {
+              await request(api + 'cafe/bookings/' + encodeURIComponent(booking.id) + '/assign-table', { method: 'POST', headers, credentials: 'same-origin', body: JSON.stringify({ table_id: Number(tableSelect.value) }) });
+              setStatus(root, 'میز برای رزرو تخصیص داده شد.', 'success');
+              await load();
+            } catch (error) {
+              assign.disabled = false;
+              setStatus(root, error.message, 'error');
+            }
+          });
+          actions.append(tableSelect, assign, el('span', '', ' '));
+        }
         const act = (label, endpoint, reasonNeeded) => {
           const button = el('button', 'button', label);
           button.type = 'button';
