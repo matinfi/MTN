@@ -250,6 +250,20 @@ final class MTN_CB_Bookings {
 		if ( is_wp_error( $schedule_check ) ) {
 			return $schedule_check;
 		}
+		$expiry_minutes = min( 1440, max( 5, absint( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ) ) );
+		$expiry_before = gmdate( 'Y-m-d H:i:s', time() - ( $expiry_minutes * MINUTE_IN_SECONDS ) );
+		$expired_count = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE " . self::table_name() . " SET status = 'expired', updated_at = %s WHERE cafe_id = %d AND status = 'pending_cafe' AND created_at < %s",
+				current_time( 'mysql', true ),
+				$cafe_id,
+				$expiry_before
+			)
+		);
+		if ( $expired_count ) {
+			do_action( 'mtn_cb_pending_bookings_expired', $cafe_id, absint( $expired_count ) );
+		}
+
 		$min_party = absint( get_post_meta( $event_id, 'mtn_min_party_size', true ) );
 		$max_party = absint( get_post_meta( $event_id, 'mtn_max_party_size', true ) );
 		$max_party = $max_party ? $max_party : 100;
