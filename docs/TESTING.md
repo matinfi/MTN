@@ -20,7 +20,8 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Event capacity | Submit requests whose combined active party size exceeds event capacity | The over-capacity request returns HTTP 409 |
 | Table overlap | Submit overlapping bookings for the same table | The conflicting request returns HTTP 409 |
 | Table boundary | Submit a second booking starting exactly when the first reservation window ends | The second request is accepted if no other rule blocks it |
-| Expiry | Leave a pending booking beyond the configured expiry, then create another booking at that cafe | The stale pending booking becomes `expired` before capacity is evaluated |
+| Expiry | Leave a pending booking beyond the configured expiry and trigger the scheduled worker | The stale pending booking becomes `expired`, an audit event is written, and capacity is released |
+| Expiry lock contention | Run the expiry worker while a cafe booking is being created | Per-cafe lock prevents conflicting status updates; worker retries on a later schedule |
 | Idempotency replay | Repeat the same payload and key as the same customer | The original booking is returned; no duplicate row is inserted |
 | Idempotency mismatch | Reuse a key with a different payload | HTTP 409 |
 | Idempotency isolation | Use the same key for a different customer | A separate booking may be created |
