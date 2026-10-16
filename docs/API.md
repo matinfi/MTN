@@ -75,16 +75,26 @@ A customer may request cancellation only for their own booking. Cancellation fol
 
 Until cafe ownership and staff authorization are implemented, only WordPress administrators can confirm a booking. The route must not be exposed as a functioning cafe-staff workflow.
 
-## Reject a booking (temporary administrator-only behavior)
+## Cafe operations
+
+`GET /cafe/bookings`
+
+Administrators can see all bookings; a user with the `mtn_cafe_manager` role sees only bookings for cafes whose `mtn_cafe_owner_id` matches their account. The owner ID is never exposed through public cafe metadata.
+
+`POST /cafe/bookings/{id}/cancel`
+
+Cancels a pending or confirmed booking for a cafe managed by the current user (or any booking for an administrator). Optional JSON field: `reason`.
+
+## Reject a booking
 
 `POST /cafe/bookings/{id}/reject`
 
-Optional JSON field: `reason` (plain text). Only administrators may reject until cafe ownership and staff authorization are implemented. The reason is saved as the current cafe note; append-only status history is not implemented yet.
+Optional JSON field: `reason` (plain text). Only the assigned cafe owner or an administrator may reject. The reason is saved as the current cafe note; append-only status history is not implemented yet.
 
 ## Current contract limitations
 
 - Idempotency is optional; clients should send a stable unique `idempotency_key` for each booking attempt. Reusing a key with a different payload returns HTTP 409.
-- Cafe-assigned-table mode does not yet allocate a table automatically; the admin console is currently administrator-only.
+- Cafe-assigned-table mode does not yet allocate a table automatically. Cafe dashboard access is limited to the single configured owner ID per cafe; staff invitations and multi-user cafe teams are not implemented.
 - Event capacity counts active bookings attached to the event post. Each event post is treated as one capacity pool; recurring schedules are not implemented.
 - Locking relies on MySQL/MariaDB `GET_LOCK()`. Validate behavior on the production database and test concurrent requests before launch.
 - Online payments, SMS OTP, automatic WhatsApp delivery and check-in tokens are not implemented.
