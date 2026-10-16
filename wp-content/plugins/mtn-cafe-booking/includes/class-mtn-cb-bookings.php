@@ -181,6 +181,7 @@ final class MTN_CB_Bookings {
 		$code = self::generate_code();
 		$commission_snapshot = number_format( max( 0, (float) get_option( 'mtn_cb_default_commission', '0' ) ), 2, '.', '' );
 		$commission_currency = sanitize_text_field( get_option( 'mtn_cb_currency', 'TRY' ) );
+		$commission_trigger_status = in_array( get_option( 'mtn_cb_commission_trigger_status', 'confirmed' ), array( 'confirmed', 'completed' ), true ) ? get_option( 'mtn_cb_commission_trigger_status', 'confirmed' ) : 'confirmed';
 
 		$inserted = $wpdb->insert(
 			self::table_name(),
@@ -199,10 +200,11 @@ final class MTN_CB_Bookings {
 				'checkin_status'         => 'not_checked_in',
 				'commission_amount'      => $commission_snapshot,
 				'commission_currency'    => $commission_currency,
+				'commission_trigger_status' => $commission_trigger_status,
 				'created_at'             => $now,
 				'updated_at'             => $now,
 			),
-			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
 
 		if ( false === $inserted ) {
