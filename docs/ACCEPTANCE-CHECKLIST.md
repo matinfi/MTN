@@ -12,7 +12,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Enforce event headcount capacity and prevent overlapping reservations for a selected table.
 - [x] Optional per-user idempotency key with payload matching and duplicate-request recovery.
 - [x] Scheduled five-minute expiry worker for stale pending reservations.
-- [ ] Configurable cancellation policy and customer-facing cancellation cutoffs.
+- [x] Configurable customer cancellation cutoff in minutes; the REST API rejects late or past-start customer cancellations.
 - [x] Append-only booking event history with actor, reason/details and timestamp.
 
 ## Cafe operations
