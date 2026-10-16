@@ -1,0 +1,11 @@
+{
+  "name": "matinfi/mtn-cafe-booking-tests",
+  "description": "Development dependencies for MTN cafe booking WordPress integration tests",
+  "type": "project",
+  "require-dev": {
+    "yoast/phpunit-polyfills": "^2.0"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
