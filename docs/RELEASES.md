@@ -4,8 +4,8 @@
 Use Semantic Versioning. Keep the plugin header and `MTN_CB_VERSION` aligned with the plugin release version. The theme has its own independent version and should be bumped only when theme files change; a combined release may package both independently versioned components. Current plugin version is 0.7.1; database schema version is 11. The finance admin page includes a reconciliation summary, but automated statements and overdue calculation remain incomplete. This code version has not been tagged or approved as a production release.
 
 ## CI
-- `.github/workflows/php-lint.yml` runs PHP syntax validation on pushes and pull requests.
-- `.github/workflows/package.yml` validates PHP and creates separate plugin/theme ZIP artifacts on manual run or a `v*` tag.
+- `.github/workflows/php-lint.yml` runs PHP syntax validation, the booking-wizard JavaScript syntax check and static source-contract regression checks on pushes and pull requests.
+- `.github/workflows/package.yml` validates JavaScript syntax, static source contracts and PHP syntax, then creates separate plugin/theme ZIP artifacts on manual run or a `v*` tag.
 - A successful ZIP build proves packaging and syntax only; it does not prove end-to-end functionality or production readiness.
 
 ## Release checklist
