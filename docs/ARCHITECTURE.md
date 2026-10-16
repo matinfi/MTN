@@ -21,8 +21,13 @@ The plugin creates a dedicated bookings table on activation and upgrades it usin
 ## API namespace
 Base namespace: `mtn/v1`. Public read endpoints must return only published public data. Booking creation and private booking reads require authentication. Mutations require a valid WordPress REST nonce/cookie or another supported authenticated mechanism and object-level authorization.
 
-## Concurrency caveat
-A production reservation system must lock or atomically claim capacity in the database and enforce overlap constraints under concurrent traffic. A preflight availability check alone is not sufficient. This first foundation does not yet claim to provide complete race-proof capacity allocation.
+## Reservation concurrency and time semantics
+Booking creation obtains a MySQL/MariaDB advisory lock scoped to the cafe before checking capacity and inserting a reservation. A lock timeout returns a retryable service error. Event capacity is a total headcount across `pending_cafe` and `confirmed` bookings attached to that event record; zero means no configured cap. When a customer selects a table, the system rejects another active booking starting within the configured reservation-duration window. The default duration is 120 minutes and is configurable in plugin settings.
+
+The REST API accepts `booking_at` as `YYYY-MM-DD HH:MM:SS` in the WordPress site's configured timezone, rejects past times, and stores the converted UTC value. API consumers must display/submit dates in the site's timezone and interpret returned database timestamps as UTC.
+
+These controls depend on MySQL/MariaDB `GET_LOCK()` support and still need integration/concurrency tests on the supported production database. Cafe-assigned table mode does not yet auto-allocate a specific table; full schedules, event recurrence, idempotency, and audit history remain incomplete.
+
 
 ## Security
 - Sanitize input and escape output.
