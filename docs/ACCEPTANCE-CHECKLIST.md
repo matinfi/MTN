@@ -30,9 +30,10 @@ This checklist is the release gate. An unchecked item must not be described as i
 
 ## Finance
 - [x] Central setting for default fixed commission amount and currency.
-- [ ] Ledger entry created at the configured eligibility point.
-- [ ] Append-only corrections/reversals.
-- [ ] Manual settlement records, statements and CSV exports.
+- [x] Ledger entry created when a booking is marked completed; amount and currency are snapshotted at booking creation.
+- [x] Append-only manual corrections/reversals with actor, timestamp and reason.
+- [x] Manual settlement records, cafe balances and ledger CSV export.
+- [ ] Automated statements and reconciliation reports.
 - [ ] Reconciliation reports distinguishing accrued, settled and overdue amounts.
 
 ## Identity and communication
