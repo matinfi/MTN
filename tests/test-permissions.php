@@ -48,6 +48,35 @@ class MTN_Cafe_Booking_Permission_Test extends WP_UnitTestCase {
 		$result = MTN_CB_Rest::get_booking( $request );
 		$this->assertWPError( $result );
 		$this->assertSame( 404, $result->get_error_data()['status'] );
+
+		$history_request = new WP_REST_Request( 'GET', '/mtn/v1/bookings/' . $booking_id . '/history' );
+		$history_request->set_param( 'id', $booking_id );
+		$history = MTN_CB_Rest::booking_history( $history_request );
+		$this->assertWPError( $history );
+		$this->assertSame( 404, $history->get_error_data()['status'] );
+
+		$token_request = new WP_REST_Request( 'POST', '/mtn/v1/bookings/' . $booking_id . '/checkin-token' );
+		$token_request->set_param( 'id', $booking_id );
+		$token = MTN_CB_Rest::issue_checkin_token( $token_request );
+		$this->assertWPError( $token );
+	}
+
+	public function test_anonymous_user_cannot_read_customer_bookings() {
+		wp_set_current_user( 0 );
+		$request = new WP_REST_Request( 'GET', '/mtn/v1/my/bookings' );
+		$result = rest_get_server()->dispatch( $request );
+		$this->assertSame( 401, $result->get_status() );
+	}
+
+	public function test_cafe_manager_cannot_manage_booking_for_unassigned_cafe() {
+		$user_id = self::factory()->user->create( array( 'role' => 'mtn_cafe_manager' ) );
+		$cafe_id = self::factory()->post->create( array( 'post_type' => 'mtn_cafe', 'post_status' => 'publish' ) );
+		wp_set_current_user( $user_id );
+		$request = new WP_REST_Request( 'POST', '/mtn/v1/cafe/bookings/999999/confirm' );
+		$request->set_param( 'id', 999999 );
+		$result = MTN_CB_Rest::can_manage_booking_request( $request );
+		$this->assertWPError( $result );
+		$this->assertSame( 403, $result->get_error_data()['status'] );
 	}
 
 }
