@@ -29,6 +29,7 @@ final class MTN_CB_Settings {
 		register_setting( 'mtn_cb_settings', 'mtn_cb_default_commission', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_amount' ), 'default' => '0' ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_commission_trigger_status', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_commission_trigger' ), 'default' => 'confirmed' ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_expiry_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_minutes' ), 'default' => 30 ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_checkin_token_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_checkin_minutes' ), 'default' => 15 ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_duration_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_duration' ), 'default' => 120 ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_customer_cancel_cutoff_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_cancel_cutoff' ), 'default' => 0 ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_mode', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_mode' ), 'default' => 'customer_selects_table' ) );
@@ -57,6 +58,10 @@ final class MTN_CB_Settings {
 
 	public static function sanitize_minutes( $value ) {
 		return min( 1440, max( 5, absint( $value ) ) );
+	}
+
+	public static function sanitize_checkin_minutes( $value ) {
+		return min( 60, max( 5, absint( $value ) ) );
 	}
 
 	public static function sanitize_duration( $value ) {
@@ -91,6 +96,7 @@ final class MTN_CB_Settings {
 					<tr><th><label for="mtn_cb_commission_trigger_status"><?php esc_html_e( 'زمان ایجاد کارمزد', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_commission_trigger_status" name="mtn_cb_commission_trigger_status"><option value="confirmed" <?php selected( get_option( 'mtn_cb_commission_trigger_status', 'confirmed' ), 'confirmed' ); ?>><?php esc_html_e( 'پس از تأیید کافه (پیش‌فرض)', 'mtn-cafe-booking' ); ?></option><option value="completed" <?php selected( get_option( 'mtn_cb_commission_trigger_status', 'confirmed' ), 'completed' ); ?>><?php esc_html_e( 'پس از تکمیل رزرو', 'mtn-cafe-booking' ); ?></option></select><p class="description"><?php esc_html_e( 'این سیاست هنگام ایجاد هر رزرو ثبت می‌شود و تغییر بعدی فقط روی رزروهای جدید اثر دارد.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_default_commission"><?php esc_html_e( 'کارمزد ثابت هر رزرو واجد شرایط', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="0" step="0.01" id="mtn_cb_default_commission" name="mtn_cb_default_commission" value="<?php echo esc_attr( get_option( 'mtn_cb_default_commission', '0' ) ); ?>"></td></tr>
 					<tr><th><label for="mtn_cb_booking_expiry_minutes"><?php esc_html_e( 'مهلت تأیید رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="5" max="1440" id="mtn_cb_booking_expiry_minutes" name="mtn_cb_booking_expiry_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_checkin_token_minutes"><?php esc_html_e( 'اعتبار کد اعلام حضور (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="5" max="60" id="mtn_cb_checkin_token_minutes" name="mtn_cb_checkin_token_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_checkin_token_minutes', 15 ) ); ?>"><p class="description"><?php esc_html_e( 'کد اعلام حضور یک‌بارمصرف است و پس از این مدت منقضی می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_booking_duration_minutes"><?php esc_html_e( 'مدت اشغال میز برای هر رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="30" max="720" id="mtn_cb_booking_duration_minutes" name="mtn_cb_booking_duration_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_duration_minutes', 120 ) ); ?>"><p class="description"><?php esc_html_e( 'برای بررسی هم‌پوشانی رزروهای میز استفاده می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_customer_cancel_cutoff_minutes"><?php esc_html_e( 'حداقل فاصله لغو توسط مشتری تا شروع رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="0" max="10080" id="mtn_cb_customer_cancel_cutoff_minutes" name="mtn_cb_customer_cancel_cutoff_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 ) ); ?>"><p class="description"><?php esc_html_e( 'صفر یعنی لغو تا پیش از زمان شروع رزرو مجاز است؛ حداکثر مقدار قابل تنظیم ۷ روز است.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_booking_mode"><?php esc_html_e( 'روش انتخاب میز', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_booking_mode" name="mtn_cb_booking_mode"><option value="customer_selects_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'customer_selects_table' ); ?>><?php esc_html_e( 'انتخاب توسط مشتری', 'mtn-cafe-booking' ); ?></option><option value="cafe_assigns_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'cafe_assigns_table' ); ?>><?php esc_html_e( 'تخصیص توسط کافه', 'mtn-cafe-booking' ); ?></option></select></td></tr>
