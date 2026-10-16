@@ -1,7 +1,7 @@
 # Build and release process
 
 ## Versioning
-Use Semantic Versioning. Keep the plugin header, theme header, constants, changelog and release tag aligned. Current plugin version is 0.4.1; database schema version is 9. Version 0.4.1 is a patch-level code update and has not been tagged or approved as a production release.
+Use Semantic Versioning. Keep the plugin header, theme header, constants, changelog and release tag aligned. Current plugin version is 0.4.1; database schema version is 9. Version 0.4.1 is the current code version in the working branch and has not been tagged or approved as a production release. The database schema version is 9.
 
 ## CI
 - `.github/workflows/php-lint.yml` runs PHP syntax validation on pushes and pull requests.
