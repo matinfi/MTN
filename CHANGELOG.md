@@ -5,6 +5,7 @@
 - Add a customer booking wizard, booking history and cancellation controls.
 - Add administrator booking management and cafe-owner-scoped confirmation, rejection and cancellation.
 - Add a cafe-manager role, ownership checks and a cafe dashboard page.
+- Add manual table assignment with locked capacity/overlap revalidation.
 - Add admin metadata forms for cafe contact/location/music, event schedule/capacity and table capacity.
 - Add cafe/event archive and detail templates plus dynamic homepage sections.
 - Create /book/, /my-account/ and /cafe-dashboard/ pages automatically when their slugs are unused.
