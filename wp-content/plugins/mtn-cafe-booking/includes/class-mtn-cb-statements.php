@@ -25,12 +25,12 @@ final class MTN_CB_Statements {
 
 	private static function due_timestamp( $created_at ) {
 		try {
-			$date = new DateTimeImmutable( $created_at, new DateTimeZone( 'UTC' ) );
+			$date = ( new DateTimeImmutable( $created_at, new DateTimeZone( 'UTC' ) ) )->setTimezone( wp_timezone() );
 		} catch ( Exception $exception ) {
 			return time();
 		}
 		$end_of_month = $date->modify( 'first day of next month' )->modify( '-1 second' );
-		return $end_of_month->getTimestamp() + ( self::due_days() * DAY_IN_SECONDS );
+		return $end_of_month->modify( '+' . self::due_days() . ' days' )->getTimestamp();
 	}
 
 	public static function calculate_overdue( $cafe_id, $currency, $as_of = null ) {
