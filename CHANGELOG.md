@@ -7,6 +7,7 @@
 - Reset the booking idempotency key when the customer changes the request payload.
 - Bound manual finance adjustment amounts to the supported ledger precision.
 - Add a hierarchical cafe-location taxonomy for country/city/area/neighborhood terms.
+- Add a configurable commission trigger, defaulting to cafe confirmation, and snapshot the policy for new bookings.
 - Include the assigned root-to-leaf location path in the public catalog response.
 - Add lightweight static source-contract checks; integration and concurrency tests remain outstanding.
 
@@ -20,6 +21,7 @@
 - Upgrade schema to version 6 with append-only booking audit events and add an owner-scoped history API.
 - Upgrade schema to version 7 and schedule a five-minute pending-reservation expiry worker with audit entries.
 - Upgrade schema to version 8 with unique settlement request keys to prevent duplicate form submissions.
+- Upgrade schema to version 9 to snapshot the configurable commission trigger status per booking; the default is confirmation.
 - Lock the global currency setting after bookings or ledger entries exist to prevent mixed-currency balances.
 - Add CSV formula-injection protection and test-plan coverage for finance and expiry workflows.
 
