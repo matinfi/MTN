@@ -36,7 +36,7 @@ foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications,
 	}
 }
 
-$route_count = preg_match_all( "/'[^']*\\(\\?P<id>[^']*\\)'/", $rest );
+$route_count = substr_count( $rest, '(?P<id>' );
 if ( 10 !== $route_count ) {
 	fwrite( STDERR, "Expected 10 booking routes with an ID pattern; found {$route_count}.\n" );
 	exit( 1 );
