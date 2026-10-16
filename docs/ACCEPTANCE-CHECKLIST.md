@@ -50,9 +50,9 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] PHP lint workflow.
 - [x] Booking wizard JavaScript syntax check in CI.
 - [x] Static source-contract regression checks in lint and package workflows.
-- [x] PHPUnit and WordPress integration CI cover settings, installation/schema upgrade markers, team authorization, cross-customer booking read/history/check-in-token privacy, anonymous booking-list denial, OTP abuse throttling/lockout/resend invalidation, and notification idempotency. Full booking lifecycle coverage remains incomplete.
+- [x] PHPUnit and WordPress integration CI cover settings, installation/schema upgrade markers, team authorization, cross-customer booking read/history/check-in-token privacy, anonymous booking-list denial, OTP per-phone/per-IP throttling, lockout/resend invalidation, and notification idempotency. Full booking lifecycle coverage remains incomplete.
 - [x] Database advisory-lock contention and event-capacity invariants are tested under serialized competing booking requests on the MySQL 8 and MariaDB 10.11 CI matrix; a true multi-process capacity-race test remains a follow-up.
-- [x] CI coverage configured for plugin schema installation, repeated schema-version upgrades, and a database backup/restore round trip on MySQL 8 and MariaDB 10.11. The workflow result still must pass and production-host backup/restore must be rehearsed.
-- [x] CI packages and extracts plugin/theme ZIPs into a clean WordPress test core, checks plugin schema activation and theme discoverability. The successful CI result must be confirmed before release.
+- [x] CI passed on 2026-10-16 for plugin schema installation, schema-version upgrade markers, and a database backup/restore round trip on MySQL 8 and MariaDB 10.11. Production-host backup/restore must still be rehearsed.
+- [x] CI package/extraction smoke tests passed: plugin/theme ZIPs were installed into clean WordPress test core, schema activation completed, and the theme was discoverable.
 - [ ] Accessibility, responsive, security and performance review on supported devices and hosting.
 - [ ] Staging sign-off before production release.
