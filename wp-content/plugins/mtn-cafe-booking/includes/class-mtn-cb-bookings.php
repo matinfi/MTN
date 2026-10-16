@@ -80,6 +80,21 @@ final class MTN_CB_Bookings {
 		}
 		$utc_date       = $local_date->setTimezone( new DateTimeZone( 'UTC' ) );
 		$booking_at_utc = $utc_date->format( 'Y-m-d H:i:s' );
+		if ( 'cafe_assigns_table' === get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) {
+			$table_id = 0;
+		}
+		// A repeated key returns the original booking only when the request payload matches.
+		if ( null !== $idempotency_key ) {
+			$existing = self::get_by_idempotency_key( $user_id, $idempotency_key );
+			if ( $existing ) {
+				if ( self::matches_request( $existing, $cafe_id, $event_id, $table_id, $party, $booking_at_utc, $customer_note ) ) {
+					return $existing;
+				}
+				return new WP_Error( 'mtn_idempotency_conflict', __( 'این کلید قبلاً برای درخواست رزرو دیگری استفاده شده است.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			}
+		}
+
+
 
 		$cafe  = get_post( $cafe_id );
 		$event = get_post( $event_id );
@@ -111,17 +126,6 @@ final class MTN_CB_Bookings {
 			}
 		} else {
 			return new WP_Error( 'mtn_table_required', __( 'یک میز معتبر انتخاب کنید.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
-		}
-
-		// A repeated key returns the original booking only when the request payload matches.
-		if ( null !== $idempotency_key ) {
-			$existing = self::get_by_idempotency_key( $user_id, $idempotency_key );
-			if ( $existing ) {
-				if ( self::matches_request( $existing, $cafe_id, $event_id, $table_id, $party, $booking_at_utc, $customer_note ) ) {
-					return $existing;
-				}
-				return new WP_Error( 'mtn_idempotency_conflict', __( 'این کلید قبلاً برای درخواست رزرو دیگری استفاده شده است.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
-			}
 		}
 
 		if ( $utc_date->getTimestamp() <= time() ) {
