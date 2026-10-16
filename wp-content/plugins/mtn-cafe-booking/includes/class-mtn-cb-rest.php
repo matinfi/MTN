@@ -64,7 +64,7 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
-			'/bookings/(?P<id>\\d+)/checkin-token',
+			'/bookings/(?P<id>\d+)/checkin-token',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'issue_checkin_token' ),
