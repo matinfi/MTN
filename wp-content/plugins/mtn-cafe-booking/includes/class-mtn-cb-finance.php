@@ -96,12 +96,13 @@ final class MTN_CB_Finance {
 		}
 		check_admin_referer( 'mtn_cb_record_settlement' );
 		$cafe_id = isset( $_POST['cafe_id'] ) ? absint( $_POST['cafe_id'] ) : 0;
+		$request_key = isset( $_POST['request_key'] ) && is_scalar( $_POST['request_key'] ) ? sanitize_text_field( wp_unslash( $_POST['request_key'] ) ) : '';
 		$raw_amount = isset( $_POST['amount'] ) && is_scalar( $_POST['amount'] ) ? wp_unslash( $_POST['amount'] ) : '';
 		$amount = is_numeric( $raw_amount ) ? round( (float) $raw_amount, 2 ) : 0;
 		$reference = isset( $_POST['reference'] ) && is_scalar( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
 		$note = isset( $_POST['note'] ) && is_scalar( $_POST['note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['note'] ) ) : '';
 		$cafe = get_post( $cafe_id );
-		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || $amount <= 0 ) {
+		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || $amount <= 0 || ! preg_match( '/^[A-Za-z0-9._:-]{8,64}$/', $request_key ) ) {
 			self::redirect( 'invalid' );
 		}
 		global $wpdb;
@@ -109,6 +110,11 @@ final class MTN_CB_Finance {
 		$locked = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock_name ) );
 		if ( '1' !== (string) $locked ) {
 			self::redirect( 'busy' );
+		}
+		$existing_settlement = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::settlements_table() . ' WHERE request_key = %s', $request_key ) );
+		if ( $existing_settlement ) {
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+			self::redirect( 'settled' );
 		}
 		$balance = self::get_balance( $cafe_id );
 		if ( $amount > $balance + 0.001 ) {
@@ -119,8 +125,8 @@ final class MTN_CB_Finance {
 		$now = current_time( 'mysql', true );
 		$inserted = $wpdb->insert(
 			self::settlements_table(),
-			array( 'cafe_id' => $cafe_id, 'amount' => number_format( $amount, 2, '.', '' ), 'currency' => $currency, 'reference' => $reference, 'note' => $note, 'status' => 'paid', 'actor_id' => get_current_user_id(), 'created_at' => $now, 'paid_at' => $now ),
-			array( '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+			array( 'request_key' => $request_key, 'cafe_id' => $cafe_id, 'amount' => number_format( $amount, 2, '.', '' ), 'currency' => $currency, 'reference' => $reference, 'note' => $note, 'status' => 'paid', 'actor_id' => get_current_user_id(), 'created_at' => $now, 'paid_at' => $now ),
+			array( '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
 		);
 		if ( false === $inserted ) {
 			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
@@ -250,6 +256,7 @@ final class MTN_CB_Finance {
 			<h2><?php esc_html_e( 'ثبت تسویه دریافت‌شده', 'mtn-cafe-booking' ); ?></h2>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="mtn_cb_record_settlement">
+				<input type="hidden" name="request_key" value="<?php echo esc_attr( wp_generate_uuid4() ); ?>">
 				<?php wp_nonce_field( 'mtn_cb_record_settlement' ); ?>
 				<table class="form-table"><tbody>
 					<tr><th><label for="mtn-settlement-cafe"><?php esc_html_e( 'کافه', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn-settlement-cafe" name="cafe_id" required><option value=""><?php esc_html_e( 'انتخاب کافه', 'mtn-cafe-booking' ); ?></option><?php foreach ( $cafes as $cafe ) : ?><option value="<?php echo (int) $cafe->ID; ?>"><?php echo esc_html( get_the_title( $cafe ) . ' — مانده: ' . number_format_i18n( self::get_balance( $cafe->ID ), 2 ) ); ?></option><?php endforeach; ?></select></td></tr>
