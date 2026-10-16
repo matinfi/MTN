@@ -17,6 +17,10 @@ $sms_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-
 $recurrence_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-event-recurrence.php';
 $event_cancel_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-event-cancellation.php';
 $statements_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-statements.php';
+$shortcodes_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-shortcodes.php';
+$otp_js_path = $root . '/wp-content/plugins/mtn-cafe-booking/assets/otp-login.js';
+$theme_header_path = $root . '/wp-content/themes/mtn-cafe-theme/header.php';
+$theme_style_path = $root . '/wp-content/themes/mtn-cafe-theme/style.css';
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
 $content = file_get_contents( $content_path );
@@ -28,8 +32,12 @@ $sms = file_get_contents( $sms_path );
 $recurrence = file_get_contents( $recurrence_path );
 $event_cancel = file_get_contents( $event_cancel_path );
 $statements = file_get_contents( $statements_path );
+$shortcodes = file_get_contents( $shortcodes_path );
+$otp_js = file_get_contents( $otp_js_path );
+$theme_header = file_get_contents( $theme_header_path );
+$theme_style = file_get_contents( $theme_style_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -104,6 +112,11 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $rest, 'MTN_CB_WhatsApp::manual_link' ) ||
 	false === strpos( $rest, "'whatsapp_url'" ) ) {
 	fwrite( STDERR, "Commission/check-in schema or behavior contract is missing.\n" );
+	exit( 1 );
+}
+
+if ( false === strpos( $theme_header, 'class="skip-link"' ) || false === strpos( $theme_header, 'id="main-content" tabindex="-1"' ) || false === strpos( $theme_style, '.skip-link:focus' ) || false === strpos( $theme_style, 'prefers-reduced-motion:reduce' ) || 1 !== substr_count( $shortcodes, "add_shortcode( 'mtn_cafe_invite_accept'" ) || false === strpos( $otp_js, 'codeField.hidden = false' ) ) {
+	fwrite( STDERR, "Accessibility or front-end registration regression detected.\n" );
 	exit( 1 );
 }
 
