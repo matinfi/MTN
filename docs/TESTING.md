@@ -31,6 +31,7 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Cafe dashboard | Sign in as the configured cafe owner | The dashboard loads only bookings for cafes assigned to that user |
 | Manual table assignment | Assign a free active table to an unassigned booking | Table is saved; conflicting, inactive, undersized or other-cafe tables are rejected |
 | Commission snapshot | Change the default commission after creating a booking, then complete it | The ledger uses the booking-time amount/currency snapshot |
+| Currency lock | Create a booking or ledger entry, then attempt to change the global currency | The setting remains unchanged to prevent mixed-currency balances |
 | Commission eligibility | Mark a booking no-show, then mark another completed | No-show creates no commission; completed creates exactly one ledger entry |
 | Completion table gate | In cafe-assigned-table mode, attempt to complete a booking without a table | HTTP 409 until an active table is assigned |
 | Settlement balance | Record a settlement larger than the outstanding cafe balance | The request is rejected and no settlement/ledger row is added |
