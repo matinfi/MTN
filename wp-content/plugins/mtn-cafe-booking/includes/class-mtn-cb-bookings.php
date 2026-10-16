@@ -128,20 +128,8 @@ final class MTN_CB_Bookings {
 			return new WP_Error( 'mtn_booking_in_past', __( 'زمان رزرو باید در آینده باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
 
-		// Release expired pending holds before checking the event's remaining capacity.
-		$expiry_minutes = min( 1440, max( 5, absint( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ) ) );
-		$expiry_before  = gmdate( 'Y-m-d H:i:s', time() - ( $expiry_minutes * MINUTE_IN_SECONDS ) );
-		$expired_count  = $wpdb->query(
-			$wpdb->prepare(
-				"UPDATE " . self::table_name() . " SET status = 'expired', updated_at = %s WHERE cafe_id = %d AND status = 'pending_cafe' AND created_at < %s",
-				current_time( 'mysql', true ),
-				$cafe_id,
-				$expiry_before
-			)
-		);
-		if ( $expired_count ) {
-			do_action( 'mtn_cb_pending_bookings_expired', $cafe_id, absint( $expired_count ) );
-		}
+		// Release stale pending holds while the per-cafe advisory lock is held.
+		self::expire_pending_for_cafe_locked( $cafe_id );
 
 		$duration = absint( get_option( 'mtn_cb_booking_duration_minutes', 120 ) );
 		$duration = min( 720, max( 30, $duration ) );
@@ -231,6 +219,57 @@ final class MTN_CB_Bookings {
 	 * Return an advisory availability snapshot for the public booking wizard.
 	 * Creation rechecks all rules under the cafe lock; this response is never a hold.
 	 */
+	private static function expire_pending_for_cafe_locked( $cafe_id ) {
+		global $wpdb;
+		$expiry_minutes = min( 1440, max( 5, absint( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ) ) );
+		$expiry_before = gmdate( 'Y-m-d H:i:s', time() - ( $expiry_minutes * MINUTE_IN_SECONDS ) );
+		$ids = $wpdb->get_col( $wpdb->prepare(
+			"SELECT id FROM " . self::table_name() . " WHERE cafe_id = %d AND status = 'pending_cafe' AND created_at < %s ORDER BY id ASC LIMIT 500",
+			absint( $cafe_id ),
+			$expiry_before
+		) );
+		$expired = 0;
+		foreach ( $ids as $booking_id ) {
+			$updated = $wpdb->update(
+				self::table_name(),
+				array( 'status' => 'expired', 'updated_at' => current_time( 'mysql', true ) ),
+				array( 'id' => absint( $booking_id ), 'status' => 'pending_cafe' ),
+				array( '%s', '%s' ),
+				array( '%d', '%s' )
+			);
+			if ( 1 === $updated ) {
+				++$expired;
+				self::record_event( $booking_id, 0, 'booking_expired', 'pending_cafe', 'expired', 'approval_timeout' );
+			}
+		}
+		if ( $expired ) {
+			do_action( 'mtn_cb_pending_bookings_expired', absint( $cafe_id ), $expired );
+		}
+		return $expired;
+	}
+
+	public static function expire_pending_bookings() {
+		global $wpdb;
+		$expiry_minutes = min( 1440, max( 5, absint( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ) ) );
+		$expiry_before = gmdate( 'Y-m-d H:i:s', time() - ( $expiry_minutes * MINUTE_IN_SECONDS ) );
+		$cafe_ids = $wpdb->get_col( $wpdb->prepare(
+			"SELECT DISTINCT cafe_id FROM " . self::table_name() . " WHERE status = 'pending_cafe' AND created_at < %s LIMIT 500",
+			$expiry_before
+		) );
+		foreach ( $cafe_ids as $cafe_id ) {
+			$lock_name = 'mtn_cb_cafe_' . absint( $cafe_id );
+			$locked = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 2)', $lock_name ) );
+			if ( '1' !== (string) $locked ) {
+				continue;
+			}
+			try {
+				self::expire_pending_for_cafe_locked( $cafe_id );
+			} finally {
+				$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+			}
+		}
+	}
+
 	public static function get_availability( $args ) {
 		global $wpdb;
 
