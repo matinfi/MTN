@@ -29,6 +29,11 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Ownership | Read or cancel another customer's booking | The request returns not found |
 | Customer cancellation cutoff | Configure a cutoff and attempt cancellation before and inside that window; also try after booking start | Cancellation succeeds only before the cutoff window; late or past-start cancellation returns HTTP 409 |
 | Audit history privacy | Request history as booking owner, assigned cafe owner, unrelated customer and admin | Only owner, assigned cafe owner and admin can read; actor IDs are not exposed in REST output |
+| Check-in token privacy | Issue a token for a confirmed booking and inspect the database/API response | Plaintext is returned once, only its hash is stored, and public booking/history payloads do not contain the token |
+| Check-in token expiry | Issue a token and attempt check-in after configured expiry | The request is rejected and booking remains not checked in |
+| Check-in token single use | Check in with a valid token, then replay it | First request marks checked-in and appends an audit event; replay is rejected |
+| Check-in authorization | Submit a valid token as an unrelated cafe manager | HTTP 403; the token remains unconsumed so the assigned owner can use it |
+| Check-in token replacement | Issue a second token for the same booking | The old token is invalid and only the new token can check in the customer |
 | Cafe owner isolation | Sign in as owner A and request owner B's booking ID | Confirm/reject/cancel returns HTTP 403; owner A's list never includes owner B's records |
 | Cafe dashboard | Sign in as the configured cafe owner | The dashboard loads only bookings for cafes assigned to that user |
 | Manual table assignment | Assign a free active table to an unassigned booking | Table is saved; conflicting, inactive, undersized or other-cafe tables are rejected |
