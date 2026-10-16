@@ -193,7 +193,7 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( '2' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
+		if ( '3' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
@@ -214,7 +214,11 @@ final class MTN_CB_Install {
 			}
 		}
 		update_option( 'mtn_cb_default_pages_created', 1 );
-		update_option( 'mtn_cb_default_pages_version', '2' );
+		$account_page = get_page_by_path( 'my-account', OBJECT, 'page' );
+		if ( $account_page && false === strpos( $account_page->post_content, '[mtn_cafe_invite_accept]' ) ) {
+			wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_page->post_content . "\n\n[mtn_cafe_invite_accept]" ) );
+		}
+		update_option( 'mtn_cb_default_pages_version', '3' );
 	}
 
 	public static function maybe_upgrade() {
@@ -228,6 +232,7 @@ final class MTN_CB_Install {
 	public static function deactivate() {
 		// Preserve all booking and finance data on deactivation.
 		wp_clear_scheduled_hook( 'mtn_cb_expire_pending_bookings' );
+		wp_clear_scheduled_hook( 'mtn_cb_process_notifications' );
 		flush_rewrite_rules();
 	}
 }
