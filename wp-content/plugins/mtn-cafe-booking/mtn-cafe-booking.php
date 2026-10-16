@@ -29,6 +29,7 @@ require_once MTN_CB_PATH . 'includes/class-mtn-cb-finance.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-notifications.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-team-invites.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-event-cancellation.php';
+require_once MTN_CB_PATH . 'includes/class-mtn-cb-event-recurrence.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-notifications.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-team-invites.php';
 
@@ -61,6 +62,7 @@ add_action(
 		MTN_CB_Notifications::init();
 		MTN_CB_Team_Invites::init();
 		MTN_CB_Event_Cancellation::init();
+		MTN_CB_Event_Recurrence::init();
 		MTN_CB_Notifications::init();
 		MTN_CB_Team_Invites::init();
 	}
