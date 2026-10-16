@@ -8,8 +8,8 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Customer read/cancel endpoints scope records to the authenticated owner.
 - [x] Event and cafe must be published records and their relationship must match.
 - [x] Table selection validates cafe association and configured capacity.
-- [ ] Atomically reserve capacity under concurrent requests.
-- [ ] Event capacity and overlapping reservation checks.
+- [x] Serialize booking writes per cafe using MySQL/MariaDB advisory locks.
+- [x] Enforce event headcount capacity and prevent overlapping reservations for a selected table.
 - [ ] Idempotency key for retried client requests.
 - [ ] Full cancellation policy and expiration worker.
 - [ ] Append-only status history with actor, reason and timestamp.
