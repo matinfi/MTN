@@ -1,6 +1,6 @@
 <?php
 /**
- * Booking persistence and state machine.
+ * Booking persistence, availability checks and state machine.
  *
  * @package MTN_Cafe_Booking
  */
@@ -20,12 +20,40 @@ final class MTN_CB_Bookings {
 		'no_show',
 	);
 
+	const CAPACITY_STATUSES = array( 'pending_cafe', 'confirmed' );
+
 	public static function table_name() {
 		global $wpdb;
 		return $wpdb->prefix . 'mtn_bookings';
 	}
 
+	/**
+	 * Serialize reservation writes per cafe, then validate and insert while the
+	 * advisory lock is held. This protects checks against concurrent requests
+	 * on MySQL/MariaDB connections that support GET_LOCK().
+	 */
 	public static function create( $args ) {
+		global $wpdb;
+
+		$cafe_id = isset( $args['cafe_id'] ) ? absint( $args['cafe_id'] ) : 0;
+		if ( ! $cafe_id ) {
+			return new WP_Error( 'mtn_invalid_booking', __( 'اطلاعات رزرو معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+
+		$lock_name = 'mtn_cb_cafe_' . $cafe_id;
+		$locked    = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock_name ) );
+		if ( '1' !== (string) $locked ) {
+			return new WP_Error( 'mtn_booking_busy', __( 'سامانه در حال پردازش رزروهای این کافه است؛ چند لحظه دیگر تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 503 ) );
+		}
+
+		try {
+			return self::create_locked( $args );
+		} finally {
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+		}
+	}
+
+	private static function create_locked( $args ) {
 		global $wpdb;
 
 		$user_id    = get_current_user_id();
@@ -35,9 +63,19 @@ final class MTN_CB_Bookings {
 		$table_id   = isset( $args['table_id'] ) ? absint( $args['table_id'] ) : 0;
 		$booking_at = isset( $args['booking_at'] ) ? sanitize_text_field( $args['booking_at'] ) : '';
 
-		if ( ! $user_id || $party < 1 || $party > 100 || ! $event_id || ! $cafe_id || ! self::valid_datetime( $booking_at ) ) {
+		if ( ! $user_id || $party < 1 || $party > 100 || ! $event_id || ! $cafe_id ) {
 			return new WP_Error( 'mtn_invalid_booking', __( 'اطلاعات رزرو معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
+
+		$local_date = self::parse_local_datetime( $booking_at );
+		if ( ! $local_date ) {
+			return new WP_Error( 'mtn_invalid_datetime', __( 'زمان رزرو باید به قالب YYYY-MM-DD HH:MM:SS و بر اساس منطقه زمانی سایت باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		$utc_date = $local_date->setTimezone( new DateTimeZone( 'UTC' ) );
+		if ( $utc_date->getTimestamp() <= time() ) {
+			return new WP_Error( 'mtn_booking_in_past', __( 'زمان رزرو باید در آینده باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		$booking_at_utc = $utc_date->format( 'Y-m-d H:i:s' );
 
 		$cafe  = get_post( $cafe_id );
 		$event = get_post( $event_id );
@@ -67,25 +105,63 @@ final class MTN_CB_Bookings {
 			return new WP_Error( 'mtn_table_required', __( 'یک میز معتبر انتخاب کنید.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
 
+		$duration = absint( get_option( 'mtn_cb_booking_duration_minutes', 120 ) );
+		$duration = min( 720, max( 30, $duration ) );
+		$start_ts = $utc_date->getTimestamp();
+		$end_ts   = $start_ts + ( $duration * MINUTE_IN_SECONDS );
+		$window_start = gmdate( 'Y-m-d H:i:s', $start_ts - ( $duration * MINUTE_IN_SECONDS ) );
+		$window_end   = gmdate( 'Y-m-d H:i:s', $end_ts );
+
+		// Event capacity is a total headcount for this event record. A value of
+		// zero means that the operator has not configured a capacity limit.
+		$event_capacity = absint( get_post_meta( $event_id, 'mtn_event_capacity', true ) );
+		if ( $event_capacity ) {
+			$booked_people = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COALESCE(SUM(party_size), 0) FROM ' . self::table_name() . " WHERE event_id = %d AND status IN ('pending_cafe','confirmed')",
+					$event_id
+				)
+			);
+			if ( $booked_people + $party > $event_capacity ) {
+				return new WP_Error( 'mtn_event_capacity_reached', __( 'ظرفیت این رویداد برای تعداد نفرات درخواستی کافی نیست.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			}
+		}
+
+		// A table cannot have two active reservations whose time windows overlap.
+		if ( $table_id ) {
+			$conflict = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT id FROM ' . self::table_name() . " WHERE cafe_id = %d AND table_id = %d AND status IN ('pending_cafe','confirmed') AND booking_at >= %s AND booking_at < %s LIMIT 1",
+					$cafe_id,
+					$table_id,
+					$window_start,
+					$window_end
+				)
+			);
+			if ( $conflict ) {
+				return new WP_Error( 'mtn_table_time_conflict', __( 'این میز در بازه زمانی انتخاب‌شده رزرو فعال دیگری دارد.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			}
+		}
+
 		$now  = current_time( 'mysql', true );
 		$code = self::generate_code();
 
 		$inserted = $wpdb->insert(
 			self::table_name(),
 			array(
-				'booking_code'           => $code,
-				'user_id'                => $user_id,
+				'booking_code'          => $code,
+				'user_id'               => $user_id,
 				'cafe_id'                => $cafe_id,
 				'event_id'               => $event_id,
 				'table_id'               => $table_id,
 				'party_size'             => $party,
-				'booking_at'             => gmdate( 'Y-m-d H:i:s', strtotime( $booking_at . ' UTC' ) ),
+				'booking_at'             => $booking_at_utc,
 				'status'                 => 'pending_cafe',
 				'customer_note'          => isset( $args['customer_note'] ) ? sanitize_textarea_field( $args['customer_note'] ) : '',
 				'whatsapp_action_status' => 'manual_required',
-				'checkin_status'          => 'not_checked_in',
-				'created_at'              => $now,
-				'updated_at'              => $now,
+				'checkin_status'         => 'not_checked_in',
+				'created_at'             => $now,
+				'updated_at'             => $now,
 			),
 			array( '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
@@ -155,8 +231,15 @@ final class MTN_CB_Bookings {
 		return strtoupper( bin2hex( random_bytes( 12 ) ) );
 	}
 
-	private static function valid_datetime( $value ) {
-		$date = DateTime::createFromFormat( 'Y-m-d H:i:s', $value );
-		return $date && $date->format( 'Y-m-d H:i:s' ) === $value;
+	private static function parse_local_datetime( $value ) {
+		if ( ! is_string( $value ) || ! preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $value ) ) {
+			return false;
+		}
+		$date   = DateTimeImmutable::createFromFormat( '!Y-m-d H:i:s', $value, wp_timezone() );
+		$errors = DateTimeImmutable::getLastErrors();
+		if ( ! $date || ( is_array( $errors ) && ( $errors['warning_count'] || $errors['error_count'] ) ) || $date->format( 'Y-m-d H:i:s' ) !== $value ) {
+			return false;
+		}
+		return $date;
 	}
 }
