@@ -398,12 +398,17 @@ final class MTN_CB_Bookings {
 		if ( $event_day && ! preg_match( '/^\\d{4}-\\d{2}-\\d{2}$/', $event_day ) ) {
 			return new WP_Error( 'mtn_event_schedule_invalid', __( 'تاریخ برنامه در تنظیمات کافه معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
-		if ( $event_day && $local_date->format( 'Y-m-d' ) !== $event_day ) {
-			return new WP_Error( 'mtn_event_date_mismatch', __( 'رزرو باید در تاریخ ثبت‌شده برای این برنامه باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
-		}
 		$time = $local_date->format( 'H:i:s' );
 		$start = $start ? ( 5 === strlen( $start ) ? $start . ':00' : $start ) : '';
 		$end = $end ? ( 5 === strlen( $end ) ? $end . ':00' : $end ) : '';
+		if ( $event_day && $local_date->format( 'Y-m-d' ) !== $event_day ) {
+			$next_day = DateTimeImmutable::createFromFormat( '!Y-m-d', $event_day, wp_timezone() );
+			$next_day = $next_day ? $next_day->modify( '+1 day' )->format( 'Y-m-d' ) : '';
+			$overnight_event = $start && $end && $end < $start;
+			if ( ! ( $overnight_event && $local_date->format( 'Y-m-d' ) === $next_day && $time < $end ) ) {
+				return new WP_Error( 'mtn_event_date_mismatch', __( 'رزرو باید در تاریخ ثبت‌شده برای این برنامه باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+			}
+		}
 		if ( ( $start && ! preg_match( '/^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$/', $start ) ) || ( $end && ! preg_match( '/^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$/', $end ) ) ) {
 			return new WP_Error( 'mtn_event_schedule_invalid', __( 'ساعت برنامه در تنظیمات کافه معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
