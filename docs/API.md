@@ -8,7 +8,7 @@ All booking mutations require an authenticated WordPress session and a valid RES
 
 `GET /catalog`
 
-Returns published cafes and events whose cafe relationship points to a published cafe, plus the configured WordPress timezone and current table-selection mode. It does not expose cafe owner identifiers.
+Returns published cafes and events whose cafe relationship points to a published cafe, plus the configured WordPress timezone and current table-selection mode. Cafe objects include `location_path`, an ordered array of assigned hierarchical location term names from root to leaf (empty when no location is assigned). It does not expose cafe owner identifiers.
 
 ## Availability preview
 
