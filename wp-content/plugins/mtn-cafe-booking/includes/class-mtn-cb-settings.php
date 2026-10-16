@@ -50,7 +50,7 @@ final class MTN_CB_Settings {
 	}
 
 	public static function sanitize_amount( $value ) {
-		return is_numeric( $value ) && (float) $value >= 0 ? number_format( (float) $value, 2, '.', '' ) : '0.00';
+		return is_numeric( $value ) && (float) $value >= 0 ? number_format( min( 9999999999.99, (float) $value ), 2, '.', '' ) : '0.00';
 	}
 
 	public static function sanitize_minutes( $value ) {
