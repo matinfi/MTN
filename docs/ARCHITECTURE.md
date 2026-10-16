@@ -16,7 +16,7 @@
 - **WordPress**: user accounts, media, roles/capabilities, options, REST infrastructure and cron.
 
 ## Persistence
-The plugin creates versioned custom tables for bookings, append-only finance ledger entries, settlement records and booking audit events. Cafe/event/table content is stored as WordPress custom post types with administrator metadata boxes. Booking codes are random and unique. Status changes are validated against allowed transitions; audit events are appended for creation, status changes, table assignment and expiry.
+The plugin creates versioned custom tables for bookings, append-only finance ledger entries, settlement records and booking audit events. Cafe/event/table content is stored as WordPress custom post types with administrator metadata boxes. Cafes can also be assigned terms in a hierarchical `mtn_cafe_location` taxonomy; administrators should nest country → city → area → neighborhood terms. Booking codes are random and unique. Status changes are validated against allowed transitions; audit events are appended for creation, status changes, table assignment and expiry.
 
 ## API namespace
 Base namespace: `mtn/v1`. Public read endpoints must return only published public data. Booking creation and private booking reads require authentication. Mutations require a valid WordPress REST nonce/cookie or another supported authenticated mechanism and object-level authorization.
