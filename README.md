@@ -24,7 +24,7 @@ This repository contains a WordPress plugin and Persian RTL theme for cafe disco
 
 ## Current scope and limitations
 - Implemented: versioned REST APIs for catalog, availability, booking creation/read/cancel/history and admin confirmation/rejection; per-cafe advisory locks; event headcount and schedule checks; selected-table overlap validation; optional idempotency; expiry of stale pending holds during booking creation; customer booking wizard/history; administrator booking console; cafe-manager dashboard scoped to owned cafes; cafe/event/table metadata boxes; responsive RTL listing/detail templates.
-- Incomplete: staff invitation/management beyond assigning a cafe owner, automatic table assignment mode, append-only audit log, finance ledger/settlements, check-in, production OTP, WhatsApp API delivery, automated integration/concurrency tests and production deployment. Availability is advisory; booking creation is authoritative. Database locking and all upgrade paths still require testing on the target hosting stack.
+- Incomplete: staff invitation/management beyond assigning a cafe owner, automatic table allocation (manual assignment is available from the cafe dashboard), append-only audit log, finance ledger/settlements, check-in, production OTP, WhatsApp API delivery, automated integration/concurrency tests and production deployment. Availability is advisory; booking creation is authoritative. Database locking and all upgrade paths still require testing on the target hosting stack.
 - Do not treat this foundation as a production-ready reservation engine until concurrency, authorization, integration and acceptance tests pass.
 
 ## Development
