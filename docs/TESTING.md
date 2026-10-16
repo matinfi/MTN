@@ -73,7 +73,8 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Statement overdue allocation | Add old commission accrual, newer accrual, a reversal and a settlement; evaluate due dates | Reversals reduce their booking's accrual first; settlements/credits reduce oldest open items first; overdue balance is reported by currency |
 | Status transition | Attempt to confirm/reject a cancelled booking | HTTP 409 |
 | Concurrent capacity | Fire simultaneous requests for the final available seats/table | At most one conflicting reservation is created |
-| Lock failure | Simulate unavailable advisory locking on a disposable test DB | HTTP 503; no booking row is inserted |
+| Lock failure | Hold the cafe advisory lock from a second MySQL connection while creating a booking | HTTP 503; no booking row is inserted |
+| Concurrent booking requests | Submit simultaneous requests for the final event seats and a shared table on each supported database engine | Capacity and table constraints hold under race; no conflicting booking is persisted. This broader race test is still a release gate.
 
 ## Release gate
 
