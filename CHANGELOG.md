@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.0] - 2026-10-16
+- Add optional Twilio SMS OTP sign-in with hashed codes, five-minute expiry, resend throttling, per-phone/IP limits and five-attempt lockout.
+- Add administrator-managed E.164 phone assignments to existing WordPress users; provider credentials must be configured outside source control.
+- Add weekly/monthly recurrence controls that generate draft occurrences for editorial review, including featured image inheritance.
+- Add event-cancellation commission reversal policy snapshot and schema version 13.
+- Add WordPress settings tests and a WordPress test-suite CI workflow; run results are not yet verified.
+
+
 ## [0.8.0] - 2026-10-16
 - Add expiring cafe-team invitation tokens with hash-only storage, email matching and single-use acceptance.
 - Add an idempotent email notification queue with bounded exponential retries and delivery history.
