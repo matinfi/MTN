@@ -73,7 +73,7 @@ A customer may read only their own booking. Administrators may read any booking.
 
 `POST /bookings/{id}/cancel`
 
-A customer may request cancellation only for their own booking. Cancellation follows the server-side state machine; only pending or confirmed bookings can transition to customer-cancelled.
+A customer may request cancellation only for their own booking. Cancellation follows the server-side state machine; only pending or confirmed bookings can transition to customer-cancelled. The administrator-configured `mtn_cb_customer_cancel_cutoff_minutes` setting controls the cutoff: `0` permits cancellation until the booking start, while a positive value blocks cancellation inside that many minutes before start. Late or past-start requests return HTTP 409.
 
 ## Confirm a booking
 
