@@ -67,4 +67,28 @@ class MTN_Cafe_Booking_SMS_OTP_Test extends WP_UnitTestCase {
 		$this->assertSame( 5, (int) $row->attempts );
 		$this->assertSame( 'locked', $row->status );
 	}
+	public function test_resending_invalidates_previous_active_code() {
+		global $wpdb;
+		$phone = '+905551234569';
+		$now_ts = time();
+		$wpdb->insert( MTN_CB_SMS_OTP::table_name(), array(
+			'phone' => $phone, 'code_hash' => str_repeat( 'd', 64 ), 'ip_hash' => str_repeat( 'e', 64 ),
+			'attempts' => 0, 'status' => 'sent', 'created_at' => gmdate( 'Y-m-d H:i:s', $now_ts - 120 ),
+			'expires_at' => gmdate( 'Y-m-d H:i:s', $now_ts + 180 ), 'consumed_at' => null,
+		) );
+		$old_id = (int) $wpdb->insert_id;
+		$request = new WP_REST_Request( 'POST', '/mtn/v1/auth/otp/request' );
+		$request->set_param( 'phone', $phone );
+		$result = MTN_CB_SMS_OTP::request_code( $request );
+		$this->assertNotWPError( $result );
+		$status = $wpdb->get_var( $wpdb->prepare( 'SELECT status FROM ' . MTN_CB_SMS_OTP::table_name() . ' WHERE id = %d', $old_id ) );
+		$this->assertSame( 'superseded', $status );
+	}
+
+	public function test_invalid_otp_format_is_rejected_before_lookup() {
+		$result = MTN_CB_SMS_OTP::verify_code( $this->make_request( 'not-a-phone', '12ab' ) );
+		$this->assertWPError( $result );
+		$this->assertSame( 'mtn_otp_invalid', $result->get_error_code() );
+	}
+
 }
