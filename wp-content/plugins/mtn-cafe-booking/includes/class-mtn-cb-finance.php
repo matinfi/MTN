@@ -27,7 +27,8 @@ final class MTN_CB_Finance {
 	}
 
 	public static function on_booking_status_changed( $booking, $next_status, $actor_id = 0, $reason = '' ) {
-		if ( 'completed' !== $next_status || empty( $booking->id ) ) {
+		$trigger_status = isset( $booking->commission_trigger_status ) && in_array( $booking->commission_trigger_status, array( 'confirmed', 'completed' ), true ) ? $booking->commission_trigger_status : 'confirmed';
+		if ( $trigger_status !== $next_status || empty( $booking->id ) ) {
 			return;
 		}
 		self::accrue_commission( absint( $booking->id ), absint( $actor_id ) );
@@ -36,8 +37,9 @@ final class MTN_CB_Finance {
 	public static function accrue_commission( $booking_id, $actor_id = 0 ) {
 		global $wpdb;
 		$booking = MTN_CB_Bookings::get_by_id( $booking_id );
-		if ( ! $booking || 'completed' !== $booking->status ) {
-			return new WP_Error( 'mtn_commission_not_eligible', __( 'کارمزد فقط برای رزرو تکمیل‌شده محاسبه می‌شود.', 'mtn-cafe-booking' ) );
+		$trigger_status = $booking && isset( $booking->commission_trigger_status ) && in_array( $booking->commission_trigger_status, array( 'confirmed', 'completed' ), true ) ? $booking->commission_trigger_status : 'confirmed';
+		if ( ! $booking || $trigger_status !== $booking->status ) {
+			return new WP_Error( 'mtn_commission_not_eligible', __( 'رزرو هنوز به وضعیت مشمول کارمزد نرسیده است.', 'mtn-cafe-booking' ) );
 		}
 		$entry_key = 'commission_booking_' . absint( $booking_id );
 		$existing = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::ledger_table() . ' WHERE entry_key = %s', $entry_key ) );
