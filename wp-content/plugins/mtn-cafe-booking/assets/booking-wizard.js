@@ -202,6 +202,24 @@
         } else {
           actionCell.textContent = '—';
         }
+        if (booking.status === 'confirmed' && booking.checkin_status !== 'checked_in') {
+          const checkinButton = el('button', 'button', 'کد اعلام حضور');
+          checkinButton.type = 'button';
+          checkinButton.addEventListener('click', async () => {
+            checkinButton.disabled = true;
+            try {
+              const issued = await request(api + 'bookings/' + encodeURIComponent(booking.id) + '/checkin-token', { method: 'POST', headers, credentials: 'same-origin', body: '{}' });
+              const tokenBox = el('div', 'mtn-checkin-token');
+              tokenBox.append(el('strong', '', 'کد یک‌بارمصرف: '), el('code', '', issued.token), el('p', '', 'اعتبار تا ' + issued.expires_at));
+              checkinButton.replaceWith(tokenBox);
+              setStatus(root, 'کد اعلام حضور ساخته شد؛ آن را فقط به کارکنان مجاز کافه نشان دهید.', 'success');
+            } catch (error) {
+              checkinButton.disabled = false;
+              setStatus(root, error.message, 'error');
+            }
+          });
+          actionCell.append(checkinButton);
+        }
         const historyButton = el('button', 'button', 'تاریخچه');
         historyButton.type = 'button';
         let historyRow = null;
