@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.1] - 2026-10-16
+- Fix over-escaped booking history, completion, no-show, table assignment and cafe-cancellation REST route patterns.
+- Restrict cafe owner assignment and manager-role grants to WordPress administrators.
+- Add configurable customer cancellation cutoff and reject late/past-start customer cancellation attempts.
+- Reset the booking idempotency key when the customer changes the request payload.
+- Bound manual finance adjustment amounts to the supported ledger precision.
+- Add lightweight static source-contract checks; integration and concurrency tests remain outstanding.
+
+
 ## [0.4.0] - 2026-10-16
 - Add an append-only commission ledger with commission amount/currency snapshotted at booking creation and accrual on completion.
 - Add manual settlement records, cafe balance checks, append-only adjustments/reversals and ledger CSV export.
