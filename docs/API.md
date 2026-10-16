@@ -14,7 +14,7 @@ Returns published cafes and events whose cafe relationship points to a published
 
 `GET /availability?cafe_id={id}&event_id={id}&party_size={n}&booking_at=YYYY-MM-DD%20HH:MM:SS`
 
-Returns whether event headcount capacity and selected-table availability appear sufficient, along with eligible table IDs/capacities. The time must be expressed in the WordPress site's timezone. If an event date or operating hours are configured, the requested time must fall within that schedule, including supported overnight events. This is an advisory snapshot, not a reservation hold; `POST /bookings` repeats validation.
+Returns whether event headcount capacity and selected-table availability appear sufficient, along with eligible table IDs/capacities. The time must be expressed in the WordPress site's timezone. The event must have a valid date and start time configured by an administrator. The requested time must fall within that schedule; an optional end time is enforced, including supported overnight events. This is an advisory snapshot, not a reservation hold; `POST /bookings` repeats validation.
 
 ## Booking audit history
 
