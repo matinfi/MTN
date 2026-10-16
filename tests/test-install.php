@@ -5,6 +5,7 @@ class MTN_Cafe_Booking_Install_Test extends WP_UnitTestCase {
 			update_option( 'mtn_cb_db_version', (string) $version );
 			MTN_CB_Install::maybe_upgrade();
 			$this->assertSame( '13', (string) get_option( 'mtn_cb_db_version' ) );
+		$this->assertTrue( wp_get_theme( 'mtn-cafe-theme' )->exists(), 'The packaged theme must be discoverable by WordPress.' );
 		}
 	}
 
