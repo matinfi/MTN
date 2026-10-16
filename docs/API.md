@@ -93,7 +93,7 @@ Required JSON field: `table_id`. Assigns a published, active table belonging to 
 
 `POST /cafe/bookings/{id}/complete` and `POST /cafe/bookings/{id}/no-show`
 
-Move a confirmed booking to completed or no-show. Completing a booking triggers commission accrual from the amount snapshotted at booking creation. In cafe-assigned-table mode, the booking must have a table before it can be completed.
+Move a confirmed booking to completed or no-show. Completing a booking triggers commission accrual from the amount snapshotted at booking creation. In cafe-assigned-table mode, a table must be assigned before the booking can be confirmed or completed.
 
 `POST /cafe/bookings/{id}/cancel`
 
