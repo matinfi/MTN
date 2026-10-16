@@ -137,6 +137,14 @@ final class MTN_CB_Content {
 
 	public static function save_cafe_meta( $post_id ) {
 		self::save_fields( $post_id, array( 'mtn_cafe_owner_id', 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre' ), array( 'mtn_cafe_owner_id' ) );
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+		$owner_id = absint( get_post_meta( $post_id, 'mtn_cafe_owner_id', true ) );
+		$owner = $owner_id ? get_user_by( 'id', $owner_id ) : false;
+		if ( $owner && ! in_array( 'administrator', (array) $owner->roles, true ) ) {
+			$owner->add_role( 'mtn_cafe_manager' );
+		}
 	}
 
 	public static function save_event_meta( $post_id ) {
