@@ -7,7 +7,8 @@
 - Add a cafe-manager role, ownership checks and a cafe dashboard page.
 - Add admin metadata forms for cafe contact/location/music, event schedule/capacity and table capacity.
 - Add cafe/event archive and detail templates plus dynamic homepage sections.
-- Create /book/ and /my-account/ pages automatically when their slugs are unused.
+- Create /book/, /my-account/ and /cafe-dashboard/ pages automatically when their slugs are unused.
+- Add schema/page provisioning migration version 4 for upgraded installations.
 - Validate configured event dates and operating hours, including overnight events.
 - Add responsive styles for booking and listing interfaces.
 
@@ -16,7 +17,7 @@
 - Serialize booking creation per cafe using database advisory locks.
 - Enforce configured event headcount limits and selected-table time-window conflicts.
 - Expire stale pending booking holds when new requests are processed.
-- Add an administrator-only rejection endpoint with an optional reason.
+- Add a rejection endpoint with an optional reason, restricted to the assigned cafe owner or administrator.
 - Add per-user idempotency keys with payload checks and duplicate-request recovery.
 - Upgrade the booking schema to version 3 with a unique per-user idempotency index.
 - Add a repeatable integration and concurrency test plan; execution remains outstanding.
