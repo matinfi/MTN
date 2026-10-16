@@ -46,8 +46,8 @@ jobs:
           test -s dist/mtn-cafe-theme.zip
           unzip -t dist/mtn-cafe-booking.zip
           unzip -t dist/mtn-cafe-theme.zip
-          test "$(unzip -Z1 dist/mtn-cafe-booking.zip | head -n 1)" = "mtn-cafe-booking/"
-          test "$(unzip -Z1 dist/mtn-cafe-theme.zip | head -n 1)" = "mtn-cafe-theme/"
+          test "$(unzip -Z1 dist/mtn-cafe-booking.zip | sed -n '1p')" = "mtn-cafe-booking/"
+          test "$(unzip -Z1 dist/mtn-cafe-theme.zip | sed -n '1p')" = "mtn-cafe-theme/"
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
