@@ -121,6 +121,7 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_default_commission', '0' );
 		add_option( 'mtn_cb_booking_expiry_minutes', 30 );
 		add_option( 'mtn_cb_booking_duration_minutes', 120 );
+		add_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 );
 		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
 	}
 
