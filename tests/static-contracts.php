@@ -14,6 +14,9 @@ $finance_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn
 $install_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-install.php';
 $notifications_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-notifications.php';
 $invites_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-team-invites.php';
+$sms_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-sms-otp.php';
+$recurrence_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-event-recurrence.php';
+$event_cancel_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-event-cancellation.php';
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
 $content = file_get_contents( $content_path );
@@ -21,8 +24,11 @@ $install = file_get_contents( $install_path );
 $finance = file_get_contents( $finance_path );
 $notifications = file_get_contents( $notifications_path );
 $invites = file_get_contents( $invites_path );
+$sms = file_get_contents( $sms_path );
+$recurrence = file_get_contents( $recurrence_path );
+$event_cancel = file_get_contents( $event_cancel_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -56,13 +62,19 @@ if ( false === strpos( $content, "if ( current_user_can( 'manage_options' ) )" )
 	exit( 1 );
 }
 
-if ( false === strpos( $install, "const DB_VERSION = '12';" ) ||
+if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $install, 'commission_trigger_status varchar(20)' ) ||
 	false === strpos( $install, 'commission_reverse_on_cancellation tinyint(1)' ) ||
 	false === strpos( $install, 'commission_reverse_on_no_show tinyint(1)' ) ||
 	false === strpos( $install, 'commission_reverse_on_event_cancel tinyint(1)' ) ||
 	false === strpos( $install, 'mtn_cafe_invites' ) ||
 	false === strpos( $install, 'mtn_notifications' ) ||
+	false === strpos( $install, 'mtn_sms_otps' ) ||
+	false === strpos( $sms, 'public static function request_code' ) ||
+	false === strpos( $sms, 'public static function verify_code' ) ||
+	false === strpos( $sms, 'MTN_CB_TWILIO_AUTH_TOKEN' ) ||
+	false === strpos( $recurrence, 'public static function generate_occurrences' ) ||
+	false === strpos( $event_cancel, 'commission_reverse_on_event_cancel' ) ||
 	false === strpos( $notifications, 'public static function process_queue' ) ||
 	false === strpos( $notifications, 'next_attempt_at' ) ||
 	false === strpos( $invites, 'public static function accept_from_form' ) ||
