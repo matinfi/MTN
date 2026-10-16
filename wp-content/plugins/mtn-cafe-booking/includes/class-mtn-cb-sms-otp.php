@@ -42,7 +42,7 @@ final class MTN_CB_SMS_OTP {
 			<h2><?php esc_html_e( 'ورود با پیامک', 'mtn-cafe-booking' ); ?></h2>
 			<form>
 				<p><label for="mtn-otp-phone"><?php esc_html_e( 'شماره تلفن با کد کشور', 'mtn-cafe-booking' ); ?></label><input id="mtn-otp-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+905xxxxxxxxx" pattern="\+[1-9][0-9]{7,14}" maxlength="16" required></p>
-				<p><label for="mtn-otp-code"><?php esc_html_e( 'کد شش‌رقمی پیامک‌شده', 'mtn-cafe-booking' ); ?></label><input id="mtn-otp-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" hidden></p>
+				<p class="mtn-otp-code-field" hidden><label for="mtn-otp-code"><?php esc_html_e( 'کد شش‌رقمی پیامک‌شده', 'mtn-cafe-booking' ); ?></label><input id="mtn-otp-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></p>
 				<div class="mtn-booking-actions"><button class="button" type="button" data-otp-request><?php esc_html_e( 'ارسال کد', 'mtn-cafe-booking' ); ?></button><button class="button" type="submit" data-otp-verify hidden><?php esc_html_e( 'تأیید و ورود', 'mtn-cafe-booking' ); ?></button></div>
 				<p role="status" aria-live="polite"></p>
 			</form>
