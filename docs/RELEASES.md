@@ -1,7 +1,7 @@
 # Build and release process
 
 ## Versioning
-Use Semantic Versioning. Keep the plugin header and `MTN_CB_VERSION` aligned with the plugin release version. The theme has its own independent version and should be bumped only when theme files change; a combined release may package both independently versioned components. Current plugin version is 0.7.0; database schema version is 11. This code version has not been tagged or approved as a production release.
+Use Semantic Versioning. Keep the plugin header and `MTN_CB_VERSION` aligned with the plugin release version. The theme has its own independent version and should be bumped only when theme files change; a combined release may package both independently versioned components. Current plugin version is 0.7.1; database schema version is 11. The finance admin page includes a reconciliation summary, but automated statements and overdue calculation remain incomplete. This code version has not been tagged or approved as a production release.
 
 ## CI
 - `.github/workflows/php-lint.yml` runs PHP syntax validation on pushes and pull requests.
