@@ -57,7 +57,7 @@ final class MTN_CB_Admin {
 		if ( ! in_array( $status, $valid_statuses, true ) ) {
 			$status = '';
 		}
-		$sql = 'SELECT b.*, cafe.post_title AS cafe_title, event.post_title AS event_title FROM ' . $table . ' b LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = b.cafe_id LEFT JOIN ' . $wpdb->posts . ' event ON event.ID = b.event_id';
+		$sql = 'SELECT b.*, cafe.post_title AS cafe_title, ev.post_title AS event_title FROM ' . $table . ' b LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = b.cafe_id LEFT JOIN ' . $wpdb->posts . ' ev ON ev.ID = b.event_id';
 		if ( $status ) {
 			$sql .= $wpdb->prepare( ' WHERE b.status = %s', $status );
 		}
