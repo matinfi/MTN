@@ -42,7 +42,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Manual WhatsApp URL helper; never reports a link opening as delivery.
 - [x] Optional Twilio SMS OTP adapter with five-minute expiry, 60-second resend delay, per-phone/IP limits, five-attempt lockout and OTP WordPress login. Live credentials and delivery verification remain deployment gates.
 - [x] Secure one-time check-in tokens with configurable expiry, hash-only storage and atomic consumption.
-- [x] Check-in audit trail and authorized assigned cafe-owner/administrator action; multi-user staff teams remain outstanding.
+- [x] Check-in audit trail and authorization for assigned cafe owners, invited team members and administrators.
 - [x] Email notification queue with idempotency keys, bounded exponential retries and persistent sent/failed message history; actual delivery depends on site mail configuration.
 - [ ] Official WhatsApp API/webhook adapter (not required for v1).
 
@@ -51,9 +51,9 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Booking wizard JavaScript syntax check in CI.
 - [x] Static source-contract regression checks in lint and package workflows.
 - [x] Initial PHPUnit settings and cafe-team authorization tests plus a WordPress test-suite CI workflow. Full booking lifecycle and concurrency coverage remain outstanding.
-- [ ] REST permission and privacy tests.
+- [ ] Comprehensive REST permission and privacy tests, including cross-customer booking access and OTP abuse scenarios.
 - [ ] Concurrent booking tests against supported database engines.
-- [ ] Clean install, upgrade and backup/restore tests.
-- [ ] Installable plugin/theme ZIPs tested on clean WordPress.
-- [ ] Accessibility, responsive, security and performance review.
+- [ ] Clean install, schema upgrade and backup/restore tests on the supported hosting/database stack.
+- [ ] Installable plugin/theme ZIPs tested on a clean WordPress installation.
+- [ ] Accessibility, responsive, security and performance review on supported devices and hosting.
 - [ ] Staging sign-off before production release.
