@@ -31,6 +31,7 @@ final class MTN_CB_Rest {
 					'booking_at'    => array( 'required' => true, 'sanitize_callback' => 'sanitize_text_field' ),
 					'table_id'      => array( 'required' => false, 'default' => 0, 'sanitize_callback' => 'absint' ),
 					'customer_note' => array( 'required' => false, 'sanitize_callback' => 'sanitize_textarea_field' ),
+					'idempotency_key' => array( 'required' => false, 'sanitize_callback' => 'sanitize_text_field' ),
 				),
 			)
 		);
