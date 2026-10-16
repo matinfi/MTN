@@ -44,9 +44,6 @@ final class MTN_CB_Finance {
 			return true;
 		}
 		$amount = (float) $booking->commission_amount;
-		if ( $amount <= 0 ) {
-			$amount = (float) get_option( 'mtn_cb_default_commission', '0' );
-		}
 		$amount = round( max( 0, $amount ), 2 );
 		if ( $amount <= 0 ) {
 			return true;
