@@ -115,6 +115,22 @@ The authenticated customer who owns a confirmed booking can issue a one-time, ra
 
 Requires an authenticated cafe manager who is the configured owner or an assigned team member for the booking's cafe, or a WordPress administrator. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Team members can be assigned directly by an administrator or added through the expiring invitation workflow. Check-in token delivery is not automated.
 
+## Cafe team invitations
+
+`POST /admin/cafes/{cafe_id}/invite`
+
+Administrator-only. Requires a JSON email field. The invitation expires after 48 hours, stores only a SHA-256 token hash and can be accepted only by a logged-in WordPress account whose email matches the invitation. The recipient follows the invitation link on `/my-account/` and submits the acceptance form.
+
+## SMS OTP sign-in
+
+`POST /auth/otp/request`
+
+Requires an E.164 phone number. Sends a six-digit code through Twilio when the provider constants are configured. The code expires after five minutes; resends are limited to one per minute, with a maximum of three requests per phone and ten per IP in 15 minutes.
+
+`POST /auth/otp/verify`
+
+Requires the same phone number and the six-digit code. A valid code is single-use and authenticates the WordPress account whose administrator-assigned `mtn_cb_phone` matches the phone. Five failed attempts lock the code. Configure `MTN_CB_TWILIO_ACCOUNT_SID`, `MTN_CB_TWILIO_AUTH_TOKEN` and `MTN_CB_TWILIO_FROM` outside source control. Provider delivery and login-cookie behavior must be verified on staging before production use.
+
 ## Finance behavior
 
 The fixed commission amount, currency, trigger status and cancellation/no-show reversal policies are snapshotted when a booking is created. The central setting defaults to accruing commission on `confirmed`, with `completed` available as an alternative; later setting changes affect only new bookings. When the booking-time reversal option is enabled, a later cancellation or no-show appends a negative reversal entry if commission was already accrued. No payment refund is initiated or verified. When the booking-time event-cancellation policy is enabled, moving a published event to draft, private or trash appends an idempotent reversal for accrued commissions. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
