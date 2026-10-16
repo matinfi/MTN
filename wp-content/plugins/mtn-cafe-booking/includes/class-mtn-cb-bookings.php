@@ -568,8 +568,12 @@ final class MTN_CB_Bookings {
 		$event_day = sanitize_text_field( get_post_meta( $event_id, 'mtn_event_date', true ) );
 		$start = sanitize_text_field( get_post_meta( $event_id, 'mtn_event_start_time', true ) );
 		$end = sanitize_text_field( get_post_meta( $event_id, 'mtn_event_end_time', true ) );
-		if ( $event_day && ! preg_match( '/^\\d{4}-\\d{2}-\\d{2}$/', $event_day ) ) {
-			return new WP_Error( 'mtn_event_schedule_invalid', __( 'تاریخ برنامه در تنظیمات کافه معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		if ( $event_day ) {
+			$event_date_object = DateTimeImmutable::createFromFormat( '!Y-m-d', $event_day, wp_timezone() );
+			$event_date_errors = DateTimeImmutable::getLastErrors();
+			if ( ! preg_match( '/^\\d{4}-\\d{2}-\\d{2}$/', $event_day ) || ! $event_date_object || ( is_array( $event_date_errors ) && ( $event_date_errors['warning_count'] || $event_date_errors['error_count'] ) ) || $event_date_object->format( 'Y-m-d' ) !== $event_day ) {
+				return new WP_Error( 'mtn_event_schedule_invalid', __( 'تاریخ برنامه در تنظیمات کافه معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+			}
 		}
 		$time = $local_date->format( 'H:i:s' );
 		$start = $start ? ( 5 === strlen( $start ) ? $start . ':00' : $start ) : '';
