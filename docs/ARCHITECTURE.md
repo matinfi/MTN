@@ -5,7 +5,7 @@
 2. Booking and financial records must survive theme changes.
 3. Version 1 does not collect online payments from customers.
 4. New bookings start as `pending_cafe` and require cafe confirmation.
-5. Commission defaults to a fixed amount per eligible booking; amount and currency are snapshotted when the booking is created and accrued to the ledger only on completion.
+5. Commission defaults to a fixed amount per eligible booking; amount, currency and trigger status (`confirmed` by default, or `completed`) are snapshotted when the booking is created.
 6. WhatsApp in v1 is manual-link based. Link opening is not proof of sending or delivery.
 7. OTP must use a configured real SMS provider in production; development OTP must never be presented as production authentication.
 8. All privileged REST operations must check capabilities and object ownership on the server.
@@ -16,7 +16,7 @@
 - **WordPress**: user accounts, media, roles/capabilities, options, REST infrastructure and cron.
 
 ## Persistence
-The plugin creates versioned custom tables for bookings, append-only finance ledger entries, settlement records and booking audit events. Cafe/event/table content is stored as WordPress custom post types with administrator metadata boxes. Cafes can also be assigned terms in a hierarchical `mtn_cafe_location` taxonomy; administrators should nest country → city → area → neighborhood terms. Booking codes are random and unique. Status changes are validated against allowed transitions; audit events are appended for creation, status changes, table assignment and expiry.
+The plugin creates versioned custom tables for bookings, append-only finance ledger entries, settlement records and booking audit events. Schema version 9 snapshots the commission trigger status per booking. Cafe/event/table content is stored as WordPress custom post types with administrator metadata boxes. Cafes can also be assigned terms in a hierarchical `mtn_cafe_location` taxonomy; administrators should nest country → city → area → neighborhood terms. Booking codes are random and unique. Status changes are validated against allowed transitions; audit events are appended for creation, status changes, table assignment and expiry.
 
 ## API namespace
 Base namespace: `mtn/v1`. Public read endpoints must return only published public data. Booking creation and private booking reads require authentication. Mutations require a valid WordPress REST nonce/cookie or another supported authenticated mechanism and object-level authorization.
