@@ -10,7 +10,7 @@ This repository contains a WordPress plugin and Persian RTL theme for cafe disco
 - `wp-content/themes/mtn-cafe-theme/`: presentation only; reservation records remain if the theme changes.
 - WordPress APIs, capability checks, REST permission callbacks, nonce support, prepared SQL, and semantic versioning.
 - No online customer payments in v1. Default booking state is `pending_cafe`; commission is not revenue collected.
-- WhatsApp v1 uses prepared text/manual links; opening a WhatsApp link does not imply sent/delivered.
+- WhatsApp v1 exposes a prepared manual link in the customer's booking list when the cafe has a valid WhatsApp number; opening the link does not imply sent/delivered.
 - OTP production authentication requires a real SMS provider integration and configuration.
 
 ## Installation (development)
