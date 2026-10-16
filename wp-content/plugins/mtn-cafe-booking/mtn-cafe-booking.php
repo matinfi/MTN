@@ -31,8 +31,6 @@ require_once MTN_CB_PATH . 'includes/class-mtn-cb-team-invites.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-event-cancellation.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-event-recurrence.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-sms-otp.php';
-require_once MTN_CB_PATH . 'includes/class-mtn-cb-notifications.php';
-require_once MTN_CB_PATH . 'includes/class-mtn-cb-team-invites.php';
 
 register_activation_hook( __FILE__, array( 'MTN_CB_Install', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
@@ -65,7 +63,5 @@ add_action(
 		MTN_CB_Event_Cancellation::init();
 		MTN_CB_Event_Recurrence::init();
 		MTN_CB_SMS_OTP::init();
-		MTN_CB_Notifications::init();
-		MTN_CB_Team_Invites::init();
 	}
 );
