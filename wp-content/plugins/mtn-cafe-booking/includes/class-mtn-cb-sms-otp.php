@@ -10,10 +10,45 @@ defined( 'ABSPATH' ) || exit;
 final class MTN_CB_SMS_OTP {
 	public static function init() {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
+		add_shortcode( 'mtn_sms_login', array( __CLASS__, 'login_shortcode' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 		add_action( 'show_user_profile', array( __CLASS__, 'render_phone_field' ) );
 		add_action( 'edit_user_profile', array( __CLASS__, 'render_phone_field' ) );
 		add_action( 'personal_options_update', array( __CLASS__, 'save_phone_field' ) );
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'save_phone_field' ) );
+	}
+
+	public static function register_assets() {
+		wp_register_script( 'mtn-cb-otp-login', MTN_CB_URL . 'assets/otp-login.js', array(), MTN_CB_VERSION, true );
+	}
+
+	public static function login_shortcode() {
+		if ( is_user_logged_in() ) {
+			return '';
+		}
+		wp_enqueue_script( 'mtn-cb-otp-login' );
+		wp_localize_script( 'mtn-cb-otp-login', 'MTNOTP', array(
+			'restUrl' => esc_url_raw( rest_url( 'mtn/v1/' ) ),
+			'redirectUrl' => esc_url_raw( home_url( '/my-account/' ) ),
+			'sending' => __( 'در حال درخواست کد پیامکی…', 'mtn-cafe-booking' ),
+			'requested' => __( 'اگر شماره واجد شرایط باشد، پیامک ارسال می‌شود.', 'mtn-cafe-booking' ),
+			'verifying' => __( 'در حال بررسی کد…', 'mtn-cafe-booking' ),
+			'success' => __( 'ورود موفق بود؛ در حال انتقال…', 'mtn-cafe-booking' ),
+			'error' => __( 'درخواست انجام نشد؛ کمی بعد دوباره تلاش کنید.', 'mtn-cafe-booking' ),
+		) );
+		ob_start();
+		?>
+		<section class="mtn-booking-panel" data-mtn-otp-login>
+			<h2><?php esc_html_e( 'ورود با پیامک', 'mtn-cafe-booking' ); ?></h2>
+			<form>
+				<p><label for="mtn-otp-phone"><?php esc_html_e( 'شماره تلفن با کد کشور', 'mtn-cafe-booking' ); ?></label><input id="mtn-otp-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+905xxxxxxxxx" pattern="\+[1-9][0-9]{7,14}" maxlength="16" required></p>
+				<p><label for="mtn-otp-code"><?php esc_html_e( 'کد شش‌رقمی پیامک‌شده', 'mtn-cafe-booking' ); ?></label><input id="mtn-otp-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" hidden></p>
+				<div class="mtn-booking-actions"><button class="button" type="button" data-otp-request><?php esc_html_e( 'ارسال کد', 'mtn-cafe-booking' ); ?></button><button class="button" type="submit" data-otp-verify hidden><?php esc_html_e( 'تأیید و ورود', 'mtn-cafe-booking' ); ?></button></div>
+				<p role="status" aria-live="polite"></p>
+			</form>
+		</section>
+		<?php
+		return ob_get_clean();
 	}
 
 	public static function table_name() {
