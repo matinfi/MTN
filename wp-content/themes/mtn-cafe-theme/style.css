@@ -1,0 +1,32 @@
+/*
+Theme Name: MTN Cafe
+Theme URI: https://github.com/matinfi/MTN
+Author: MTN Project
+Description: Lightweight Persian RTL theme for cafe discovery and live music reservations.
+Version: 0.1.0
+Requires at least: 6.4
+Requires PHP: 8.1
+Text Domain: mtn-cafe-theme
+*/
+:root{--mtn-bg:#101014;--mtn-surface:#1b1b22;--mtn-text:#f7f4ef;--mtn-muted:#b8b4bf;--mtn-accent:#e7a94b;--mtn-radius:18px}
+*{box-sizing:border-box}
+html{direction:rtl;scroll-behavior:smooth}
+body{margin:0;background:var(--mtn-bg);color:var(--mtn-text);font-family:Tahoma,Arial,sans-serif;line-height:1.8}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:3px solid var(--mtn-accent);outline-offset:3px}
+.site-header,.site-footer{padding:1rem clamp(1rem,4vw,4rem);background:#15151b}
+.site-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid #2a2931}
+.brand{font-size:1.25rem;font-weight:800}.brand span{color:var(--mtn-accent)}
+.nav-links{display:flex;gap:1rem;flex-wrap:wrap;color:var(--mtn-muted)}
+.container{width:min(1160px,calc(100% - 2rem));margin-inline:auto}
+.hero{padding:clamp(3rem,8vw,7rem) 0;background:radial-gradient(ellipse at 15% 15%,#3a2b1c 0,transparent 45%),linear-gradient(135deg,#17171e,#101014)}
+.hero h1{font-size:clamp(2rem,5vw,4rem);line-height:1.25;max-width:800px;margin:.5rem 0 1rem}
+.hero p,.muted{color:var(--mtn-muted);max-width:700px}
+.eyebrow{color:var(--mtn-accent);font-weight:700}
+.button{display:inline-flex;align-items:center;justify-content:center;padding:.75rem 1.2rem;border-radius:999px;background:var(--mtn-accent);color:#17120b;font-weight:800}
+.section{padding:3rem 0}.section-heading{display:flex;align-items:end;justify-content:space-between;gap:1rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:1rem}
+.card{padding:1.25rem;background:var(--mtn-surface);border:1px solid #302e38;border-radius:var(--mtn-radius)}
+.card h3{margin-top:0}.notice{padding:1rem;border:1px solid #65502d;border-radius:12px;background:#292219}
+.site-footer{margin-top:3rem;color:var(--mtn-muted)}
+@media(max-width:600px){.site-header{align-items:flex-start;flex-direction:column}.nav-links{gap:.65rem}.section-heading{align-items:flex-start;flex-direction:column}}
