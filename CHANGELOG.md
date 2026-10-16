@@ -6,6 +6,8 @@
 - Expire stale pending booking holds when new requests are processed.
 - Add an administrator-only rejection endpoint with an optional reason.
 - Add per-user idempotency keys with payload checks and duplicate-request recovery.
+- Upgrade the booking schema to version 3 with a unique per-user idempotency index.
+- Add a repeatable integration and concurrency test plan; execution remains outstanding.
 - Parse reservation times in the WordPress site timezone and store UTC timestamps.
 - Add configurable table-occupancy duration and a schema migration for the supporting index.
 - Hide cafe owner identifiers from public REST metadata.
