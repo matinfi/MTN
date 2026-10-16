@@ -6,6 +6,7 @@
 - Add configurable customer cancellation cutoff and reject late/past-start customer cancellation attempts.
 - Reset the booking idempotency key when the customer changes the request payload.
 - Bound manual finance adjustment amounts to the supported ledger precision.
+- Add a hierarchical cafe-location taxonomy for country/city/area/neighborhood terms.
 - Add lightweight static source-contract checks; integration and concurrency tests remain outstanding.
 
 
