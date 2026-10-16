@@ -74,7 +74,6 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $sms, 'MTN_CB_TWILIO_ACCOUNT_SID' ) ||
 	false === strpos( $sms, 'wp_set_auth_cookie' ) ||
 	false === strpos( $sms, 'mtn_sms_login' ) ||
-
 	false === strpos( $sms, 'public static function request_code' ) ||
 	false === strpos( $sms, 'public static function verify_code' ) ||
 	false === strpos( $sms, 'MTN_CB_TWILIO_AUTH_TOKEN' ) ||
@@ -84,8 +83,7 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $recurrence, "'post_status' => 'draft'" ) ||
 	false === strpos( $statements, 'public static function generate_monthly_statements' ) ||
 	false === strpos( $statements, 'public static function calculate_overdue' ) ||
-	false === strpos( $content, 'mtn_event_recurrence_until' ) ||
-	false === strpos( $recurrence, "'post_status' => 'draft'" ) ||
+
 	false === strpos( $notifications, 'public static function process_queue' ) ||
 	false === strpos( $notifications, 'next_attempt_at' ) ||
 	false === strpos( $invites, 'public static function accept_from_form' ) ||
