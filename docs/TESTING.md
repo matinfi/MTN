@@ -25,6 +25,7 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Idempotency mismatch | Reuse a key with a different payload | HTTP 409 |
 | Idempotency isolation | Use the same key for a different customer | A separate booking may be created |
 | Ownership | Read or cancel another customer's booking | The request returns not found |
+| Audit history privacy | Request history as booking owner, assigned cafe owner, unrelated customer and admin | Only owner, assigned cafe owner and admin can read; actor IDs are not exposed in REST output |
 | Cafe owner isolation | Sign in as owner A and request owner B's booking ID | Confirm/reject/cancel returns HTTP 403; owner A's list never includes owner B's records |
 | Cafe dashboard | Sign in as the configured cafe owner | The dashboard loads only bookings for cafes assigned to that user |
 | Manual table assignment | Assign a free active table to an unassigned booking | Table is saved; conflicting, inactive, undersized or other-cafe tables are rejected |
