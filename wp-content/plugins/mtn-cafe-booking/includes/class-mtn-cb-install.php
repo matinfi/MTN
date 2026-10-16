@@ -48,6 +48,11 @@ final class MTN_CB_Install {
 
 		dbDelta( $sql );
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
+		if ( class_exists( 'MTN_CB_Content' ) ) {
+			MTN_CB_Content::register_types();
+			flush_rewrite_rules();
+		}
+		self::ensure_default_pages();
 		add_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) );
 		add_option( 'mtn_cb_currency', 'TRY' );
 		add_option( 'mtn_cb_default_commission', '0' );
@@ -56,13 +61,38 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
 	}
 
+	public static function ensure_default_pages() {
+		if ( get_option( 'mtn_cb_default_pages_created' ) ) {
+			return;
+		}
+		$pages = array(
+			'book' => array( 'title' => 'رزرو کافه', 'content' => '[mtn_booking_form]' ),
+			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]' ),
+		);
+		foreach ( $pages as $slug => $page ) {
+			if ( ! get_page_by_path( $slug, OBJECT, 'page' ) ) {
+				wp_insert_post( array(
+					'post_type' => 'page',
+					'post_status' => 'publish',
+					'post_title' => $page['title'],
+					'post_name' => $slug,
+					'post_content' => $page['content'],
+					'post_author' => get_current_user_id(),
+				) );
+			}
+		}
+		update_option( 'mtn_cb_default_pages_created', 1 );
+	}
+
 	public static function maybe_upgrade() {
 		if ( (string) get_option( 'mtn_cb_db_version', '0' ) !== self::DB_VERSION ) {
 			self::activate();
 		}
+		self::ensure_default_pages();
 	}
 
 	public static function deactivate() {
 		// Preserve all booking and finance data on deactivation.
+		flush_rewrite_rules();
 	}
 }
