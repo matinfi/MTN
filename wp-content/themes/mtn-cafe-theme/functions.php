@@ -36,6 +36,11 @@ function mtn_cafe_event_archive_query( $query ) {
 			'compare' => '>=',
 			'type' => 'DATE',
 		),
+		array(
+			'key' => 'mtn_event_start_time',
+			'value' => '',
+			'compare' => '!=',
+		),
 	) );
 }
 add_action( 'pre_get_posts', 'mtn_cafe_event_archive_query' );
