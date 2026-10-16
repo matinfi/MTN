@@ -22,10 +22,11 @@
 - [ ] Append-only booking audit log
 
 ## Phase 2 — finance and attendance
-- [ ] Append-only commission ledger and correction/reversal entries
-- [ ] Fixed-per-eligible-booking default commission settings and cafe statements
+- [x] Append-only commission ledger and manual correction/reversal entries
+- [x] Fixed commission snapshot at booking creation and accrual on completion
+- [ ] Automated cafe statements
 - [ ] Secure time-limited check-in token and audit history
-- [ ] Manual settlement records and CSV exports
+- [x] Manual settlement records and ledger CSV export
 
 ## Phase 3 — communications and identity
 - [ ] Real SMS provider adapter, OTP expiry, resend limits and attempt throttling
