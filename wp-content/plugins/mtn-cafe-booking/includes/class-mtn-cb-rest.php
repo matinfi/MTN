@@ -458,6 +458,8 @@ final class MTN_CB_Rest {
 	}
 
 	private static function public_booking( $booking ) {
+		$whatsapp_link = MTN_CB_WhatsApp::manual_link( $booking, get_post_meta( $booking->cafe_id, 'mtn_cafe_whatsapp', true ) );
+		$whatsapp_url = is_wp_error( $whatsapp_link ) ? '' : $whatsapp_link;
 		return array(
 			'id'                     => (int) $booking->id,
 			'booking_code'           => $booking->booking_code,
@@ -468,6 +470,7 @@ final class MTN_CB_Rest {
 			'booking_at'             => $booking->booking_at,
 			'status'                 => $booking->status,
 			'whatsapp_action_status' => $booking->whatsapp_action_status,
+			'whatsapp_url'            => $whatsapp_url,
 			'checkin_status'          => $booking->checkin_status,
 			'created_at'              => $booking->created_at,
 		);
