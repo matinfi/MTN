@@ -55,7 +55,7 @@ Optional fields:
 | `customer_note` | string | Plain text; sanitized on the server |
 | `idempotency_key` | string | Optional client-generated key, 8–64 letters/digits or `. _ : -`; replays the same request safely when the payload matches |
 
-A successful request returns HTTP 201 with the booking ID, random booking code, selected listing IDs, party size, status and timestamps. New records start as `pending_cafe`. The persisted `booking_at` is UTC; convert it for display using the site's configured timezone.
+A successful request returns HTTP 201 with the booking ID, random booking code, selected listing IDs, party size, status and timestamps. Private booking responses also include `whatsapp_url` when the cafe has a valid WhatsApp number configured; this opens a prefilled manual message and does not mean a message was sent or delivered. New records start as `pending_cafe`. The persisted `booking_at` is UTC; convert it for display using the site's configured timezone.
 
 Possible errors include:
 - `400`: invalid input, invalid listing relationship, party size, past time or table.
