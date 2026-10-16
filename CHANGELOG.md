@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0] - 2026-10-16
+- Add expiring cafe-team invitation tokens with hash-only storage, email matching and single-use acceptance.
+- Add an idempotent email notification queue with bounded exponential retries and delivery history.
+- Add event-cancellation commission policy snapshots and schema version 12.
+- Fix the check-in token REST route pattern.
+- Add a WordPress PHPUnit test harness and CI workflow; execution results must be verified before release.
+
+
 ## [0.7.1] - 2026-10-16
 - Add an administrator finance reconciliation summary by published cafe and currency.
 - Separate accrued commissions, reversals, settlements, signed adjustments and net outstanding balance.
