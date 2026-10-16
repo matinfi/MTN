@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1] - 2026-10-16
+- Add an administrator finance reconciliation summary by published cafe and currency.
+- Separate accrued commissions, reversals, settlements, signed adjustments and net outstanding balance.
+- Clarify the finance page's commission trigger text to match the configured default (`confirmed`) and optional `completed` trigger.
+- Document that overdue balances cannot be inferred without a configured due-date policy.
+
+
 ## [0.7.0] - 2026-10-16
 - Add booking-time snapshots for automatic commission reversal on cancellation and no-show.
 - Append negative, idempotent commission reversal entries when the configured policy applies after accrual.
