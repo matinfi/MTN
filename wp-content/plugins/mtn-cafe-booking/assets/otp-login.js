@@ -36,6 +36,11 @@
 			});
 			form.addEventListener('submit', function (event) {
 				event.preventDefault();
+				if (code.hidden) {
+					status.textContent = MTNOTP.requested;
+					phone.focus();
+					return;
+				}
 				status.textContent = MTNOTP.verifying;
 				verifyButton.disabled = true;
 				send('auth/otp/verify', { phone: phone.value.trim(), code: code.value.trim() }).then(function (data) {
