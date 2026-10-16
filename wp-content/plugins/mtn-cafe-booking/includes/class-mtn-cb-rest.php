@@ -151,7 +151,7 @@ final class MTN_CB_Rest {
 			'order' => 'ASC',
 		) );
 		$cafes = array();
-		foreach ( $ cafe_posts as $cafe ) {
+		foreach ( $cafe_posts as $cafe ) {
 			$cafes[] = array( 'id' => (int) $cafe->ID, 'name' => get_the_title( $cafe ), 'url' => get_permalink( $cafe ), 'description' => wp_strip_all_tags( get_the_excerpt( $cafe ) ) );
 		}
 		$event_posts = get_posts( array(
