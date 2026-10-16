@@ -35,5 +35,5 @@ A positive balance means the cafe owes the platform. A zero balance means the re
 
 - Reconcile the ledger against external bank/payment records before considering a settlement final.
 - Back up the database before migration and test schema upgrade on staging.
-- The application does not yet provide automated cafe statements, period close, tax/VAT handling, bank reconciliation or a payment gateway.
+- Monthly cafe statement emails, a configurable month-end due-date policy and overdue balance reporting are implemented. External bank-statement reconciliation, period-close approval, tax/VAT handling and payment-gateway processing remain out of scope.
 - Booking status audit events and financial ledger entries are separate records with different purposes.
