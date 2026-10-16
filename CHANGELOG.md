@@ -5,6 +5,9 @@
 - Add a configurable 1–90 day due-date policy and overdue balance report by cafe/currency.
 - Add administrator-managed cafe statement email metadata and a dedicated statements page.
 - Extend source-contract checks to cover statements, recurrence, OTP and invitation workflows.
+- Harden OTP resends with per-phone advisory locking, invalidation of superseded codes and atomic failed-attempt lockout updates.
+- Expand REST privacy/authorization and OTP abuse regression tests; add serialized event-capacity invariant coverage.
+- Repair CI test setup to use the maintained WP-CLI installer and avoid interactive recreation of the service database.
 
 
 ## [0.9.0] - 2026-10-16
