@@ -26,6 +26,7 @@ A positive balance means the cafe owes the platform. A zero balance means the re
 - Adjustments require an administrator, a published cafe, a non-zero signed amount and a reason.
 - CSV export is administrator-only and text fields are escaped against spreadsheet formula injection.
 - The default commission is snapshotted at booking creation; zero means no commission entry will be accrued for that booking.
+- The global currency setting is locked after the first booking or ledger entry to prevent mixing currencies in a single balance.
 
 ## Operational cautions
 
