@@ -524,7 +524,7 @@ final class MTN_CB_Bookings {
 		if ( ! $booking ) {
 			return new WP_Error( 'mtn_checkin_invalid', __( 'کد اعلام حضور معتبر نیست یا منقضی شده است.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
-		if ( ! current_user_can( 'manage_options' ) && ( ! current_user_can( 'mtn_manage_cafes' ) || absint( get_post_meta( $booking->cafe_id, 'mtn_cafe_owner_id', true ) ) !== absint( $actor_id ) ) ) {
+		if ( ! current_user_can( 'manage_options' ) && ( ! current_user_can( 'mtn_manage_cafes' ) || ! MTN_CB_Content::user_can_manage_cafe( $booking->cafe_id, $actor_id ) ) ) {
 			return new WP_Error( 'mtn_checkin_forbidden', __( 'دسترسی به ثبت حضور این کافه را ندارید.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
 		}
 		$now = current_time( 'mysql', true );
