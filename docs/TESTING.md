@@ -51,6 +51,7 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Commission eligibility | Configure trigger as `completed`; mark one booking no-show and another completed | No-show creates no commission; completed creates exactly one ledger entry |
 | Table assignment gate | In cafe-assigned-table mode, attempt to confirm or complete a booking without a table | HTTP 409 until an active table is assigned |
 | Settlement balance | Record a settlement larger than the outstanding cafe balance | The request is rejected and no settlement/ledger row is added |
+| Finance reconciliation summary | Add commission accrual, reversal, settlement and signed adjustment entries for a published cafe | Admin summary separates each category and its net outstanding balance by currency; overdue is not inferred without an agreed due-date policy |
 | Settlement idempotency | Submit the same settlement form request key twice | Only one settlement and one ledger entry are created |
 | Duplicate accrual | Trigger the configured commission-status hook twice for one booking | Unique entry key prevents duplicate commission accrual |
 | Ledger correction | Record a signed adjustment with a reason | A new immutable ledger entry is appended and balance recalculates |
