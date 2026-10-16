@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0] - 2026-10-16
+- Add automated monthly cafe statement emails through the idempotent notification queue.
+- Add a configurable 1–90 day due-date policy and overdue balance report by cafe/currency.
+- Add administrator-managed cafe statement email metadata and a dedicated statements page.
+- Extend source-contract checks to cover statements, recurrence, OTP and invitation workflows.
+
+
 ## [0.9.0] - 2026-10-16
 - Add optional Twilio SMS OTP sign-in with hashed codes, five-minute expiry, resend throttling, per-phone/IP limits and five-attempt lockout.
 - Add administrator-managed E.164 phone assignments to existing WordPress users; provider credentials must be configured outside source control.
