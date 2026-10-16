@@ -39,6 +39,7 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Settlement idempotency | Submit the same settlement form request key twice | Only one settlement and one ledger entry are created |
 | Duplicate accrual | Trigger the completion hook twice for one booking | Unique entry key prevents duplicate commission accrual |
 | Ledger correction | Record a signed adjustment with a reason | A new immutable ledger entry is appended and balance recalculates |
+| Adjustment idempotency | Submit the same adjustment form request key twice | Only one ledger entry is added; key reuse with changed amount/reason is rejected |
 | CSV export | Export the ledger as an administrator | CSV includes entries, amounts, currency, reference, actor and UTC timestamp; non-admin is denied |
 | Concurrent table assignment | Assign the same table to overlapping bookings simultaneously | Cafe-scoped lock permits no conflicting assignment |
 | Admin metadata | Save cafe, event and table metadata using the editor | Values persist and are used by catalog, schedule and capacity checks |
