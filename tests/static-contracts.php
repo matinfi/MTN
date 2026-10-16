@@ -34,7 +34,7 @@ if ( false !== strpos( $rest, '\\\\d+' ) ) {
 }
 
 if ( false === strpos( $bookings, "get_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 )" ) ||
-	false === strpos( $bookings, "'cancelled_by_customer' === $next_status" ) ) {
+	false === strpos( $bookings, "'cancelled_by_customer' === \\$next_status" ) ) {
 	fwrite( STDERR, "Customer cancellation cutoff enforcement is missing.\n" );
 	exit( 1 );
 }
