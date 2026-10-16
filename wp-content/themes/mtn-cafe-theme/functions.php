@@ -21,3 +21,21 @@ function mtn_cafe_enqueue_assets() {
 	wp_enqueue_style( 'mtn-cafe-style', get_stylesheet_uri(), array(), '0.2.0' );
 }
 add_action( 'wp_enqueue_scripts', 'mtn_cafe_enqueue_assets' );
+
+function mtn_cafe_event_archive_query( $query ) {
+	if ( is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive( 'mtn_event' ) ) {
+		return;
+	}
+	$query->set( 'meta_key', 'mtn_event_date' );
+	$query->set( 'orderby', 'meta_value' );
+	$query->set( 'order', 'ASC' );
+	$query->set( 'meta_query', array(
+		array(
+			'key' => 'mtn_event_date',
+			'value' => current_time( 'Y-m-d' ),
+			'compare' => '>=',
+			'type' => 'DATE',
+		),
+	) );
+}
+add_action( 'pre_get_posts', 'mtn_cafe_event_archive_query' );
