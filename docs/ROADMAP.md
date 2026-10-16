@@ -17,6 +17,7 @@
 - [x] Customer booking wizard, booking history and cancellation UI
 - [x] Administrator booking confirmation/rejection console
 - [x] Cafe-owner dashboard for owned bookings with confirm/reject/cancel actions
+- [x] Scheduled expiry worker for stale pending reservations
 - [ ] Staff invitations, multi-user teams and configurable cancellation policy
 - [x] Optional idempotency keys for booking creation
 - [x] Append-only booking audit log for creation, status transitions and table assignment
