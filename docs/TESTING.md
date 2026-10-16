@@ -37,11 +37,11 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Commission trigger default | Create a booking with default settings and confirm it | Exactly one commission entry is accrued on confirmation when the snapshotted amount is positive |
 | Commission trigger alternative | Configure `completed`, create a booking, confirm it and then complete it | No commission entry on confirmation; exactly one on completion |
 | Commission trigger snapshot | Change the central trigger setting after creating a booking | The existing booking retains its original trigger; only new bookings use the new setting |
-| Commission eligibility | Mark a booking no-show, then mark another completed | No-show creates no commission; completed creates exactly one ledger entry |
+| Commission eligibility | Configure trigger as `completed`; mark one booking no-show and another completed | No-show creates no commission; completed creates exactly one ledger entry |
 | Table assignment gate | In cafe-assigned-table mode, attempt to confirm or complete a booking without a table | HTTP 409 until an active table is assigned |
 | Settlement balance | Record a settlement larger than the outstanding cafe balance | The request is rejected and no settlement/ledger row is added |
 | Settlement idempotency | Submit the same settlement form request key twice | Only one settlement and one ledger entry are created |
-| Duplicate accrual | Trigger the completion hook twice for one booking | Unique entry key prevents duplicate commission accrual |
+| Duplicate accrual | Trigger the configured commission-status hook twice for one booking | Unique entry key prevents duplicate commission accrual |
 | Ledger correction | Record a signed adjustment with a reason | A new immutable ledger entry is appended and balance recalculates |
 | Adjustment idempotency | Submit the same adjustment form request key twice | Only one ledger entry is added; key reuse with changed amount/reason is rejected |
 | CSV export | Export the ledger as an administrator | CSV includes entries, amounts, currency, reference, actor and UTC timestamp; non-admin is denied |
