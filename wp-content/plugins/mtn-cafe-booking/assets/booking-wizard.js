@@ -150,6 +150,18 @@
         updateEvents();
         resetAvailability();
         setStatus(root, 'درخواست رزرو ثبت شد. کد پیگیری: ' + booking.booking_code + ' — وضعیت: در انتظار تأیید کافه.', 'success');
+        if (booking.whatsapp_url) {
+          loginNote.hidden = false;
+          loginNote.replaceChildren(document.createTextNode('برای باز کردن پیام آماده و ارسال دستی به کافه: '));
+          const whatsappLink = el('a', '', 'باز کردن واتساپ');
+          whatsappLink.href = booking.whatsapp_url;
+          whatsappLink.target = '_blank';
+          whatsappLink.rel = 'noopener noreferrer';
+          loginNote.append(whatsappLink);
+        } else {
+          loginNote.hidden = true;
+          loginNote.replaceChildren();
+        }
       } catch (error) {
         setStatus(root, error.message, 'error');
         submitButton.disabled = false;
