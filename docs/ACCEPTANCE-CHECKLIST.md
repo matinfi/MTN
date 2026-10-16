@@ -16,10 +16,13 @@ This checklist is the release gate. An unchecked item must not be described as i
 
 ## Cafe operations
 - [x] WordPress content models for cafes, events and tables.
+- [x] Cafe owner ID and contact metadata fields for administrator configuration.
 - [ ] Cafe owner and staff management screens.
 - [ ] Object-level cafe staff authorization.
-- [ ] Cafe confirmation/rejection UI and rejection reason.
-- [ ] Event schedule, recurrence, media and publication approval.
+- [x] Administrator confirmation/rejection console with optional reason.
+- [ ] Cafe-owner/staff confirmation UI and object-level authorization.
+- [x] Event date, start/end time and capacity metadata fields.
+- [ ] Recurrence, media workflow and publication approval.
 - [ ] Geo hierarchy (country, city, area, neighborhood).
 
 ## Finance
