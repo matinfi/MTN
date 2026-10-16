@@ -38,8 +38,15 @@ final class MTN_CB_Event_Recurrence {
 			if ( ! $until || ! $next || $until < $next ) {
 				continue;
 			}
+			$monthly_day = (int) $next->format( 'j' );
 			for ( $count = 0; $count < 60; $count++ ) {
-				$next = 'weekly' === $frequency ? $next->modify( '+7 days' ) : $next->modify( '+1 month' );
+				if ( 'weekly' === $frequency ) {
+					$next = $next->modify( '+7 days' );
+				} else {
+					$month_start = $next->modify( 'first day of next month' );
+					$day = min( $monthly_day, (int) $month_start->format( 't' ) );
+					$next = $month_start->setDate( (int) $month_start->format( 'Y' ), (int) $month_start->format( 'n' ), $day );
+				}
 				if ( $next > $until || $next > $horizon ) {
 					break;
 				}
