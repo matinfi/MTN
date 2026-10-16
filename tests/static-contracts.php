@@ -11,7 +11,6 @@ $bookings_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mt
 $content_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-content.php';
 $install_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-install.php';
 $finance_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-finance.php';
-$install_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-install.php';
 $notifications_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-notifications.php';
 $invites_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-team-invites.php';
 $sms_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-sms-otp.php';
@@ -70,11 +69,16 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $install, 'mtn_cafe_invites' ) ||
 	false === strpos( $install, 'mtn_notifications' ) ||
 	false === strpos( $install, 'mtn_sms_otps' ) ||
+	false === strpos( $sms, 'MTN_CB_TWILIO_ACCOUNT_SID' ) ||
+	false === strpos( $sms, 'wp_set_auth_cookie' ) ||
+	false === strpos( $sms, 'mtn_sms_login' ) ||
 	false === strpos( $sms, 'public static function request_code' ) ||
 	false === strpos( $sms, 'public static function verify_code' ) ||
 	false === strpos( $sms, 'MTN_CB_TWILIO_AUTH_TOKEN' ) ||
 	false === strpos( $recurrence, 'public static function generate_occurrences' ) ||
 	false === strpos( $event_cancel, 'commission_reverse_on_event_cancel' ) ||
+	false === strpos( $content, 'mtn_event_recurrence_until' ) ||
+	false === strpos( $recurrence, "'post_status' => 'draft'" ) ||
 	false === strpos( $notifications, 'public static function process_queue' ) ||
 	false === strpos( $notifications, 'next_attempt_at' ) ||
 	false === strpos( $invites, 'public static function accept_from_form' ) ||
