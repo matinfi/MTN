@@ -578,7 +578,10 @@ final class MTN_CB_Bookings {
 		$time = $local_date->format( 'H:i:s' );
 		$start = $start ? ( 5 === strlen( $start ) ? $start . ':00' : $start ) : '';
 		$end = $end ? ( 5 === strlen( $end ) ? $end . ':00' : $end ) : '';
-		if ( $event_day && $local_date->format( 'Y-m-d' ) !== $event_day ) {
+		if ( ! $event_day || ! $start ) {
+			return new WP_Error( 'mtn_event_schedule_missing', __( 'تاریخ و ساعت شروع برنامه را پیش از فعال‌کردن رزرو تنظیم کنید.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		if ( $local_date->format( 'Y-m-d' ) !== $event_day ) {
 			$next_day = DateTimeImmutable::createFromFormat( '!Y-m-d', $event_day, wp_timezone() );
 			$next_day = $next_day ? $next_day->modify( '+1 day' )->format( 'Y-m-d' ) : '';
 			$overnight_event = $start && $end && $end < $start;
