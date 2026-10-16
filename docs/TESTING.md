@@ -27,6 +27,8 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Ownership | Read or cancel another customer's booking | The request returns not found |
 | Cafe owner isolation | Sign in as owner A and request owner B's booking ID | Confirm/reject/cancel returns HTTP 403; owner A's list never includes owner B's records |
 | Cafe dashboard | Sign in as the configured cafe owner | The dashboard loads only bookings for cafes assigned to that user |
+| Manual table assignment | Assign a free active table to an unassigned booking | Table is saved; conflicting, inactive, undersized or other-cafe tables are rejected |
+| Concurrent table assignment | Assign the same table to overlapping bookings simultaneously | Cafe-scoped lock permits no conflicting assignment |
 | Admin metadata | Save cafe, event and table metadata using the editor | Values persist and are used by catalog, schedule and capacity checks |
 | Default pages | Upgrade a site that already has the booking/account pages | A cafe-dashboard page is added without duplicating existing slugs |
 | Frontend assets | Open booking page and inspect browser console | Booking wizard JavaScript loads without syntax/runtime errors |
