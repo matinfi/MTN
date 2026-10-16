@@ -170,7 +170,7 @@ final class MTN_CB_Finance {
 		$cafe_id = isset( $_POST['cafe_id'] ) ? absint( $_POST['cafe_id'] ) : 0;
 		$request_key = isset( $_POST['request_key'] ) && is_scalar( $_POST['request_key'] ) ? sanitize_text_field( wp_unslash( $_POST['request_key'] ) ) : '';
 		$raw_amount = isset( $_POST['amount'] ) && is_scalar( $_POST['amount'] ) ? wp_unslash( $_POST['amount'] ) : '';
-		$amount = is_numeric( $raw_amount ) ? round( (float) $raw_amount, 2 ) : 0;
+		$amount = is_numeric( $raw_amount ) && abs( (float) $raw_amount ) <= 9999999999.99 ? round( (float) $raw_amount, 2 ) : 0;
 		$reference = isset( $_POST['reference'] ) && is_scalar( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
 		$note = isset( $_POST['note'] ) && is_scalar( $_POST['note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['note'] ) ) : '';
 		$cafe = get_post( $cafe_id );
