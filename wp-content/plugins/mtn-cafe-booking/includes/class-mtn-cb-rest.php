@@ -51,6 +51,19 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
+			'/bookings/(?P<id>\\d+)/history',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'booking_history' ),
+				'permission_callback' => static function () {
+					return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای مشاهده تاریخچه وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) );
+				},
+				'args' => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
 			'/bookings/(?P<id>\d+)/cancel',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -309,6 +322,28 @@ final class MTN_CB_Rest {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
 		return rest_ensure_response( self::public_booking( $booking ) );
+	}
+
+	public static function booking_history( WP_REST_Request $request ) {
+		$booking = MTN_CB_Bookings::get_by_id( $request['id'] );
+		if ( ! $booking ) {
+			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
+		}
+		$is_customer = (int) $booking->user_id === get_current_user_id();
+		$is_cafe_owner = current_user_can( 'mtn_manage_cafes' ) && absint( get_post_meta( $booking->cafe_id, 'mtn_cafe_owner_id', true ) ) === get_current_user_id();
+		if ( ! $is_customer && ! $is_cafe_owner && ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
+		}
+		$events = MTN_CB_Bookings::get_history( $booking->id );
+		return rest_ensure_response( array_map( static function ( $event ) {
+			return array(
+				'event_type' => $event->event_type,
+				'from_status' => $event->from_status,
+				'to_status' => $event->to_status,
+				'details' => $event->details,
+				'created_at' => $event->created_at,
+			);
+		}, $events ) );
 	}
 
 	public static function cancel_booking( WP_REST_Request $request ) {
