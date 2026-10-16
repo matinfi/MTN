@@ -50,11 +50,15 @@ if ( false === strpos( $content, "if ( current_user_can( 'manage_options' ) )" )
 	exit( 1 );
 }
 
-if ( false === strpos( $install, "const DB_VERSION = '9';" ) ||
+if ( false === strpos( $install, "const DB_VERSION = '10';" ) ||
 	false === strpos( $install, 'commission_trigger_status varchar(20)' ) ||
+	false === strpos( $install, 'checkin_token_hash char(64)' ) ||
 	false === strpos( $bookings, "'commission_trigger_status' => $commission_trigger_status" ) ||
-	false === strpos( $finance, '$booking->commission_trigger_status' ) ) {
-	fwrite( STDERR, "Commission trigger schema/snapshot contract is missing.\\n" );
+	false === strpos( $bookings, 'public static function issue_checkin_token' ) ||
+	false === strpos( $bookings, 'public static function check_in_with_token' ) ||
+	false === strpos( $finance, '$booking->commission_trigger_status' ) ||
+	false === strpos( $rest, "'/cafe/check-in'" ) ) {
+	fwrite( STDERR, "Commission/check-in schema or behavior contract is missing.\\n" );
 	exit( 1 );
 }
 
