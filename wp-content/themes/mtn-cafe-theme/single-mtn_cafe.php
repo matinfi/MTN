@@ -11,7 +11,7 @@
     <?php $address = get_post_meta( $cafe_id, 'mtn_cafe_address', true ); if ( $address ) : ?><p><strong><?php esc_html_e( 'نشانی:', 'mtn-cafe-theme' ); ?></strong> <?php echo esc_html( $address ); ?></p><?php endif; ?>
     <?php $phone = get_post_meta( $cafe_id, 'mtn_cafe_phone', true ); if ( $phone ) : ?><p><strong><?php esc_html_e( 'تماس:', 'mtn-cafe-theme' ); ?></strong> <?php echo esc_html( $phone ); ?></p><?php endif; ?>
     <h2><?php esc_html_e( 'برنامه‌های این کافه', 'mtn-cafe-theme' ); ?></h2>
-    <?php $events = new WP_Query( array( 'post_type' => 'mtn_event', 'post_status' => 'publish', 'posts_per_page' => 30, 'meta_key' => 'mtn_cafe_id', 'meta_value' => $cafe_id ) ); ?>
+    <?php $events = new WP_Query( array( 'post_type' => 'mtn_event', 'post_status' => 'publish', 'posts_per_page' => 30, 'meta_key' => 'mtn_cafe_id', 'meta_value' => $cafe_id, 'orderby' => 'meta_value', 'meta_key' => 'mtn_event_date', 'order' => 'ASC', 'meta_query' => array( array( 'key' => 'mtn_event_date', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ) ) ) ); ?>
     <?php if ( $events->have_posts() ) : ?><div class="cards"><?php while ( $events->have_posts() ) : $events->the_post(); ?>
       <article class="card mtn-listing-card"><h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
       <?php $event_date = get_post_meta( get_the_ID(), 'mtn_event_date', true ); if ( $event_date ) : ?><p class="muted"><?php echo esc_html( $event_date ); ?></p><?php endif; ?>
