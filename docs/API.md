@@ -113,7 +113,7 @@ The authenticated customer who owns a confirmed booking can issue a one-time, ra
 
 `POST /cafe/check-in`
 
-Requires an authenticated cafe manager assigned as the cafe owner or a WordPress administrator. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Team members must be assigned by an administrator in the cafe editor; invitation/acceptance and automated notification of tokens are not implemented.
+Requires an authenticated cafe manager who is the configured owner or an assigned team member for the booking's cafe, or a WordPress administrator. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Team members must be assigned by an administrator in the cafe editor; invitation/acceptance and automated notification of tokens are not implemented.
 
 ## Finance behavior
 
