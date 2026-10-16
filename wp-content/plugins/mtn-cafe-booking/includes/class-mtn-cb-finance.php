@@ -168,12 +168,13 @@ final class MTN_CB_Finance {
 		}
 		check_admin_referer( 'mtn_cb_finance_adjustment' );
 		$cafe_id = isset( $_POST['cafe_id'] ) ? absint( $_POST['cafe_id'] ) : 0;
+		$request_key = isset( $_POST['request_key'] ) && is_scalar( $_POST['request_key'] ) ? sanitize_text_field( wp_unslash( $_POST['request_key'] ) ) : '';
 		$raw_amount = isset( $_POST['amount'] ) && is_scalar( $_POST['amount'] ) ? wp_unslash( $_POST['amount'] ) : '';
 		$amount = is_numeric( $raw_amount ) ? round( (float) $raw_amount, 2 ) : 0;
 		$reference = isset( $_POST['reference'] ) && is_scalar( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
 		$note = isset( $_POST['note'] ) && is_scalar( $_POST['note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['note'] ) ) : '';
 		$cafe = get_post( $cafe_id );
-		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || 0.0 === $amount || '' === $note ) {
+		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || 0.0 === $amount || '' === $note || ! preg_match( '/^[A-Za-z0-9._:-]{8,64}$/', $request_key ) ) {
 			self::redirect( 'invalid_adjustment' );
 		}
 		global $wpdb;
@@ -182,7 +183,13 @@ final class MTN_CB_Finance {
 		if ( '1' !== (string) $locked ) {
 			self::redirect( 'busy' );
 		}
-		$entry_key = 'adjustment_' . str_replace( '-', '', wp_generate_uuid4() );
+		$entry_key = 'adjustment_' . $request_key;
+		$existing = $wpdb->get_row( $wpdb->prepare( 'SELECT cafe_id, amount, reference, note FROM ' . self::ledger_table() . ' WHERE entry_key = %s', $entry_key ) );
+		if ( $existing ) {
+			$same_request = (int) $existing->cafe_id === $cafe_id && abs( (float) $existing->amount - $amount ) < 0.001 && (string) $existing->reference === $reference && (string) $existing->note === $note;
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+			self::redirect( $same_request ? 'adjusted' : 'invalid_adjustment' );
+		}
 		$inserted = $wpdb->insert(
 			self::ledger_table(),
 			array(
@@ -275,6 +282,7 @@ final class MTN_CB_Finance {
 			<p><?php esc_html_e( 'مبلغ مثبت بدهی کافه را افزایش می‌دهد؛ مبلغ منفی برای اصلاح یا برگشت ثبت قبلی است. دلیل ثبت الزامی است.', 'mtn-cafe-booking' ); ?></p>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="mtn_cb_finance_adjustment">
+				<input type="hidden" name="request_key" value="<?php echo esc_attr( wp_generate_uuid4() ); ?>">
 				<?php wp_nonce_field( 'mtn_cb_finance_adjustment' ); ?>
 				<table class="form-table"><tbody>
 					<tr><th><label for="mtn-adjust-cafe"><?php esc_html_e( 'کافه', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn-adjust-cafe" name="cafe_id" required><option value=""><?php esc_html_e( 'انتخاب کافه', 'mtn-cafe-booking' ); ?></option><?php foreach ( $cafes as $cafe ) : ?><option value="<?php echo (int) $cafe->ID; ?>"><?php echo esc_html( get_the_title( $cafe ) ); ?></option><?php endforeach; ?></select></td></tr>
