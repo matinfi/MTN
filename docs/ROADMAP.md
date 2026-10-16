@@ -24,7 +24,7 @@
 
 ## Phase 2 — finance and attendance
 - [x] Append-only commission ledger and manual correction/reversal entries
-- [x] Fixed commission snapshot at booking creation and accrual on completion
+- [x] Fixed commission amount/currency and configurable trigger (`confirmed` by default, `completed` optional) snapshotted at booking creation
 - [ ] Automated cafe statements
 - [ ] Secure time-limited check-in token and audit history
 - [x] Manual settlement records and ledger CSV export
