@@ -14,7 +14,7 @@ The repository's CI checks PHP syntax, booking-wizard JavaScript syntax and stat
 
 1. Back up the WordPress database and files.
 2. Install the plugin ZIP and activate it; install/activate the theme ZIP separately.
-3. Confirm the plugin schema migration reaches version 11 and that the booking, ledger, settlement and audit tables exist.
+3. Confirm the plugin schema migration reaches version 13 and that the booking, ledger, settlement and audit tables exist.
 4. Save Settings → Permalinks once if the cafe/event archive routes return 404.
 5. Configure brand, currency, fixed commission and commission trigger (`confirmed` by default or `completed`), booking expiry, reservation duration, customer cancellation cutoff, check-in token expiry, statement due days and table-selection mode. Set statement due days to the agreed finance policy and configure a valid statement email in each cafe's metadata. A zero-minute cancellation cutoff allows customer cancellation until the reservation start; positive values block cancellation inside that many minutes. Currency is intentionally locked after the first booking or ledger entry.
 6. Create a cafe and set its city, address, contact details, music genre and optional owner user. Saving an owner assigns the cafe-manager role.
