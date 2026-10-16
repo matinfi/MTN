@@ -317,6 +317,89 @@ final class MTN_CB_Bookings {
 		);
 	}
 
+	public static function get_assignable_tables( $booking_id ) {
+		global $wpdb;
+		$booking = self::get_by_id( $booking_id );
+		if ( ! $booking || ! in_array( $booking->status, self::CAPACITY_STATUSES, true ) ) {
+			return array();
+		}
+		$duration = min( 720, max( 30, absint( get_option( 'mtn_cb_booking_duration_minutes', 120 ) ) ) );
+		$start_ts = strtotime( $booking->booking_at . ' UTC' );
+		$window_start = gmdate( 'Y-m-d H:i:s', $start_ts - ( $duration * MINUTE_IN_SECONDS ) );
+		$window_end = gmdate( 'Y-m-d H:i:s', $start_ts + ( $duration * MINUTE_IN_SECONDS ) );
+		$expiry_minutes = min( 1440, max( 5, absint( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ) ) );
+		$expiry_before = gmdate( 'Y-m-d H:i:s', time() - ( $expiry_minutes * MINUTE_IN_SECONDS ) );
+		$table_ids = get_posts( array(
+			'post_type' => 'mtn_table',
+			'post_status' => 'publish',
+			'posts_per_page' => 200,
+			'fields' => 'ids',
+			'orderby' => 'title',
+			'order' => 'ASC',
+			'meta_query' => array(
+				'relation' => 'AND',
+				array( 'key' => 'mtn_cafe_id', 'value' => absint( $booking->cafe_id ), 'compare' => '=', 'type' => 'NUMERIC' ),
+				array( 'key' => 'mtn_table_active', 'value' => '1', 'compare' => '=' ),
+				array( 'key' => 'mtn_table_capacity', 'value' => absint( $booking->party_size ), 'compare' => '>=', 'type' => 'NUMERIC' ),
+			),
+		) );
+		$available = array();
+		foreach ( $table_ids as $table_id ) {
+			$conflict = $wpdb->get_var( $wpdb->prepare(
+				"SELECT id FROM " . self::table_name() . " WHERE cafe_id = %d AND table_id = %d AND id <> %d AND (status = 'confirmed' OR (status = 'pending_cafe' AND created_at >= %s)) AND booking_at > %s AND booking_at < %s LIMIT 1",
+				absint( $booking->cafe_id ), absint( $table_id ), absint( $booking->id ), $expiry_before, $window_start, $window_end
+			) );
+			if ( ! $conflict ) {
+				$available[] = array( 'id' => (int) $table_id, 'name' => get_the_title( $table_id ), 'capacity' => absint( get_post_meta( $table_id, 'mtn_table_capacity', true ) ) );
+			}
+		}
+		return $available;
+	}
+
+	public static function assign_table( $booking_id, $table_id, $actor_id = 0 ) {
+		global $wpdb;
+		$booking = self::get_by_id( $booking_id );
+		if ( ! $booking || ! in_array( $booking->status, self::CAPACITY_STATUSES, true ) ) {
+			return new WP_Error( 'mtn_booking_not_assignable', __( 'این رزرو در وضعیت فعلی قابل تخصیص میز نیست.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+		}
+		$cafe_id = absint( $booking->cafe_id );
+		$lock_name = 'mtn_cb_cafe_' . $cafe_id;
+		$locked = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock_name ) );
+		if ( '1' !== (string) $locked ) {
+			return new WP_Error( 'mtn_booking_busy', __( 'سامانه در حال پردازش رزروهای این کافه است؛ دوباره تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 503 ) );
+		}
+		try {
+			$booking = self::get_by_id( $booking_id );
+			if ( ! $booking || ! in_array( $booking->status, self::CAPACITY_STATUSES, true ) ) {
+				return new WP_Error( 'mtn_booking_not_assignable', __( 'این رزرو دیگر قابل تخصیص میز نیست.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			}
+			$table = get_post( $table_id );
+			$capacity = absint( get_post_meta( $table_id, 'mtn_table_capacity', true ) );
+			if ( ! $table || 'mtn_table' !== $table->post_type || 'publish' !== $table->post_status || absint( get_post_meta( $table_id, 'mtn_cafe_id', true ) ) !== $cafe_id || ! $capacity || $capacity < (int) $booking->party_size || ! get_post_meta( $table_id, 'mtn_table_active', true ) ) {
+				return new WP_Error( 'mtn_table_unavailable', __( 'میز انتخاب‌شده فعال نیست یا ظرفیت کافی ندارد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+			}
+			$available = self::get_assignable_tables( $booking_id );
+			$available_ids = array_map( 'absint', wp_list_pluck( $available, 'id' ) );
+			if ( ! in_array( absint( $table_id ), $available_ids, true ) ) {
+				return new WP_Error( 'mtn_table_time_conflict', __( 'این میز برای زمان رزرو در دسترس نیست.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			}
+			$updated = $wpdb->update(
+				self::table_name(),
+				array( 'table_id' => absint( $table_id ), 'updated_at' => current_time( 'mysql', true ) ),
+				array( 'id' => absint( $booking_id ), 'status' => $booking->status ),
+				array( '%d', '%s' ),
+				array( '%d', '%s' )
+			);
+			if ( 1 !== $updated ) {
+				return new WP_Error( 'mtn_booking_update_conflict', __( 'رزرو هم‌زمان تغییر کرده است؛ دوباره تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			}
+			do_action( 'mtn_cb_booking_table_assigned', $booking, absint( $table_id ), absint( $actor_id ) );
+			return self::get_by_id( $booking_id );
+		} finally {
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+		}
+	}
+
 	public static function get_by_id( $id ) {
 		global $wpdb;
 		return $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', absint( $id ) ) );
