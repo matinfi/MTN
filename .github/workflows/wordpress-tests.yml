@@ -32,6 +32,8 @@ jobs:
         with:
           php-version: "8.2"
           tools: phpunit:9.6
+      - name: Install Composer test dependencies
+        run: composer install --no-interaction --prefer-dist
       - name: Install WordPress test library
         run: |
           curl -fsSL https://raw.githubusercontent.com/wp-cli/scaffold-command/main/templates/install-wp-tests.sh -o /tmp/install-wp-tests.sh
