@@ -190,6 +190,7 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_checkin_token_minutes', 15 );
 		add_option( 'mtn_cb_booking_duration_minutes', 120 );
 		add_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 );
+		add_option( 'mtn_cb_statement_due_days', 7 );
 		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
 	}
 
@@ -259,6 +260,7 @@ final class MTN_CB_Install {
 		wp_clear_scheduled_hook( 'mtn_cb_expire_pending_bookings' );
 		wp_clear_scheduled_hook( 'mtn_cb_process_notifications' );
 		wp_clear_scheduled_hook( 'mtn_cb_generate_recurring_events' );
+		wp_clear_scheduled_hook( 'mtn_cb_generate_monthly_statements' );
 		flush_rewrite_rules();
 	}
 }
