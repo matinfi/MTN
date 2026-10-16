@@ -319,7 +319,7 @@ final class MTN_CB_Bookings {
 		$mode = get_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
 		$tables = array();
 
-		if ( 'cafe_assigns_table' !== $mode && ( null === $remaining || $remaining >= $party ) ) {
+		if ( null === $remaining || $remaining >= $party ) {
 			$table_ids = get_posts( array(
 				'post_type' => 'mtn_table',
 				'post_status' => 'publish',
@@ -349,8 +349,13 @@ final class MTN_CB_Bookings {
 			}
 		}
 
+		$has_available_table = ! empty( $tables );
+		if ( 'cafe_assigns_table' === $mode ) {
+			$tables = array();
+		}
+
 		return array(
-			'available' => ( null === $remaining || $remaining >= $party ) && ( 'cafe_assigns_table' === $mode || ! empty( $tables ) ),
+			'available' => ( null === $remaining || $remaining >= $party ) && $has_available_table,
 			'cafe_id' => $cafe_id,
 			'event_id' => $event_id,
 			'party_size' => $party,
