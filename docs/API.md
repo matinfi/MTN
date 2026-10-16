@@ -93,7 +93,7 @@ Required JSON field: `table_id`. Assigns a published, active table belonging to 
 
 `POST /cafe/bookings/{id}/complete` and `POST /cafe/bookings/{id}/no-show`
 
-Move a confirmed booking to completed or no-show. Completing a booking triggers commission accrual from the amount snapshotted at booking creation. In cafe-assigned-table mode, a table must be assigned before the booking can be confirmed or completed.
+Move a confirmed booking to completed or no-show. Commission accrual follows the trigger status snapshotted on the booking (`confirmed` by default, configurable to `completed`). In cafe-assigned-table mode, a table must be assigned before the booking can be confirmed or completed.
 
 `POST /cafe/bookings/{id}/cancel`
 
@@ -107,7 +107,7 @@ Optional JSON field: `reason` (plain text). Only the assigned cafe owner or an a
 
 ## Finance behavior
 
-The fixed commission amount and currency are snapshotted when a booking is created. A positive commission is added to the append-only ledger only when an administrator or the assigned cafe owner marks a confirmed booking as completed. Marking a booking as no-show does not accrue commission. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
+The fixed commission amount, currency and trigger status are snapshotted when a booking is created. The central setting defaults to accruing commission on `confirmed`, with `completed` available as an alternative; later setting changes affect only new bookings. A no-show does not create a new commission entry, but if commission was accrued at confirmation, this version does not automatically reverse it. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
 
 ## Current contract limitations
 
