@@ -25,6 +25,11 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Idempotency mismatch | Reuse a key with a different payload | HTTP 409 |
 | Idempotency isolation | Use the same key for a different customer | A separate booking may be created |
 | Ownership | Read or cancel another customer's booking | The request returns not found |
+| Cafe owner isolation | Sign in as owner A and request owner B's booking ID | Confirm/reject/cancel returns HTTP 403; owner A's list never includes owner B's records |
+| Cafe dashboard | Sign in as the configured cafe owner | The dashboard loads only bookings for cafes assigned to that user |
+| Admin metadata | Save cafe, event and table metadata using the editor | Values persist and are used by catalog, schedule and capacity checks |
+| Default pages | Upgrade a site that already has the booking/account pages | A cafe-dashboard page is added without duplicating existing slugs |
+| Frontend assets | Open booking page and inspect browser console | Booking wizard JavaScript loads without syntax/runtime errors |
 | Status transition | Attempt to confirm/reject a cancelled booking | HTTP 409 |
 | Concurrent capacity | Fire simultaneous requests for the final available seats/table | At most one conflicting reservation is created |
 | Lock failure | Simulate unavailable advisory locking on a disposable test DB | HTTP 503; no booking row is inserted |
