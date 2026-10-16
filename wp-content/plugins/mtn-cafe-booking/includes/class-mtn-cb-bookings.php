@@ -28,15 +28,43 @@ final class MTN_CB_Bookings {
 	public static function create( $args ) {
 		global $wpdb;
 
-		$user_id   = get_current_user_id();
-		$party     = isset( $args['party_size'] ) ? absint( $args['party_size'] ) : 0;
-		$event_id  = isset( $args['event_id'] ) ? absint( $args['event_id'] ) : 0;
-		$cafe_id   = isset( $args['cafe_id'] ) ? absint( $args['cafe_id'] ) : 0;
-		$table_id  = isset( $args['table_id'] ) ? absint( $args['table_id'] ) : 0;
+		$user_id    = get_current_user_id();
+		$party      = isset( $args['party_size'] ) ? absint( $args['party_size'] ) : 0;
+		$event_id   = isset( $args['event_id'] ) ? absint( $args['event_id'] ) : 0;
+		$cafe_id    = isset( $args['cafe_id'] ) ? absint( $args['cafe_id'] ) : 0;
+		$table_id   = isset( $args['table_id'] ) ? absint( $args['table_id'] ) : 0;
 		$booking_at = isset( $args['booking_at'] ) ? sanitize_text_field( $args['booking_at'] ) : '';
 
 		if ( ! $user_id || $party < 1 || $party > 100 || ! $event_id || ! $cafe_id || ! self::valid_datetime( $booking_at ) ) {
 			return new WP_Error( 'mtn_invalid_booking', __( 'اطلاعات رزرو معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+
+		$cafe  = get_post( $cafe_id );
+		$event = get_post( $event_id );
+		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || ! $event || 'mtn_event' !== $event->post_type || 'publish' !== $event->post_status ) {
+			return new WP_Error( 'mtn_unavailable_listing', __( 'کافه یا رویداد فعال و قابل رزرو نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		if ( absint( get_post_meta( $event_id, 'mtn_cafe_id', true ) ) !== $cafe_id ) {
+			return new WP_Error( 'mtn_event_cafe_mismatch', __( 'رویداد به این کافه تعلق ندارد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+
+		$min_party = absint( get_post_meta( $event_id, 'mtn_min_party_size', true ) );
+		$max_party = absint( get_post_meta( $event_id, 'mtn_max_party_size', true ) );
+		$max_party = $max_party ? $max_party : 100;
+		if ( ( $min_party && $party < $min_party ) || $party > $max_party ) {
+			return new WP_Error( 'mtn_party_size_invalid', __( 'تعداد نفرات خارج از محدوده مجاز رویداد است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+
+		if ( 'cafe_assigns_table' === get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) {
+			$table_id = 0;
+		} elseif ( $table_id ) {
+			$table = get_post( $table_id );
+			$table_capacity = absint( get_post_meta( $table_id, 'mtn_table_capacity', true ) );
+			if ( ! $table || 'mtn_table' !== $table->post_type || 'publish' !== $table->post_status || absint( get_post_meta( $table_id, 'mtn_cafe_id', true ) ) !== $cafe_id || ! $table_capacity || $party > $table_capacity || ! get_post_meta( $table_id, 'mtn_table_active', true ) ) {
+				return new WP_Error( 'mtn_table_unavailable', __( 'میز انتخاب‌شده معتبر یا مناسب این رزرو نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+			}
+		} else {
+			return new WP_Error( 'mtn_table_required', __( 'یک میز معتبر انتخاب کنید.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
 
 		$now  = current_time( 'mysql', true );
@@ -71,9 +99,7 @@ final class MTN_CB_Bookings {
 
 	public static function get_by_id( $id ) {
 		global $wpdb;
-		return $wpdb->get_row(
-			$wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', absint( $id ) )
-		);
+		return $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', absint( $id ) ) );
 	}
 
 	public static function get_for_user( $id, $user_id ) {
@@ -120,7 +146,7 @@ final class MTN_CB_Bookings {
 	private static function generate_code() {
 		global $wpdb;
 		for ( $i = 0; $i < 5; $i++ ) {
-			$code = strtoupper( wp_generate_password( 12, false, false ) );
+			$code  = strtoupper( wp_generate_password( 12, false, false ) );
 			$found = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::table_name() . ' WHERE booking_code = %s', $code ) );
 			if ( ! $found ) {
 				return $code;
