@@ -79,7 +79,7 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( get_option( 'mtn_cb_default_pages_created' ) ) {
+		if ( '2' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
@@ -100,6 +100,7 @@ final class MTN_CB_Install {
 			}
 		}
 		update_option( 'mtn_cb_default_pages_created', 1 );
+		update_option( 'mtn_cb_default_pages_version', '2' );
 	}
 
 	public static function maybe_upgrade() {
