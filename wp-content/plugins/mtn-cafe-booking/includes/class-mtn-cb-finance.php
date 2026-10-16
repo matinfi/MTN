@@ -43,12 +43,15 @@ final class MTN_CB_Finance {
 		if ( $existing ) {
 			return true;
 		}
-		$amount = (float) get_option( 'mtn_cb_default_commission', '0' );
+		$amount = (float) $booking->commission_amount;
+		if ( $amount <= 0 ) {
+			$amount = (float) get_option( 'mtn_cb_default_commission', '0' );
+		}
 		$amount = round( max( 0, $amount ), 2 );
 		if ( $amount <= 0 ) {
 			return true;
 		}
-		$currency = sanitize_text_field( get_option( 'mtn_cb_currency', 'TRY' ) );
+		$currency = $booking->commission_currency ? sanitize_text_field( $booking->commission_currency ) : sanitize_text_field( get_option( 'mtn_cb_currency', 'TRY' ) );
 		$inserted = $wpdb->insert(
 			self::ledger_table(),
 			array(
