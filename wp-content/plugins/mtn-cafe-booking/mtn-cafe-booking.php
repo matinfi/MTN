@@ -30,6 +30,19 @@ require_once MTN_CB_PATH . 'includes/class-mtn-cb-finance.php';
 register_activation_hook( __FILE__, array( 'MTN_CB_Install', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
 
+add_filter(
+	'cron_schedules',
+	static function ( $schedules ) {
+		$schedules['mtn_cb_five_minutes'] = array(
+			'interval' => 300,
+			'display' => __( 'هر پنج دقیقه (MTN)', 'mtn-cafe-booking' ),
+		);
+		return $schedules;
+	}
+);
+
+add_action( 'mtn_cb_expire_pending_bookings', array( 'MTN_CB_Bookings', 'expire_pending_bookings' ) );
+
 add_action(
 	'plugins_loaded',
 	static function () {
