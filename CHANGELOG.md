@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0] - 2026-10-16
+- Add an append-only commission ledger with commission amount/currency snapshotted at booking creation and accrual on completion.
+- Add manual settlement records, cafe balance checks, append-only adjustments/reversals and ledger CSV export.
+- Add administrator actions for completed/no-show bookings and cafe-owner completion/no-show actions.
+- Upgrade schema to version 5 with ledger and settlement tables.
+
+
 ## [0.3.0] - 2026-10-16
 - Add public cafe/event catalog and advisory availability REST APIs.
 - Add a customer booking wizard, booking history and cancellation controls.
