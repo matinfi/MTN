@@ -63,7 +63,9 @@ final class MTN_CB_Content {
 		register_post_meta( 'mtn_event', 'mtn_event_capacity', $common );
 		register_post_meta( 'mtn_event', 'mtn_min_party_size', $common );
 		register_post_meta( 'mtn_event', 'mtn_max_party_size', $common );
-		register_post_meta( 'mtn_cafe', 'mtn_cafe_owner_id', $common );
+		$private_owner_meta = $common;
+		$private_owner_meta['show_in_rest'] = false;
+		register_post_meta( 'mtn_cafe', 'mtn_cafe_owner_id', $private_owner_meta );
 		register_post_meta( 'mtn_table', 'mtn_cafe_id', $common );
 		register_post_meta( 'mtn_table', 'mtn_table_capacity', $common );
 		register_post_meta( 'mtn_table', 'mtn_table_active', array_merge( $common, array( 'type' => 'boolean', 'sanitize_callback' => 'rest_sanitize_boolean' ) ) );
