@@ -16,6 +16,12 @@ Returns published cafes and events whose cafe relationship points to a published
 
 Returns whether event headcount capacity and selected-table availability appear sufficient, along with eligible table IDs/capacities. The time must be expressed in the WordPress site's timezone. If an event date or operating hours are configured, the requested time must fall within that schedule, including supported overnight events. This is an advisory snapshot, not a reservation hold; `POST /bookings` repeats validation.
 
+## Booking audit history
+
+`GET /bookings/{id}/history`
+
+The customer who owns the booking, its assigned cafe owner, or an administrator can read the append-only event timeline. Actor user IDs are not returned. Events include creation, status transitions and table assignments; the timeline is operational audit evidence, not a substitute for a database backup.
+
 ## Customer booking history
 
 `GET /my/bookings`
