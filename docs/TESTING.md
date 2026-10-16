@@ -36,6 +36,8 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Check-in authorization | Submit a valid token as an unrelated cafe manager | HTTP 403; the token remains unconsumed so the assigned owner can use it |
 | Check-in token replacement | Issue a second token for the same booking | The old token is invalid and only the new token can check in the customer |
 | Cafe owner isolation | Sign in as owner A and request owner B's booking ID | Confirm/reject/cancel returns HTTP 403; owner A's list never includes owner B's records |
+| Cafe team assignment | Assign an existing user as a cafe team manager and sign in as that user | The team member can view and manage assigned-cafe bookings, but not other cafes; unassigned users receive HTTP 403 |
+| Team removal | Remove a user from a cafe's team and retry a booking action | The removed user can no longer read or mutate that cafe's bookings even if the manager role remains on the account |
 | Cafe dashboard | Sign in as the configured cafe owner | The dashboard loads only bookings for cafes assigned to that user |
 | Manual table assignment | Assign a free active table to an unassigned booking | Table is saved; conflicting, inactive, undersized or other-cafe tables are rejected |
 | Commission snapshot | Change the default commission after creating a booking, then complete it | The ledger uses the booking-time amount/currency snapshot |
