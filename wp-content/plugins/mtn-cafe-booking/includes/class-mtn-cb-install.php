@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '1';
+	const DB_VERSION = '2';
 
 	public static function activate() {
 		global $wpdb;
@@ -40,6 +40,7 @@ final class MTN_CB_Install {
 			UNIQUE KEY booking_code (booking_code),
 			KEY user_status (user_id,status),
 			KEY cafe_date (cafe_id,booking_at),
+			KEY cafe_table_date (cafe_id,table_id,booking_at,status),
 			KEY event_date (event_id,booking_at)
 		) {$collate};";
 
@@ -49,7 +50,14 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_currency', 'TRY' );
 		add_option( 'mtn_cb_default_commission', '0' );
 		add_option( 'mtn_cb_booking_expiry_minutes', 30 );
+		add_option( 'mtn_cb_booking_duration_minutes', 120 );
 		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
+	}
+
+	public static function maybe_upgrade() {
+		if ( (string) get_option( 'mtn_cb_db_version', '0' ) !== self::DB_VERSION ) {
+			self::activate();
+		}
 	}
 
 	public static function deactivate() {
