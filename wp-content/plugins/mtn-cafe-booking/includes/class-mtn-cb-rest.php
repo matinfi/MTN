@@ -350,7 +350,7 @@ final class MTN_CB_Rest {
 	public static function my_bookings() {
 		global $wpdb;
 		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . MTN_CB_Bookings::table_name() . ' WHERE user_id = %d ORDER BY created_at DESC LIMIT 100', get_current_user_id() ) );
-		return rest_ensure_response( array_map( array( __CLASS__, 'public_booking' ), $rows ) );
+		return rest_ensure_response( array_map( static function ( $booking ) { return self::public_booking( $booking, true ); }, $rows ) );
 	}
 
 	public static function create_booking( WP_REST_Request $request ) {
@@ -358,18 +358,19 @@ final class MTN_CB_Rest {
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
-		return new WP_REST_Response( self::public_booking( $result ), 201 );
+		return new WP_REST_Response( self::public_booking( $result, true ), 201 );
 	}
 
 	public static function get_booking( WP_REST_Request $request ) {
 		$booking = MTN_CB_Bookings::get_for_user( $request['id'], get_current_user_id() );
+		$is_customer = (bool) $booking;
 		if ( ! $booking && current_user_can( 'manage_options' ) ) {
 			$booking = MTN_CB_Bookings::get_by_id( $request['id'] );
 		}
 		if ( ! $booking ) {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
-		return rest_ensure_response( self::public_booking( $booking ) );
+		return rest_ensure_response( self::public_booking( $booking, $is_customer ) );
 	}
 
 	public static function booking_history( WP_REST_Request $request ) {
@@ -400,7 +401,7 @@ final class MTN_CB_Rest {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
 		$result = MTN_CB_Bookings::transition( $booking->id, 'cancelled_by_customer', get_current_user_id(), 'customer_cancelled' );
-		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result, true ) );
 	}
 
 	public static function confirm_booking( WP_REST_Request $request ) {
@@ -457,9 +458,12 @@ final class MTN_CB_Rest {
 		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
 	}
 
-	private static function public_booking( $booking ) {
-		$whatsapp_link = MTN_CB_WhatsApp::manual_link( $booking, get_post_meta( $booking->cafe_id, 'mtn_cafe_whatsapp', true ) );
-		$whatsapp_url = is_wp_error( $whatsapp_link ) ? '' : $whatsapp_link;
+	private static function public_booking( $booking, $include_whatsapp = false ) {
+		$whatsapp_url = '';
+		if ( $include_whatsapp ) {
+			$whatsapp_link = MTN_CB_WhatsApp::manual_link( $booking, get_post_meta( $booking->cafe_id, 'mtn_cafe_whatsapp', true ) );
+			$whatsapp_url = is_wp_error( $whatsapp_link ) ? '' : $whatsapp_link;
+		}
 		return array(
 			'id'                     => (int) $booking->id,
 			'booking_code'           => $booking->booking_code,
