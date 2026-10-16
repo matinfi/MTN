@@ -3,7 +3,8 @@
 ## [0.3.0] - 2026-10-16
 - Add public cafe/event catalog and advisory availability REST APIs.
 - Add a customer booking wizard, booking history and cancellation controls.
-- Add administrator-only booking management for confirmation, rejection and cancellation.
+- Add administrator booking management and cafe-owner-scoped confirmation, rejection and cancellation.
+- Add a cafe-manager role, ownership checks and a cafe dashboard page.
 - Add admin metadata forms for cafe contact/location/music, event schedule/capacity and table capacity.
 - Add cafe/event archive and detail templates plus dynamic homepage sections.
 - Create /book/ and /my-account/ pages automatically when their slugs are unused.
