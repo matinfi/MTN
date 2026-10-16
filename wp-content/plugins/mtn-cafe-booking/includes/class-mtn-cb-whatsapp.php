@@ -27,7 +27,10 @@ final class MTN_CB_WhatsApp {
 			$booking->booking_code,
 			$booking->status
 		);
-		$phone = preg_replace( '/[^0-9]/', '', $recipient );
+		$phone = preg_replace( '/[^0-9]/', '', (string) $recipient );
+		if ( strlen( $phone ) < 8 || strlen( $phone ) > 15 ) {
+			return new WP_Error( 'mtn_whatsapp_recipient_invalid', __( 'شماره واتساپ کافه تنظیم نشده است.', 'mtn-cafe-booking' ) );
+		}
 		$url   = 'https://wa.me/' . $phone . '?text=' . rawurlencode( $text );
 		return esc_url_raw( $url );
 	}
