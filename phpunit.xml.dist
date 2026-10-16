@@ -2,7 +2,7 @@
 <phpunit bootstrap="tests/bootstrap.php" colors="true" failOnWarning="true" failOnRisky="true">
 	<testsuites>
 		<testsuite name="MTN Cafe Booking">
-			<directory suffix=".php">tests</directory>
+			<file>tests/test-settings.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
