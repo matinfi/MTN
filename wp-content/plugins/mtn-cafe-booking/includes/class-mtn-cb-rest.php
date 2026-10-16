@@ -75,6 +75,20 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
+			'/cafe/bookings/(?P<id>\\d+)/assign-table',
+			array(
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => array( __CLASS__, 'assign_table' ),
+				'permission_callback' => array( __CLASS__, 'can_manage_booking_request' ),
+				'args' => array(
+					'id' => array( 'sanitize_callback' => 'absint' ),
+					'table_id' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
 			'/cafe/bookings/(?P<id>\\d+)/cancel',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
@@ -196,6 +210,8 @@ final class MTN_CB_Rest {
 			$data = self::public_booking( $booking );
 			$data['cafe_name'] = $booking->cafe_title ? $booking->cafe_title : '';
 			$data['event_name'] = $booking->event_title ? $booking->event_title : '';
+			$data['table_name'] = $booking->table_id ? get_the_title( $booking->table_id ) : '';
+			$data['available_tables'] = in_array( $booking->status, MTN_CB_Bookings::CAPACITY_STATUSES, true ) ? MTN_CB_Bookings::get_assignable_tables( $booking->id ) : array();
 			return $data;
 		}, $rows ) );
 	}
@@ -288,6 +304,11 @@ final class MTN_CB_Rest {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
 		$result = MTN_CB_Bookings::transition( $booking->id, 'confirmed', get_current_user_id(), 'confirmed_by_cafe_admin' );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
+	}
+
+	public static function assign_table( WP_REST_Request $request ) {
+		$result = MTN_CB_Bookings::assign_table( $request['id'], $request->get_param( 'table_id' ), get_current_user_id() );
 		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
 	}
 
