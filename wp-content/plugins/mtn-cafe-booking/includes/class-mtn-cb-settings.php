@@ -34,7 +34,18 @@ final class MTN_CB_Settings {
 
 	public static function sanitize_currency( $value ) {
 		$value = strtoupper( sanitize_text_field( $value ) );
-		return preg_match( '/^[A-Z]{3,8}$/', $value ) ? $value : 'TRY';
+		if ( ! preg_match( '/^[A-Z]{3,8}$/', $value ) ) {
+			return 'TRY';
+		}
+		$current = strtoupper( sanitize_text_field( get_option( 'mtn_cb_currency', 'TRY' ) ) );
+		if ( $value !== $current ) {
+			global $wpdb;
+			$bookings_exist = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . MTN_CB_Bookings::table_name() );
+			if ( $bookings_exist > 0 ) {
+				return $current;
+			}
+		}
+		return $value;
 	}
 
 	public static function sanitize_amount( $value ) {
@@ -65,7 +76,7 @@ final class MTN_CB_Settings {
 				<?php settings_fields( 'mtn_cb_settings' ); ?>
 				<table class="form-table" role="presentation">
 					<tr><th><label for="mtn_cb_brand_name"><?php esc_html_e( 'نام برند', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_brand_name" name="mtn_cb_brand_name" value="<?php echo esc_attr( get_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) ) ); ?>"></td></tr>
-					<tr><th><label for="mtn_cb_currency"><?php esc_html_e( 'واحد پول', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_currency" name="mtn_cb_currency" value="<?php echo esc_attr( get_option( 'mtn_cb_currency', 'TRY' ) ); ?>" maxlength="8"></td></tr>
+					<tr><th><label for="mtn_cb_currency"><?php esc_html_e( 'واحد پول', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_currency" name="mtn_cb_currency" value="<?php echo esc_attr( get_option( 'mtn_cb_currency', 'TRY' ) ); ?>" maxlength="8"><p class="description"><?php esc_html_e( 'برای جلوگیری از ترکیب ارزها در دفتر مالی، پس از ایجاد اولین رزرو تغییر ارز قفل می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_default_commission"><?php esc_html_e( 'کارمزد ثابت هر رزرو واجد شرایط', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="0" step="0.01" id="mtn_cb_default_commission" name="mtn_cb_default_commission" value="<?php echo esc_attr( get_option( 'mtn_cb_default_commission', '0' ) ); ?>"></td></tr>
 					<tr><th><label for="mtn_cb_booking_expiry_minutes"><?php esc_html_e( 'مهلت تأیید رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="5" max="1440" id="mtn_cb_booking_expiry_minutes" name="mtn_cb_booking_expiry_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ); ?>"></td></tr>
 					<tr><th><label for="mtn_cb_booking_duration_minutes"><?php esc_html_e( 'مدت اشغال میز برای هر رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="30" max="720" id="mtn_cb_booking_duration_minutes" name="mtn_cb_booking_duration_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_duration_minutes', 120 ) ); ?>"><p class="description"><?php esc_html_e( 'برای بررسی هم‌پوشانی رزروهای میز استفاده می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
