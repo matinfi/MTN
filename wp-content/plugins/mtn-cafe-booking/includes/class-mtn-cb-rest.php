@@ -76,7 +76,7 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
-			'/cafe/bookings/(?P<id>\\d+)/reject',
+			'/cafe/bookings/(?P<id>\d+)/reject',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'reject_booking' ),
