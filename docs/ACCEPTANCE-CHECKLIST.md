@@ -31,7 +31,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 
 ## Finance
 - [x] Central setting for default fixed commission amount and currency.
-- [x] Ledger entry created when a booking is marked completed; amount and currency are snapshotted at booking creation.
+- [x] Configurable commission trigger (`confirmed` by default or `completed`); amount, currency and trigger status are snapshotted at booking creation.
 - [x] Append-only manual corrections/reversals with actor, timestamp and reason.
 - [x] Manual settlement records, cafe balances and ledger CSV export.
 - [ ] Automated cafe statements and reconciliation reports distinguishing accrued, settled and overdue amounts.
