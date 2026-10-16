@@ -62,6 +62,8 @@ if ( false === strpos( $install, "const DB_VERSION = '11';" ) ||
 	false === strpos( $bookings, 'public static function check_in_with_token' ) ||
 	false === strpos( $finance, '$booking->commission_trigger_status' ) ||
 	false === strpos( $finance, 'public static function reverse_commission' ) ||
+	false === strpos( $finance, 'گزارش تطبیق مانده کافه‌ها' ) ||
+	false === strpos( $finance, 'SUM(l.amount) AS outstanding' ) ||
 	false === strpos( $rest, "'/cafe/check-in'" ) ||
 	false === strpos( $rest, 'MTN_CB_WhatsApp::manual_link' ) ||
 	false === strpos( $rest, "'whatsapp_url'" ) ) {
