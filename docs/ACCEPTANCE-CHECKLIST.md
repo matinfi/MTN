@@ -27,7 +27,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [ ] Staff invitation and multi-user team management UI.
 - [x] Event date, start/end time and capacity metadata fields; booking is blocked until date and start time are valid.
 - [ ] Recurrence, media workflow and publication approval.
-- [ ] Geo hierarchy (country, city, area, neighborhood).
+- [x] Hierarchical cafe-location taxonomy supports nested country, city, area and neighborhood terms; administrators maintain the hierarchy.
 
 ## Finance
 - [x] Central setting for default fixed commission amount and currency.
