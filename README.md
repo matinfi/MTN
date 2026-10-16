@@ -33,4 +33,4 @@ Run PHP lint over PHP files:
 find wp-content -name '*.php' -print0 | xargs -0 -n1 php -l
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/FINANCE.md](docs/FINANCE.md), [docs/TESTING.md](docs/TESTING.md), [docs/ROADMAP.md](docs/ROADMAP.md), and [CHANGELOG.md](CHANGELOG.md).
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/FINANCE.md](docs/FINANCE.md), [docs/TESTING.md](docs/TESTING.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/ROADMAP.md](docs/ROADMAP.md), and [CHANGELOG.md](CHANGELOG.md).
