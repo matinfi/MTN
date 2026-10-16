@@ -130,7 +130,7 @@
       }
       submitButton.disabled = true;
       checkButton.disabled = true;
-      if (!idempotencyKey) idempotencyKey = (window.crypto && crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))).replace(/[^A-Za-z0-9._:-]/g, '').slice(0, 64).padEnd(8, '0');
+      if (!idempotencyKey) idempotencyKey = (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))).replace(/[^A-Za-z0-9._:-]/g, '').slice(0, 64).padEnd(8, '0');
       const payload = {
         cafe_id: Number(cafe.value),
         event_id: Number(event.value),
