@@ -3,6 +3,7 @@
 	<testsuites>
 		<testsuite name="MTN Cafe Booking">
 			<file>tests/test-settings.php</file>
+			<file>tests/test-permissions.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
