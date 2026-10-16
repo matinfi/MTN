@@ -17,8 +17,8 @@ This repository contains a WordPress plugin and Persian RTL theme for cafe disco
 1. Install a supported WordPress site with PHP 8.1+ and MySQL/MariaDB.
 2. Copy `wp-content/plugins/mtn-cafe-booking` to `wp-content/plugins/` and activate **MTN Cafe Booking**.
 3. Copy `wp-content/themes/mtn-cafe-theme` to `wp-content/themes/` and activate **MTN Cafe**.
-4. Activate the plugin and theme. The plugin creates `/book/` and `/my-account/` pages when those slugs do not already exist. Cafe/event archives are `/cafes/` and `/events/`.
-5. Create and publish a cafe, set its city/contact/music metadata and (optionally) an existing WordPress user ID as owner. Saving the cafe assigns that user the cafe-manager role. Then create and publish an event with that cafe ID, capacity, date and start/end time. Create published table posts with the same cafe ID, a capacity and the active checkbox.
+4. Activate the plugin and theme. The plugin creates `/book/`, `/my-account/` and `/cafe-dashboard/` pages when those slugs do not already exist. Cafe/event archives are `/cafes/` and `/events/`.
+5. Create and publish a cafe, set its city/contact/music metadata and (optionally) select an existing WordPress user as owner. Saving the cafe assigns that user the cafe-manager role. Then create and publish an event with that cafe ID, capacity, date and start/end time. Create published table posts with the same cafe ID, a capacity and the active checkbox.
 6. Configure the site timezone, currency, brand and booking policy in WordPress settings/plugin settings.
 7. Do not use production customer data until deployment hardening, OTP provider integration and acceptance tests are complete.
 
