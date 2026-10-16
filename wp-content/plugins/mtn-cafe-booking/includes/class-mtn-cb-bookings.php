@@ -217,6 +217,94 @@ final class MTN_CB_Bookings {
 		return self::get_by_id( $wpdb->insert_id );
 	}
 
+	/**
+	 * Return an advisory availability snapshot for the public booking wizard.
+	 * Creation rechecks all rules under the cafe lock; this response is never a hold.
+	 */
+	public static function get_availability( $args ) {
+		global $wpdb;
+
+		$cafe_id    = isset( $args['cafe_id'] ) ? absint( $args['cafe_id'] ) : 0;
+		$event_id   = isset( $args['event_id'] ) ? absint( $args['event_id'] ) : 0;
+		$party      = isset( $args['party_size'] ) ? absint( $args['party_size'] ) : 0;
+		$booking_at = isset( $args['booking_at'] ) ? sanitize_text_field( $args['booking_at'] ) : '';
+		$date       = self::parse_local_datetime( $booking_at );
+
+		if ( ! $cafe_id || ! $event_id || $party < 1 || $party > 100 || ! $date ) {
+			return new WP_Error( 'mtn_invalid_availability_query', __( 'پارامترهای بررسی ظرفیت معتبر نیستند.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		$utc_date = $date->setTimezone( new DateTimeZone( 'UTC' ) );
+		if ( $utc_date->getTimestamp() <= time() ) {
+			return new WP_Error( 'mtn_booking_in_past', __( 'زمان انتخابی باید در آینده باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		$cafe  = get_post( $cafe_id );
+		$event = get_post( $event_id );
+		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || ! $event || 'mtn_event' !== $event->post_type || 'publish' !== $event->post_status || absint( get_post_meta( $event_id, 'mtn_cafe_id', true ) ) !== $cafe_id ) {
+			return new WP_Error( 'mtn_unavailable_listing', __( 'کافه یا رویداد قابل رزرو نیست.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
+		}
+		$min_party = absint( get_post_meta( $event_id, 'mtn_min_party_size', true ) );
+		$max_party = absint( get_post_meta( $event_id, 'mtn_max_party_size', true ) );
+		$max_party = $max_party ? $max_party : 100;
+		if ( ( $min_party && $party < $min_party ) || $party > $max_party ) {
+			return new WP_Error( 'mtn_party_size_invalid', __( 'تعداد نفرات خارج از محدوده مجاز رویداد است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+
+		$duration = min( 720, max( 30, absint( get_option( 'mtn_cb_booking_duration_minutes', 120 ) ) ) );
+		$start_ts = $utc_date->getTimestamp();
+		$window_start = gmdate( 'Y-m-d H:i:s', $start_ts - ( $duration * MINUTE_IN_SECONDS ) );
+		$window_end = gmdate( 'Y-m-d H:i:s', $start_ts + ( $duration * MINUTE_IN_SECONDS ) );
+		$event_capacity = absint( get_post_meta( $event_id, 'mtn_event_capacity', true ) );
+		$booked_people = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COALESCE(SUM(party_size), 0) FROM " . self::table_name() . " WHERE event_id = %d AND status IN ('pending_cafe','confirmed')",
+			$event_id
+		) );
+		$remaining = $event_capacity ? max( 0, $event_capacity - $booked_people ) : null;
+		$mode = get_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
+		$tables = array();
+
+		if ( 'cafe_assigns_table' !== $mode && ( null === $remaining || $remaining >= $party ) ) {
+			$table_ids = get_posts( array(
+				'post_type' => 'mtn_table',
+				'post_status' => 'publish',
+				'posts_per_page' => 200,
+				'fields' => 'ids',
+				'orderby' => 'title',
+				'order' => 'ASC',
+				'meta_query' => array(
+					'relation' => 'AND',
+					array( 'key' => 'mtn_cafe_id', 'value' => $cafe_id, 'compare' => '=', 'type' => 'NUMERIC' ),
+					array( 'key' => 'mtn_table_active', 'value' => '1', 'compare' => '=' ),
+					array( 'key' => 'mtn_table_capacity', 'value' => $party, 'compare' => '>=', 'type' => 'NUMERIC' ),
+				),
+			) );
+			foreach ( $table_ids as $table_id ) {
+				$conflict = $wpdb->get_var( $wpdb->prepare(
+					"SELECT id FROM " . self::table_name() . " WHERE cafe_id = %d AND table_id = %d AND status IN ('pending_cafe','confirmed') AND booking_at > %s AND booking_at < %s LIMIT 1",
+					$cafe_id, $table_id, $window_start, $window_end
+				) );
+				if ( ! $conflict ) {
+					$tables[] = array(
+						'id' => (int) $table_id,
+						'name' => get_the_title( $table_id ),
+						'capacity' => absint( get_post_meta( $table_id, 'mtn_table_capacity', true ) ),
+					);
+				}
+			}
+		}
+
+		return array(
+			'available' => ( null === $remaining || $remaining >= $party ) && ( 'cafe_assigns_table' === $mode || ! empty( $tables ) ),
+			'cafe_id' => $cafe_id,
+			'event_id' => $event_id,
+			'party_size' => $party,
+			'remaining_event_capacity' => $remaining,
+			'booking_duration_minutes' => $duration,
+			'table_selection_required' => 'cafe_assigns_table' !== $mode,
+			'tables' => $tables,
+			'note' => __( 'این نتیجه صرفاً پیش‌نمایش ظرفیت است؛ ظرفیت نهایی هنگام ثبت رزرو دوباره بررسی می‌شود.', 'mtn-cafe-booking' ),
+		);
+	}
+
 	public static function get_by_id( $id ) {
 		global $wpdb;
 		return $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', absint( $id ) ) );
