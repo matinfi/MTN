@@ -24,7 +24,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Staff invitation and invite-acceptance workflow: administrator-only invitation API, 48-hour token, hash-only storage, account-email matching and single-use acceptance.
 - [x] Administrator confirmation/rejection console with optional reason.
 - [x] Cafe-owner dashboard with confirmation, rejection reason, cancellation and manual table assignment actions.
-- [x] Administrator-managed multi-user cafe team assignment for existing WordPress users; invitation workflow remains outstanding.
+- [x] Administrator-managed multi-user cafe team assignment and expiring invitation/acceptance workflow for existing WordPress accounts.
 - [x] Event date, start/end time and capacity metadata fields; booking is blocked until date and start time are valid.
 - [x] Weekly/monthly recurrence generates draft occurrences for review; content and featured images are inherited, and WordPress publication states provide editorial approval.
 - [x] Hierarchical cafe-location taxonomy supports nested country, city, area and neighborhood terms; administrators maintain the hierarchy.
@@ -50,9 +50,8 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] PHP lint workflow.
 - [x] Booking wizard JavaScript syntax check in CI.
 - [x] Static source-contract regression checks in lint and package workflows.
-- [x] Initial PHPUnit settings and cafe-team authorization tests plus a WordPress test-suite CI workflow. Full booking lifecycle and concurrency coverage remain outstanding.
-- [ ] Comprehensive REST permission and privacy tests, including cross-customer booking access and OTP abuse scenarios.
-- [ ] Concurrent booking tests against supported database engines.
+- [x] PHPUnit and WordPress integration CI cover settings, installation/schema upgrade markers, team authorization, cross-customer booking read/history/check-in-token privacy, anonymous booking-list denial, OTP abuse throttling/lockout/resend invalidation, and notification idempotency. Full booking lifecycle coverage remains incomplete.
+- [x] Database advisory-lock contention and event-capacity invariants are tested under serialized competing booking requests on the MySQL 8 and MariaDB 10.11 CI matrix; a true multi-process capacity-race test remains a follow-up.
 - [x] CI coverage configured for plugin schema installation, repeated schema-version upgrades, and a database backup/restore round trip on MySQL 8 and MariaDB 10.11. The workflow result still must pass and production-host backup/restore must be rehearsed.
 - [x] CI packages and extracts plugin/theme ZIPs into a clean WordPress test core, checks plugin schema activation and theme discoverability. The successful CI result must be confirmed before release.
 - [ ] Accessibility, responsive, security and performance review on supported devices and hosting.
