@@ -251,6 +251,14 @@
           }
         });
         actionCell.append(historyButton);
+        if (booking.whatsapp_url) {
+          const whatsappLink = el('a', 'button', 'پیام دستی در واتساپ');
+          whatsappLink.href = booking.whatsapp_url;
+          whatsappLink.target = '_blank';
+          whatsappLink.rel = 'noopener noreferrer';
+          whatsappLink.setAttribute('aria-label', 'باز کردن پیام آماده واتساپ برای رزرو ' + text(booking.booking_code));
+          actionCell.append(whatsappLink);
+        }
         row.append(actionCell);
         body.append(row);
       });
