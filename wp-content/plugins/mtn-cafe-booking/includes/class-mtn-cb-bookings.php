@@ -78,10 +78,7 @@ final class MTN_CB_Bookings {
 		if ( ! $local_date ) {
 			return new WP_Error( 'mtn_invalid_datetime', __( 'زمان رزرو باید به قالب YYYY-MM-DD HH:MM:SS و بر اساس منطقه زمانی سایت باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
-		$utc_date = $local_date->setTimezone( new DateTimeZone( 'UTC' ) );
-		if ( $utc_date->getTimestamp() <= time() ) {
-			return new WP_Error( 'mtn_booking_in_past', __( 'زمان رزرو باید در آینده باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
-		}
+		$utc_date       = $local_date->setTimezone( new DateTimeZone( 'UTC' ) );
 		$booking_at_utc = $utc_date->format( 'Y-m-d H:i:s' );
 
 		$cafe  = get_post( $cafe_id );
@@ -121,6 +118,10 @@ final class MTN_CB_Bookings {
 				}
 				return new WP_Error( 'mtn_idempotency_conflict', __( 'این کلید قبلاً برای درخواست رزرو دیگری استفاده شده است.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 			}
+		}
+
+		if ( $utc_date->getTimestamp() <= time() ) {
+			return new WP_Error( 'mtn_booking_in_past', __( 'زمان رزرو باید در آینده باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
 
 		// Release expired pending holds before checking the event's remaining capacity.
