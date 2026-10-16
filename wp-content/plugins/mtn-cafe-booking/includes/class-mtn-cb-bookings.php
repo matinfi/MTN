@@ -455,6 +455,9 @@ final class MTN_CB_Bookings {
 		if ( ! isset( $allowed[ $booking->status ] ) || ! in_array( $next_status, $allowed[ $booking->status ], true ) ) {
 			return new WP_Error( 'mtn_transition_not_allowed', __( 'این تغییر وضعیت مجاز نیست.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 		}
+		if ( 'completed' === $next_status && 'cafe_assigns_table' === get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) && ! absint( $booking->table_id ) ) {
+			return new WP_Error( 'mtn_table_not_assigned', __( 'پیش از تکمیل رزرو، میز را تخصیص دهید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+		}
 
 		$updated = $wpdb->update(
 			self::table_name(),
