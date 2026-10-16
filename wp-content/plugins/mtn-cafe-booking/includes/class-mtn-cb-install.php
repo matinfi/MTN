@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '8';
+	const DB_VERSION = '9';
 
 	public static function activate() {
 		global $wpdb;
@@ -35,6 +35,7 @@ final class MTN_CB_Install {
 			commission_amount decimal(12,2) NOT NULL DEFAULT 0.00,
 			commission_rate decimal(12,4) NOT NULL DEFAULT 0.0000,
 			commission_currency varchar(8) NOT NULL DEFAULT '',
+			commission_trigger_status varchar(20) NOT NULL DEFAULT 'confirmed',
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL,
 			PRIMARY KEY  (id),
