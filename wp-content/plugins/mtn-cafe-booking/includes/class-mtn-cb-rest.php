@@ -200,7 +200,7 @@ final class MTN_CB_Rest {
 	public static function cafe_bookings() {
 		global $wpdb;
 		$table = MTN_CB_Bookings::table_name();
-		$sql = 'SELECT b.*, cafe.post_title AS cafe_title, event.post_title AS event_title FROM ' . $table . ' b LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = b.cafe_id LEFT JOIN ' . $wpdb->posts . ' event ON event.ID = b.event_id';
+		$sql = 'SELECT b.*, cafe.post_title AS cafe_title, ev.post_title AS event_title FROM ' . $table . ' b LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = b.cafe_id LEFT JOIN ' . $wpdb->posts . ' ev ON ev.ID = b.event_id';
 		if ( ! current_user_can( 'manage_options' ) ) {
 			$sql .= $wpdb->prepare( ' INNER JOIN ' . $wpdb->postmeta . " owner_meta ON owner_meta.post_id = b.cafe_id AND owner_meta.meta_key = 'mtn_cafe_owner_id' AND owner_meta.meta_value = %s", (string) get_current_user_id() );
 		}
