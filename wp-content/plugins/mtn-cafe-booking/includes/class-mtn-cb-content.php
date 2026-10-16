@@ -151,6 +151,16 @@ final class MTN_CB_Content {
 		self::field( $post->ID, 'mtn_event_date', __( 'تاریخ برنامه', 'mtn-cafe-booking' ), 'date' );
 		self::field( $post->ID, 'mtn_event_start_time', __( 'ساعت شروع', 'mtn-cafe-booking' ), 'time' );
 		self::field( $post->ID, 'mtn_event_end_time', __( 'ساعت پایان', 'mtn-cafe-booking' ), 'time' );
+		$recurrence = get_post_meta( $post->ID, 'mtn_event_recurrence', true );
+		if ( ! in_array( $recurrence, array( 'weekly', 'monthly' ), true ) ) {
+			$recurrence = 'none';
+		}
+		echo '<p><label for="mtn_event_recurrence"><strong>' . esc_html__( 'تکرار رویداد', 'mtn-cafe-booking' ) . '</strong></label><br><select class="widefat" id="mtn_event_recurrence" name="mtn_event_recurrence">';
+		foreach ( array( 'none' => __( 'بدون تکرار', 'mtn-cafe-booking' ), 'weekly' => __( 'هفتگی', 'mtn-cafe-booking' ), 'monthly' => __( 'ماهانه', 'mtn-cafe-booking' ) ) as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '" ' . selected( $recurrence, $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select><span class="description">' . esc_html__( 'رخدادهای بعدی به‌صورت پیش‌نویس ساخته می‌شوند تا مدیر تاریخ و محتوا را بازبینی و منتشر کند.', 'mtn-cafe-booking' ) . '</span></p>';
+		self::field( $post->ID, 'mtn_event_recurrence_until', __( 'تاریخ پایان تکرار', 'mtn-cafe-booking' ), 'date' );
 	}
 
 	public static function render_table_meta_box( $post ) {
@@ -211,7 +221,15 @@ final class MTN_CB_Content {
 	}
 
 	public static function save_event_meta( $post_id ) {
-		self::save_fields( $post_id, array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size', 'mtn_event_date', 'mtn_event_start_time', 'mtn_event_end_time' ), array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size' ) );
+		self::save_fields( $post_id, array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size', 'mtn_event_date', 'mtn_event_start_time', 'mtn_event_end_time', 'mtn_event_recurrence_until' ), array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size' ) );
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) || ! isset( $_POST['mtn_cb_listing_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_cb_listing_nonce'] ) ), 'mtn_cb_save_listing' ) || ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+		$recurrence = isset( $_POST['mtn_event_recurrence'] ) && is_scalar( $_POST['mtn_event_recurrence'] ) ? sanitize_key( wp_unslash( $_POST['mtn_event_recurrence'] ) ) : 'none';
+		if ( ! in_array( $recurrence, array( 'none', 'weekly', 'monthly' ), true ) ) {
+			$recurrence = 'none';
+		}
+		update_post_meta( $post_id, 'mtn_event_recurrence', $recurrence );
 	}
 
 	public static function save_table_meta( $post_id ) {
