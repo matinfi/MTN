@@ -201,6 +201,37 @@
         } else {
           actionCell.textContent = '—';
         }
+        const historyButton = el('button', 'button', 'تاریخچه');
+        historyButton.type = 'button';
+        let historyRow = null;
+        historyButton.addEventListener('click', async () => {
+          if (historyRow && historyRow.isConnected) {
+            historyRow.remove();
+            historyRow = null;
+            return;
+          }
+          historyButton.disabled = true;
+          try {
+            const events = await request(api + 'bookings/' + encodeURIComponent(booking.id) + '/history', { headers, credentials: 'same-origin' });
+            historyRow = el('tr');
+            const cell = el('td');
+            cell.colSpan = 5;
+            const list = el('ul');
+            events.forEach((item) => {
+              const statusText = (labels[item.from_status] || item.from_status || '—') + ' ← ' + (labels[item.to_status] || item.to_status || '—');
+              list.append(el('li', '', item.created_at + ' UTC — ' + item.event_type + ' — ' + statusText + (item.details ? ' — ' + item.details : '')));
+            });
+            if (!events.length) list.append(el('li', '', 'تاریخچه‌ای ثبت نشده است.'));
+            cell.append(list);
+            historyRow.append(cell);
+            row.after(historyRow);
+          } catch (error) {
+            setStatus(root, error.message, 'error');
+          } finally {
+            historyButton.disabled = false;
+          }
+        });
+        actionCell.append(historyButton);
         row.append(actionCell);
         body.append(row);
       });
