@@ -7,6 +7,7 @@
 - Reset the booking idempotency key when the customer changes the request payload.
 - Bound manual finance adjustment amounts to the supported ledger precision.
 - Add a hierarchical cafe-location taxonomy for country/city/area/neighborhood terms.
+- Include the assigned root-to-leaf location path in the public catalog response.
 - Add lightweight static source-contract checks; integration and concurrency tests remain outstanding.
 
 
