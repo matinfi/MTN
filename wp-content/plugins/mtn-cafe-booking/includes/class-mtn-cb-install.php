@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '11';
+	const DB_VERSION = '12';
 
 	public static function activate() {
 		global $wpdb;
@@ -40,6 +40,7 @@ final class MTN_CB_Install {
 			commission_trigger_status varchar(20) NOT NULL DEFAULT 'confirmed',
 			commission_reverse_on_cancellation tinyint(1) NOT NULL DEFAULT 0,
 			commission_reverse_on_no_show tinyint(1) NOT NULL DEFAULT 0,
+			commission_reverse_on_event_cancel tinyint(1) NOT NULL DEFAULT 1,
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL,
 			PRIMARY KEY  (id),
@@ -112,6 +113,45 @@ final class MTN_CB_Install {
 			KEY event_type (event_type)
 		) {$collate};";
 		dbDelta( $audit_sql );
+		$invites_table = $wpdb->prefix . 'mtn_cafe_invites';
+		$invites_sql = "CREATE TABLE {$invites_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			cafe_id bigint(20) unsigned NOT NULL,
+			email varchar(190) NOT NULL,
+			token_hash char(64) NOT NULL,
+			invited_by bigint(20) unsigned NOT NULL DEFAULT 0,
+			status varchar(20) NOT NULL DEFAULT 'pending',
+			expires_at datetime NOT NULL,
+			accepted_user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			accepted_at datetime NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY token_hash (token_hash),
+			KEY cafe_email (cafe_id,email),
+			KEY status_expiry (status,expires_at)
+		) {$collate};";
+		$notifications_table = $wpdb->prefix . 'mtn_notifications';
+		$notifications_sql = "CREATE TABLE {$notifications_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			dedupe_key varchar(100) NOT NULL,
+			booking_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			channel varchar(20) NOT NULL DEFAULT 'email',
+			recipient varchar(190) NOT NULL,
+			subject varchar(190) NOT NULL DEFAULT '',
+			message longtext NOT NULL,
+			status varchar(20) NOT NULL DEFAULT 'queued',
+			attempts smallint(5) unsigned NOT NULL DEFAULT 0,
+			next_attempt_at datetime NOT NULL,
+			last_error text NULL,
+			created_at datetime NOT NULL,
+			sent_at datetime NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY dedupe_key (dedupe_key),
+			KEY status_next_attempt (status,next_attempt_at),
+			KEY booking_id (booking_id)
+		) {$collate};";
+		dbDelta( $invites_sql );
+		dbDelta( $notifications_sql );
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
 		if ( ! wp_next_scheduled( 'mtn_cb_expire_pending_bookings' ) ) {
 			wp_schedule_event( time() + 60, 'mtn_cb_five_minutes', 'mtn_cb_expire_pending_bookings' );
@@ -128,6 +168,7 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_commission_trigger_status', 'confirmed' );
 		add_option( 'mtn_cb_reverse_commission_on_cancellation', false );
 		add_option( 'mtn_cb_reverse_commission_on_no_show', false );
+		add_option( 'mtn_cb_reverse_commission_on_event_cancel', true );
 		add_option( 'mtn_cb_booking_expiry_minutes', 30 );
 		add_option( 'mtn_cb_checkin_token_minutes', 15 );
 		add_option( 'mtn_cb_booking_duration_minutes', 120 );
