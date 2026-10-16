@@ -8,7 +8,7 @@
 - HTTPS for login, customer sessions and authenticated REST requests
 - A valid WordPress timezone configured before publishing event schedules
 
-The repository's CI checks PHP syntax, booking-wizard JavaScript syntax and static source contracts. It does not run WordPress integration tests, browser tests, load tests or a security review.
+The repository's CI checks PHP syntax, booking-wizard JavaScript syntax and static source contracts. A WordPress PHPUnit workflow has been added for settings and team authorization tests, but its successful execution and the broader booking/concurrency scenarios must be verified. Browser, load and security reviews remain release gates.
 
 ## Install on staging
 
@@ -32,7 +32,7 @@ The plugin schedules a five-minute WP-Cron event to expire stale pending booking
 - Run schema upgrades from versions 1–10 on disposable database copies.
 - Validate login, REST nonce behavior, cafe-owner isolation, cancellation, table assignment, finance balance and CSV export permissions.
 - Confirm backups and a tested rollback procedure.
-- Configure real email/SMS/WhatsApp providers only after credentials and privacy requirements are approved. Never commit credentials to Git.
+- Configure the site mailer before using invitations and notifications. For optional SMS OTP, define `MTN_CB_TWILIO_ACCOUNT_SID`, `MTN_CB_TWILIO_AUTH_TOKEN` and `MTN_CB_TWILIO_FROM` in `wp-config.php` or a secret-injection layer; never commit credentials. Assign each user's E.164 phone to their WordPress account from the administrator profile. Verify live SMS delivery, throttling and login cookies on staging. WhatsApp Business API remains optional for v1.
 - Restrict repository visibility to the intended audience before storing internal-only documentation. The repository was observed as public during initial setup.
 - Do not advertise online payments, automatic WhatsApp delivery or SMS OTP as active features in this release.
 
