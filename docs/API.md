@@ -81,6 +81,10 @@ The assigned cafe owner or a WordPress administrator can confirm a booking. The 
 
 Administrators can see all bookings; a user with the `mtn_cafe_manager` role sees only bookings for cafes whose `mtn_cafe_owner_id` matches their account. The owner ID is never exposed through public cafe metadata.
 
+`POST /cafe/bookings/{id}/assign-table`
+
+Required JSON field: `table_id`. Assigns a published, active table belonging to the cafe, checks party capacity and overlapping active reservations, and saves the assignment while holding the cafe's database lock. Only the assigned cafe owner or an administrator may use it.
+
 `POST /cafe/bookings/{id}/cancel`
 
 Cancels a pending or confirmed booking for a cafe managed by the current user (or any booking for an administrator). Optional JSON field: `reason`.
