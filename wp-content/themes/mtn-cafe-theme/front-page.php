@@ -10,7 +10,7 @@
 </section>
 <section class="section container">
   <div class="section-heading"><div><p class="eyebrow"><?php esc_html_e( 'برنامه‌های تازه', 'mtn-cafe-theme' ); ?></p><h2><?php esc_html_e( 'این شب‌ها چه خبره؟', 'mtn-cafe-theme' ); ?></h2></div><a href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'همه برنامه‌ها', 'mtn-cafe-theme' ); ?> ←</a></div>
-  <?php $mtn_events = new WP_Query( array( 'post_type' => 'mtn_event', 'post_status' => 'publish', 'posts_per_page' => 3, 'orderby' => 'date', 'order' => 'DESC' ) ); ?>
+  <?php $mtn_events = new WP_Query( array( 'post_type' => 'mtn_event', 'post_status' => 'publish', 'posts_per_page' => 3, 'meta_key' => 'mtn_event_date', 'orderby' => 'meta_value', 'order' => 'ASC', 'meta_query' => array( array( 'key' => 'mtn_event_date', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ) ) ) ); ?>
   <?php if ( $mtn_events->have_posts() ) : ?><div class="cards">
     <?php while ( $mtn_events->have_posts() ) : $mtn_events->the_post(); $mtn_event_id = get_the_ID(); $mtn_cafe_id = absint( get_post_meta( $mtn_event_id, 'mtn_cafe_id', true ) ); ?>
       <article class="card mtn-listing-card">
