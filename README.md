@@ -2,8 +2,8 @@
 
 WordPress-based Persian RTL platform for discovering cafés with live music and night events and requesting table reservations.
 
-## Version 0.7.1 — finance reconciliation summary
-This repository contains a WordPress plugin and Persian RTL theme for cafe discovery, live music/night-event listings and table reservation requests. Version 0.7.1 includes a public catalog and advisory availability API, a booking wizard, customer booking history/cancellation, admin metadata fields for cafes/events/tables, an administrator booking console, cafe-owner-scoped booking dashboard, append-only commission ledger, manual settlement and adjustment records, an admin finance reconciliation summary, CSV export, and cafe/event detail/archive templates. Features requiring external credentials (production SMS/OTP and WhatsApp Business) are not represented as live until configured.
+## Version 0.8.0 — team invitations and notification queue
+This repository contains a WordPress plugin and Persian RTL theme for cafe discovery, live music/night-event listings and table reservation requests. Version 0.8.0 includes a public catalog and advisory availability API, a booking wizard, customer booking history/cancellation, admin metadata fields for cafes/events/tables, an administrator booking console, cafe-owner-scoped booking dashboard, append-only commission ledger, manual settlement and adjustment records, an admin finance reconciliation summary, CSV export, expiring cafe-team invitations, and a retryable email notification queue, and cafe/event detail/archive templates. Features requiring external credentials (production SMS/OTP and WhatsApp Business) are not represented as live until configured.
 
 ## Architecture
 - `wp-content/plugins/mtn-cafe-booking/`: business rules, booking persistence, REST API, permissions and settings.
