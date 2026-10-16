@@ -33,7 +33,7 @@ final class MTN_CB_Admin {
 		check_admin_referer( 'mtn_cb_admin_booking_' . $booking_id );
 		$next = isset( $_POST['next_status'] ) ? sanitize_key( wp_unslash( $_POST['next_status'] ) ) : '';
 		$reason = isset( $_POST['reason'] ) && is_scalar( $_POST['reason'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reason'] ) ) : '';
-		$allowed = array( 'confirmed', 'rejected', 'cancelled_by_admin' );
+		$allowed = array( 'confirmed', 'rejected', 'cancelled_by_admin', 'completed', 'no_show' );
 		if ( ! $booking_id || ! in_array( $next, $allowed, true ) ) {
 			self::redirect_with_notice( 'invalid' );
 		}
@@ -109,6 +109,7 @@ final class MTN_CB_Admin {
 									<input type="hidden" name="booking_id" value="<?php echo (int) $booking->id; ?>">
 									<?php wp_nonce_field( 'mtn_cb_admin_booking_' . (int) $booking->id ); ?>
 									<?php if ( 'pending_cafe' === $booking->status ) : ?><button class="button button-primary" name="next_status" value="confirmed"><?php esc_html_e( 'تأیید', 'mtn-cafe-booking' ); ?></button><button class="button" name="next_status" value="rejected"><?php esc_html_e( 'رد', 'mtn-cafe-booking' ); ?></button><?php endif; ?>
+									<?php if ( 'confirmed' === $booking->status ) : ?><button class="button button-primary" name="next_status" value="completed"><?php esc_html_e( 'تکمیل شد', 'mtn-cafe-booking' ); ?></button><button class="button" name="next_status" value="no_show"><?php esc_html_e( 'عدم مراجعه', 'mtn-cafe-booking' ); ?></button><?php endif; ?>
 									<button class="button" name="next_status" value="cancelled_by_admin" onclick="return confirm('<?php echo esc_js( __( 'از لغو این رزرو مطمئن هستید؟', 'mtn-cafe-booking' ) ); ?>')"><?php esc_html_e( 'لغو', 'mtn-cafe-booking' ); ?></button>
 									<input type="text" name="reason" placeholder="<?php esc_attr_e( 'دلیل (اختیاری)', 'mtn-cafe-booking' ); ?>" aria-label="<?php esc_attr_e( 'دلیل تغییر وضعیت', 'mtn-cafe-booking' ); ?>">
 								</form>
