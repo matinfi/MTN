@@ -29,6 +29,7 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Ownership | Read or cancel another customer's booking | The request returns not found |
 | Customer cancellation cutoff | Configure a cutoff and attempt cancellation before and inside that window; also try after booking start | Cancellation succeeds only before the cutoff window; late or past-start cancellation returns HTTP 409 |
 | Audit history privacy | Request history as booking owner, assigned cafe owner, unrelated customer and admin | Only owner, assigned cafe owner and admin can read; actor IDs are not exposed in REST output |
+| Manual WhatsApp link | Configure a valid cafe WhatsApp number and view the customer's booking list | A prefilled manual link is shown; no message is reported as sent/delivered, and an invalid/missing number produces no link |
 | Check-in token privacy | Issue a token for a confirmed booking and inspect the database/API response | Plaintext is returned once, only its hash is stored, and public booking/history payloads do not contain the token |
 | Check-in token expiry | Issue a token and attempt check-in after configured expiry | The request is rejected and booking remains not checked in |
 | Check-in token single use | Check in with a valid token, then replay it | First request marks checked-in and appends an audit event; replay is rejected |
