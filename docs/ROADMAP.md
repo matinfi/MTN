@@ -26,7 +26,7 @@
 - [x] Append-only commission ledger and manual correction/reversal entries
 - [x] Fixed commission amount/currency and configurable trigger (`confirmed` by default, `completed` optional) snapshotted at booking creation
 - [ ] Automated cafe statements
-- [ ] Secure time-limited check-in token and audit history
+- [x] Secure one-time check-in token, configurable expiry and append-only audit history (end-to-end tests still required)
 - [x] Manual settlement records and ledger CSV export
 
 ## Phase 3 — communications and identity
