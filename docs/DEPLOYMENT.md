@@ -14,7 +14,7 @@ The repository's CI currently checks PHP syntax and the booking wizard JavaScrip
 
 1. Back up the WordPress database and files.
 2. Install the plugin ZIP and activate it; install/activate the theme ZIP separately.
-3. Confirm the plugin schema migration reaches version 8 and that the booking, ledger, settlement and audit tables exist.
+3. Confirm the plugin schema migration reaches version 9 and that the booking, ledger, settlement and audit tables exist.
 4. Save Settings → Permalinks once if the cafe/event archive routes return 404.
 5. Configure brand, currency, fixed commission, booking expiry, reservation duration, customer cancellation cutoff and table-selection mode. A zero-minute cancellation cutoff allows customer cancellation until the reservation start; positive values block cancellation inside that many minutes. Currency is intentionally locked after the first booking or ledger entry.
 6. Create a cafe and set its city, address, contact details, music genre and optional owner user. Saving an owner assigns the cafe-manager role.
@@ -29,7 +29,7 @@ The plugin schedules a five-minute WP-Cron event to expire stale pending booking
 ## Before production
 
 - Verify `GET_LOCK` behavior and timeout handling on the actual database/hosting platform.
-- Run schema upgrades from versions 1–7 on disposable database copies.
+- Run schema upgrades from versions 1–8 on disposable database copies.
 - Validate login, REST nonce behavior, cafe-owner isolation, cancellation, table assignment, finance balance and CSV export permissions.
 - Confirm backups and a tested rollback procedure.
 - Configure real email/SMS/WhatsApp providers only after credentials and privacy requirements are approved. Never commit credentials to Git.
