@@ -28,6 +28,12 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Cafe owner isolation | Sign in as owner A and request owner B's booking ID | Confirm/reject/cancel returns HTTP 403; owner A's list never includes owner B's records |
 | Cafe dashboard | Sign in as the configured cafe owner | The dashboard loads only bookings for cafes assigned to that user |
 | Manual table assignment | Assign a free active table to an unassigned booking | Table is saved; conflicting, inactive, undersized or other-cafe tables are rejected |
+| Commission snapshot | Change the default commission after creating a booking, then complete it | The ledger uses the booking-time amount/currency snapshot |
+| Commission eligibility | Mark a booking no-show, then mark another completed | No-show creates no commission; completed creates exactly one ledger entry |
+| Settlement balance | Record a settlement larger than the outstanding cafe balance | The request is rejected and no settlement/ledger row is added |
+| Duplicate accrual | Trigger the completion hook twice for one booking | Unique entry key prevents duplicate commission accrual |
+| Ledger correction | Record a signed adjustment with a reason | A new immutable ledger entry is appended and balance recalculates |
+| CSV export | Export the ledger as an administrator | CSV includes entries, amounts, currency, reference, actor and UTC timestamp; non-admin is denied |
 | Concurrent table assignment | Assign the same table to overlapping bookings simultaneously | Cafe-scoped lock permits no conflicting assignment |
 | Admin metadata | Save cafe, event and table metadata using the editor | Values persist and are used by catalog, schedule and capacity checks |
 | Default pages | Upgrade a site that already has the booking/account pages | A cafe-dashboard page is added without duplicating existing slugs |
