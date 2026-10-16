@@ -204,14 +204,14 @@ final class MTN_CB_Rest {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			$sql .= $wpdb->prepare( ' INNER JOIN ' . $wpdb->postmeta . " owner_meta ON owner_meta.post_id = b.cafe_id AND owner_meta.meta_key = 'mtn_cafe_owner_id' AND owner_meta.meta_value = %s", (string) get_current_user_id() );
 		}
-		$sql .= ' ORDER BY b.created_at DESC LIMIT 200';
+		$sql .= ' ORDER BY b.created_at DESC LIMIT 100';
 		$rows = $wpdb->get_results( $sql );
 		return rest_ensure_response( array_map( static function ( $booking ) {
 			$data = self::public_booking( $booking );
 			$data['cafe_name'] = $booking->cafe_title ? $booking->cafe_title : '';
 			$data['event_name'] = $booking->event_title ? $booking->event_title : '';
 			$data['table_name'] = $booking->table_id ? get_the_title( $booking->table_id ) : '';
-			$data['available_tables'] = in_array( $booking->status, MTN_CB_Bookings::CAPACITY_STATUSES, true ) ? MTN_CB_Bookings::get_assignable_tables( $booking->id ) : array();
+			$data['available_tables'] = ! $booking->table_id && in_array( $booking->status, MTN_CB_Bookings::CAPACITY_STATUSES, true ) ? MTN_CB_Bookings::get_assignable_tables( $booking->id ) : array();
 			return $data;
 		}, $rows ) );
 	}
