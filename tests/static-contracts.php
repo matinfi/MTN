@@ -76,6 +76,9 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $sms, 'mtn_sms_login' ) ||
 	false === strpos( $sms, 'public static function request_code' ) ||
 	false === strpos( $sms, 'public static function verify_code' ) ||
+	false === strpos( $sms, 'mtn_cb_otp_' ) ||
+	false === strpos( $sms, "status = 'superseded'" ) ||
+	false === strpos( $sms, 'attempts >= 4' ) ||
 	false === strpos( $sms, 'MTN_CB_TWILIO_AUTH_TOKEN' ) ||
 	false === strpos( $recurrence, 'public static function generate_occurrences' ) ||
 	false === strpos( $event_cancel, 'commission_reverse_on_event_cancel' ) ||
