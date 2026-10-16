@@ -32,7 +32,8 @@ This checklist is the release gate. An unchecked item must not be described as i
 ## Finance
 - [x] Central setting for default fixed commission amount and currency.
 - [x] Configurable commission trigger (`confirmed` by default or `completed`); amount, currency and trigger status are snapshotted at booking creation.
-- [ ] Configurable reversal/refund policy for cancellations, no-shows and cancelled events after commission accrual.
+- [x] Per-booking snapshot of automatic commission reversal policy for cancellation and no-show after accrual.
+- [ ] Commission reversal policy for cancelled events after commission accrual.
 - [x] Append-only manual corrections/reversals with actor, timestamp and reason.
 - [x] Manual settlement records, cafe balances and ledger CSV export.
 - [ ] Automated cafe statements and reconciliation reports distinguishing accrued, settled and overdue amounts.
