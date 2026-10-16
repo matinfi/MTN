@@ -9,9 +9,13 @@ on:
 jobs:
   wordpress-tests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [mysql:8.0, mariadb:10.11]
     services:
-      mysql:
-        image: mysql:8.0
+      db:
+        image: ${{ matrix.database }}
         env:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: wordpress_test
