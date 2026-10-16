@@ -111,7 +111,7 @@ final class MTN_CB_Content {
 		} elseif ( 'checkbox' === $type ) {
 			echo '<input type="checkbox" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" value="1" ' . checked( (bool) $value, true, false ) . '> ' . esc_html__( 'فعال', 'mtn-cafe-booking' );
 		} else {
-			$input_type = in_array( $type, array( 'number', 'datetime-local', 'date', 'time', 'tel', 'url' ), true ) ? $type : 'text';
+			$input_type = in_array( $type, array( 'number', 'datetime-local', 'date', 'time', 'tel', 'url', 'email' ), true ) ? $type : 'text';
 			$step = 'number' === $input_type ? ' step="1" min="0"' : '';
 			echo '<input class="widefat" type="' . esc_attr( $input_type ) . '" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '"' . $step . '>';
 		}
@@ -138,6 +138,7 @@ final class MTN_CB_Content {
 		self::field( $post->ID, 'mtn_cafe_city', __( 'شهر', 'mtn-cafe-booking' ) );
 		self::field( $post->ID, 'mtn_cafe_address', __( 'نشانی', 'mtn-cafe-booking' ), 'textarea' );
 		self::field( $post->ID, 'mtn_cafe_phone', __( 'تلفن تماس', 'mtn-cafe-booking' ), 'tel' );
+		self::field( $post->ID, 'mtn_cafe_email', __( 'ایمیل دریافت صورت‌حساب', 'mtn-cafe-booking' ), 'email' );
 		self::field( $post->ID, 'mtn_cafe_whatsapp', __( 'شماره واتساپ با کد کشور', 'mtn-cafe-booking' ), 'tel' );
 		self::field( $post->ID, 'mtn_cafe_music_genre', __( 'سبک موسیقی', 'mtn-cafe-booking' ) );
 	}
@@ -200,7 +201,7 @@ final class MTN_CB_Content {
 		}
 		// Only administrators may assign cafe ownership. Editors who can edit
 		// public cafe content must not be able to grant users manager access.
-		$keys = array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre' );
+		$keys = array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_email', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre' );
 		if ( current_user_can( 'manage_options' ) ) {
 			$keys[] = 'mtn_cafe_owner_id';
 		}
