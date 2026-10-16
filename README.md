@@ -30,7 +30,9 @@ This repository contains a WordPress plugin and Persian RTL theme for cafe disco
 ## Development
 Run the lightweight static source-contract regression checks (these are not a replacement for integration tests), then lint PHP files:
 ```bash
-find wp-content -name '*.php' -print0 | xargs -0 -n1 php -l
+php tests/static-contracts.php
+find wp-content tests -name '*.php' -print0 | xargs -0 -n1 php -l
+node --check wp-content/plugins/mtn-cafe-booking/assets/booking-wizard.js
 ```
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/FINANCE.md](docs/FINANCE.md), [docs/TESTING.md](docs/TESTING.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/ROADMAP.md](docs/ROADMAP.md), and [CHANGELOG.md](CHANGELOG.md).
