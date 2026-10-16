@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0] - 2026-10-16
+- Add public cafe/event catalog and advisory availability REST APIs.
+- Add a customer booking wizard, booking history and cancellation controls.
+- Add administrator-only booking management for confirmation, rejection and cancellation.
+- Add admin metadata forms for cafe contact/location/music, event schedule/capacity and table capacity.
+- Add cafe/event archive and detail templates plus dynamic homepage sections.
+- Create /book/ and /my-account/ pages automatically when their slugs are unused.
+- Validate configured event dates and operating hours, including overnight events.
+- Add responsive styles for booking and listing interfaces.
+
+
 ## [0.2.0] - 2026-10-16
 - Serialize booking creation per cafe using database advisory locks.
 - Enforce configured event headcount limits and selected-table time-window conflicts.
