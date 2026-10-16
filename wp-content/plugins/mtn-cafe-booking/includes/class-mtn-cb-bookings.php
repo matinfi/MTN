@@ -459,11 +459,20 @@ final class MTN_CB_Bookings {
 			return new WP_Error( 'mtn_table_not_assigned', __( 'پیش از تکمیل رزرو، میز را تخصیص دهید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 		}
 
+		$update_data = array(
+			'status' => $next_status,
+			'updated_at' => current_time( 'mysql', true ),
+		);
+		$update_formats = array( '%s', '%s' );
+		if ( '' !== trim( (string) $reason ) && in_array( $next_status, array( 'rejected', 'cancelled_by_cafe', 'cancelled_by_admin', 'no_show' ), true ) ) {
+			$update_data['cafe_note'] = sanitize_textarea_field( $reason );
+			$update_formats[] = '%s';
+		}
 		$updated = $wpdb->update(
 			self::table_name(),
-			array( 'status' => $next_status, 'cafe_note' => sanitize_textarea_field( $reason ), 'updated_at' => current_time( 'mysql', true ) ),
+			$update_data,
 			array( 'id' => absint( $id ), 'status' => $booking->status ),
-			array( '%s', '%s', '%s' ),
+			$update_formats,
 			array( '%d', '%s' )
 		);
 		if ( 1 !== $updated ) {
