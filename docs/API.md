@@ -29,6 +29,7 @@ Optional fields:
 | --- | --- | --- |
 | `table_id` | integer | Required in customer-selects-table mode; must be active, published, belong to the cafe, and fit the party |
 | `customer_note` | string | Plain text; sanitized on the server |
+| `idempotency_key` | string | Optional client-generated key, 8–64 letters/digits or `. _ : -`; replays the same request safely when the payload matches |
 
 A successful request returns HTTP 201 with the booking ID, random booking code, selected listing IDs, party size, status and timestamps. New records start as `pending_cafe`. The persisted `booking_at` is UTC; convert it for display using the site's configured timezone.
 
@@ -64,7 +65,7 @@ Optional JSON field: `reason` (plain text). Only administrators may reject until
 
 ## Current contract limitations
 
-- Idempotency keys are not implemented; clients should not blindly retry a timed-out create request without first checking whether a booking was created.
+- Idempotency is optional; clients should send a stable unique `idempotency_key` for each booking attempt. Reusing a key with a different payload returns HTTP 409.
 - Cafe-assigned-table mode does not yet allocate a table automatically.
 - Event capacity counts active bookings attached to the event post. Each event post is treated as one capacity pool; recurring schedules are not implemented.
 - Locking relies on MySQL/MariaDB `GET_LOCK()`. Validate behavior on the production database and test concurrent requests before launch.
