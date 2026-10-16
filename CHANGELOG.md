@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0] - 2026-10-16
+- Snapshot commission trigger status per booking; default accrual occurs on cafe confirmation, with completion available as an alternative.
+- Upgrade database schema to version 9 for commission trigger snapshots.
+- Add hierarchical cafe location terms and return root-to-leaf location paths from the public catalog.
+- Add configurable customer cancellation cutoff and source-contract regression checks.
+- Correct over-escaped booking REST routes and restrict cafe owner assignment to administrators.
+
+
 ## [0.4.1] - 2026-10-16
 - Fix over-escaped booking history, completion, no-show, table assignment and cafe-cancellation REST route patterns.
 - Restrict cafe owner assignment and manager-role grants to WordPress administrators.
