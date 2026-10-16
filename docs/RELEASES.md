@@ -6,7 +6,7 @@ Use Semantic Versioning. Keep the plugin header and `MTN_CB_VERSION` aligned wit
 ## CI
 - `.github/workflows/php-lint.yml` runs PHP syntax validation, the booking-wizard JavaScript syntax check and static source-contract regression checks on pushes and pull requests.
 - `.github/workflows/package.yml` validates JavaScript syntax, static source contracts and PHP syntax, then creates separate plugin/theme ZIP artifacts on manual run or a `v*` tag.
-- `.github/workflows/wordpress-tests.yml` is configured to run PHPUnit against WordPress/MySQL, including schema, authorization, notification idempotency, OTP abuse controls and lock contention, then compare database table row counts after a backup/restore round trip. Results still need to be observed in CI.
+- `.github/workflows/wordpress-tests.yml` is configured to run PHPUnit against WordPress with MySQL 8 and MariaDB 10.11, load the packaged plugin/theme in a clean test core, cover schema, authorization, notification idempotency, OTP abuse controls and lock contention, and compare table row counts after a database backup/restore round trip. Results still need to be observed in CI.
 - A successful ZIP build proves packaging and syntax only; it does not prove end-to-end functionality or production readiness.
 
 ## Release checklist
