@@ -2,6 +2,11 @@
 /**
  * WordPress integration-test bootstrap.
  */
+$polyfills_autoload = dirname( __DIR__ ) . '/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php';
+if ( file_exists( $polyfills_autoload ) ) {
+	require_once $polyfills_autoload;
+}
+
 $wp_tests_dir = getenv( 'WP_TESTS_DIR' );
 if ( ! $wp_tests_dir ) {
 	$wp_tests_dir = '/tmp/wordpress-tests-lib';
