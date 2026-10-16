@@ -250,7 +250,7 @@ final class MTN_CB_Rest {
 			return new WP_Error( 'mtn_forbidden', __( 'دسترسی مدیر کافه لازم است.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
 		}
 		$booking = MTN_CB_Bookings::get_by_id( $request['id'] );
-		if ( ! $booking || absint( get_post_meta( $booking->cafe_id, 'mtn_cafe_owner_id', true ) ) !== get_current_user_id() ) {
+		if ( ! $booking || ! MTN_CB_Content::user_can_manage_cafe( $booking->cafe_id, get_current_user_id() ) ) {
 			return new WP_Error( 'mtn_forbidden', __( 'این رزرو متعلق به کافه تحت مدیریت شما نیست.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
 		}
 		return true;
@@ -259,9 +259,11 @@ final class MTN_CB_Rest {
 	public static function cafe_bookings() {
 		global $wpdb;
 		$table = MTN_CB_Bookings::table_name();
-		$sql = 'SELECT b.*, cafe.post_title AS cafe_title, ev.post_title AS event_title FROM ' . $table . ' b LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = b.cafe_id LEFT JOIN ' . $wpdb->posts . ' ev ON ev.ID = b.event_id';
+		$sql = 'SELECT DISTINCT b.*, cafe.post_title AS cafe_title, ev.post_title AS event_title FROM ' . $table . ' b LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = b.cafe_id LEFT JOIN ' . $wpdb->posts . ' ev ON ev.ID = b.event_id LEFT JOIN ' . $wpdb->postmeta . " owner_meta ON owner_meta.post_id = b.cafe_id AND owner_meta.meta_key = 'mtn_cafe_owner_id' LEFT JOIN " . $wpdb->postmeta . " team_meta ON team_meta.post_id = b.cafe_id AND team_meta.meta_key = 'mtn_cafe_manager_ids'";
 		if ( ! current_user_can( 'manage_options' ) ) {
-			$sql .= $wpdb->prepare( ' INNER JOIN ' . $wpdb->postmeta . " owner_meta ON owner_meta.post_id = b.cafe_id AND owner_meta.meta_key = 'mtn_cafe_owner_id' AND owner_meta.meta_value = %s", (string) get_current_user_id() );
+			$user_id = get_current_user_id();
+			$team_pattern = '%' . $wpdb->esc_like( 'i:' . $user_id . ';' ) . '%';
+			$sql .= $wpdb->prepare( ' WHERE (owner_meta.meta_value = %s OR team_meta.meta_value LIKE %s)', (string) $user_id, $team_pattern );
 		}
 		$sql .= ' ORDER BY b.created_at DESC LIMIT 100';
 		$rows = $wpdb->get_results( $sql );
@@ -379,7 +381,7 @@ final class MTN_CB_Rest {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
 		$is_customer = (int) $booking->user_id === get_current_user_id();
-		$is_cafe_owner = current_user_can( 'mtn_manage_cafes' ) && absint( get_post_meta( $booking->cafe_id, 'mtn_cafe_owner_id', true ) ) === get_current_user_id();
+		$is_cafe_owner = current_user_can( 'mtn_manage_cafes' ) && MTN_CB_Content::user_can_manage_cafe( $booking->cafe_id, get_current_user_id() );
 		if ( ! $is_customer && ! $is_cafe_owner && ! current_user_can( 'manage_options' ) ) {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
