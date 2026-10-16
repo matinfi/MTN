@@ -84,7 +84,7 @@ final class MTN_CB_SMS_OTP {
 			return new WP_Error( 'mtn_otp_store_failed', __( 'ثبت درخواست پیامک انجام نشد.', 'mtn-cafe-booking' ), array( 'status' => 500 ) );
 		}
 		if ( empty( $user_ids ) ) {
-			$wpdb->update( self::table_name(), array( 'status' => 'sent' ), array( 'id' => absint( $wpdb->insert_id ) ), array( '%s' ), array( '%d' ) );
+			$wpdb->update( self::table_name(), array( 'status' => 'not_registered' ), array( 'id' => absint( $wpdb->insert_id ) ), array( '%s' ), array( '%d' ) );
 			// Avoid account enumeration; do not send a code to an unregistered phone.
 			return rest_ensure_response( array( 'status' => 'accepted', 'message' => __( 'اگر شماره واجد شرایط باشد، پیامک ارسال می‌شود.', 'mtn-cafe-booking' ) ) );
 		}
@@ -97,9 +97,9 @@ final class MTN_CB_SMS_OTP {
 		$success = ! is_wp_error( $response ) && (int) wp_remote_retrieve_response_code( $response ) >= 200 && (int) wp_remote_retrieve_response_code( $response ) < 300;
 		$wpdb->update( self::table_name(), array( 'status' => $success ? 'sent' : 'delivery_failed' ), array( 'id' => absint( $wpdb->insert_id ) ), array( '%s' ), array( '%d' ) );
 		if ( ! $success ) {
-			return new WP_Error( 'mtn_otp_delivery_failed', __( 'ارسال پیامک انجام نشد؛ تنظیمات سرویس پیامک را بررسی کنید.', 'mtn-cafe-booking' ), array( 'status' => 502 ) );
+			return rest_ensure_response( array( 'status' => 'accepted', 'message' => __( 'اگر شماره واجد شرایط باشد، پیامک ارسال می‌شود.', 'mtn-cafe-booking' ) ) );
 		}
-		return rest_ensure_response( array( 'status' => 'sent', 'expires_in_seconds' => 300 ) );
+		return rest_ensure_response( array( 'status' => 'accepted', 'message' => __( 'اگر شماره واجد شرایط باشد، پیامک ارسال می‌شود.', 'mtn-cafe-booking' ) ) );
 	}
 
 	public static function verify_code( $request ) {
