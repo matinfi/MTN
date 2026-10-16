@@ -36,7 +36,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [ ] Commission reversal policy for cancelled events after commission accrual.
 - [x] Append-only manual corrections/reversals with actor, timestamp and reason.
 - [x] Manual settlement records, cafe balances and ledger CSV export.
-- [ ] Automated cafe statements and reconciliation reports distinguishing accrued, settled and overdue amounts.
+- [ ] Automated periodic cafe statements and due-date-aware overdue calculation. The admin page now summarizes accrued commissions, reversals, settlements, adjustments and net outstanding balance by cafe/currency; external bank reconciliation and overdue status remain outstanding.
 
 ## Identity and communication
 - [x] Manual WhatsApp URL helper; never reports a link opening as delivery.
