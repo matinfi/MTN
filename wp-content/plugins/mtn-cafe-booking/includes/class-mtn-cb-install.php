@@ -210,7 +210,7 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( '3' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
+		if ( '4' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
@@ -232,10 +232,18 @@ final class MTN_CB_Install {
 		}
 		update_option( 'mtn_cb_default_pages_created', 1 );
 		$account_page = get_page_by_path( 'my-account', OBJECT, 'page' );
-		if ( $account_page && false === strpos( $account_page->post_content, '[mtn_cafe_invite_accept]' ) ) {
-			wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_page->post_content . "\n\n[mtn_cafe_invite_accept]" ) );
+		if ( $account_page ) {
+			$account_content = $account_page->post_content;
+			foreach ( array( '[mtn_cafe_invite_accept]', '[mtn_sms_login]' ) as $shortcode ) {
+				if ( false === strpos( $account_content, $shortcode ) ) {
+					$account_content .= "\n\n" . $shortcode;
+				}
+			}
+			if ( $account_content !== $account_page->post_content ) {
+				wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_content ) );
+			}
 		}
-		update_option( 'mtn_cb_default_pages_version', '3' );
+		update_option( 'mtn_cb_default_pages_version', '4' );
 	}
 
 	public static function maybe_upgrade() {
