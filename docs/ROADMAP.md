@@ -19,7 +19,7 @@
 - [x] Cafe-owner dashboard for owned bookings with confirm/reject/cancel actions
 - [ ] Staff invitations, multi-user teams and configurable cancellation policy
 - [x] Optional idempotency keys for booking creation
-- [ ] Append-only booking audit log
+- [x] Append-only booking audit log for creation, status transitions and table assignment
 
 ## Phase 2 — finance and attendance
 - [x] Append-only commission ledger and manual correction/reversal entries
