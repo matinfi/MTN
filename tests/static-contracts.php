@@ -56,7 +56,9 @@ if ( false === strpos( $install, "const DB_VERSION = '10';" ) ||
 	false === strpos( $bookings, 'public static function issue_checkin_token' ) ||
 	false === strpos( $bookings, 'public static function check_in_with_token' ) ||
 	false === strpos( $finance, '$booking->commission_trigger_status' ) ||
-	false === strpos( $rest, "'/cafe/check-in'" ) ) {
+	false === strpos( $rest, "'/cafe/check-in'" ) ||
+	false === strpos( $rest, 'MTN_CB_WhatsApp::manual_link' ) ||
+	false === strpos( $rest, "'whatsapp_url'" ) ) {
 	fwrite( STDERR, "Commission/check-in schema or behavior contract is missing.\n" );
 	exit( 1 );
 }
