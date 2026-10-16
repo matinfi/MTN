@@ -183,6 +183,8 @@ final class MTN_CB_Bookings {
 
 		$now  = current_time( 'mysql', true );
 		$code = self::generate_code();
+		$commission_snapshot = number_format( max( 0, (float) get_option( 'mtn_cb_default_commission', '0' ) ), 2, '.', '' );
+		$commission_currency = sanitize_text_field( get_option( 'mtn_cb_currency', 'TRY' ) );
 
 		$inserted = $wpdb->insert(
 			self::table_name(),
@@ -199,10 +201,12 @@ final class MTN_CB_Bookings {
 				'customer_note'          => isset( $args['customer_note'] ) ? sanitize_textarea_field( $args['customer_note'] ) : '',
 				'whatsapp_action_status' => 'manual_required',
 				'checkin_status'         => 'not_checked_in',
+				'commission_amount'      => $commission_snapshot,
+				'commission_currency'    => $commission_currency,
 				'created_at'             => $now,
 				'updated_at'             => $now,
 			),
-			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
 
 		if ( false === $inserted ) {
