@@ -75,6 +75,28 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
+			'/cafe/bookings/(?P<id>\\d+)/complete',
+			array(
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => array( __CLASS__, 'complete_booking' ),
+				'permission_callback' => array( __CLASS__, 'can_manage_booking_request' ),
+				'args' => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
+			'/cafe/bookings/(?P<id>\\d+)/no-show',
+			array(
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => array( __CLASS__, 'mark_no_show' ),
+				'permission_callback' => array( __CLASS__, 'can_manage_booking_request' ),
+				'args' => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
 			'/cafe/bookings/(?P<id>\\d+)/assign-table',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
@@ -305,6 +327,16 @@ final class MTN_CB_Rest {
 		}
 		$result = MTN_CB_Bookings::transition( $booking->id, 'confirmed', get_current_user_id(), 'confirmed_by_cafe_admin' );
 		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
+	}
+
+	public static function complete_booking( WP_REST_Request $request ) {
+		$booking = MTN_CB_Bookings::transition( $request['id'], 'completed', get_current_user_id(), 'marked_completed_by_cafe' );
+		return is_wp_error( $booking ) ? $booking : rest_ensure_response( self::public_booking( $booking ) );
+	}
+
+	public static function mark_no_show( WP_REST_Request $request ) {
+		$booking = MTN_CB_Bookings::transition( $request['id'], 'no_show', get_current_user_id(), 'marked_no_show_by_cafe' );
+		return is_wp_error( $booking ) ? $booking : rest_ensure_response( self::public_booking( $booking ) );
 	}
 
 	public static function assign_table( WP_REST_Request $request ) {
