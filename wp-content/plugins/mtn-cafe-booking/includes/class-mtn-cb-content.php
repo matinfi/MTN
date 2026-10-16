@@ -99,7 +99,13 @@ final class MTN_CB_Content {
 
 	public static function render_cafe_meta_box( $post ) {
 		self::meta_box_nonce();
-		self::field( $post->ID, 'mtn_cafe_owner_id', __( 'مالک کافه', 'mtn-cafe-booking' ), 'user_select' );
+		if ( current_user_can( 'manage_options' ) ) {
+			self::field( $post->ID, 'mtn_cafe_owner_id', __( 'مالک کافه', 'mtn-cafe-booking' ), 'user_select' );
+		} else {
+			$owner_id = absint( get_post_meta( $post->ID, 'mtn_cafe_owner_id', true ) );
+			$owner = $owner_id ? get_user_by( 'id', $owner_id ) : false;
+			echo '<p><strong>' . esc_html__( 'مالک کافه', 'mtn-cafe-booking' ) . ':</strong> ' . esc_html( $owner ? $owner->display_name : __( 'بدون مالک مشخص', 'mtn-cafe-booking' ) ) . '</p>';
+		}
 		self::field( $post->ID, 'mtn_cafe_city', __( 'شهر', 'mtn-cafe-booking' ) );
 		self::field( $post->ID, 'mtn_cafe_address', __( 'نشانی', 'mtn-cafe-booking' ), 'textarea' );
 		self::field( $post->ID, 'mtn_cafe_phone', __( 'تلفن تماس', 'mtn-cafe-booking' ), 'tel' );
