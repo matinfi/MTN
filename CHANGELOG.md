@@ -8,6 +8,7 @@
 - Upgrade schema to version 5 with ledger and settlement tables.
 - Upgrade schema to version 6 with append-only booking audit events and add an owner-scoped history API.
 - Upgrade schema to version 7 and schedule a five-minute pending-reservation expiry worker with audit entries.
+- Upgrade schema to version 8 with unique settlement request keys to prevent duplicate form submissions.
 - Lock the global currency setting after bookings or ledger entries exist to prevent mixed-currency balances.
 - Add CSV formula-injection protection and test-plan coverage for finance and expiry workflows.
 
