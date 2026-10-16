@@ -47,7 +47,7 @@ jobs:
           table_counts() {
             local database="$1"
             while IFS= read -r table; do
-              count=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$database" -Nse "SELECT COUNT(*) FROM `$table`")
+              count=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$database" -Nse "SELECT COUNT(*) FROM \`$table\`")
               printf '%s:%s\n' "$table" "$count"
             done < <(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$database" -Nse "SHOW TABLES" | sort)
           }
