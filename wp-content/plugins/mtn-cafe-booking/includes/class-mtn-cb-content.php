@@ -73,6 +73,13 @@ final class MTN_CB_Content {
 				echo '<option value="' . (int) $cafe->ID . '" ' . selected( absint( $value ), (int) $cafe->ID, false ) . '>' . esc_html( get_the_title( $cafe ) ) . ' (#' . (int) $cafe->ID . ')</option>';
 			}
 			echo '</select>';
+		} elseif ( 'user_select' === $type ) {
+			$users = get_users( array( 'orderby' => 'display_name', 'order' => 'ASC', 'fields' => array( 'ID', 'display_name' ), 'number' => 500 ) );
+			echo '<select class="widefat" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '"><option value="0">' . esc_html__( 'بدون مالک مشخص', 'mtn-cafe-booking' ) . '</option>';
+			foreach ( $users as $user ) {
+				echo '<option value="' . (int) $user->ID . '" ' . selected( absint( $value ), (int) $user->ID, false ) . '>' . esc_html( $user->display_name ) . ' (#' . (int) $user->ID . ')</option>';
+			}
+			echo '</select>';
 		} elseif ( 'checkbox' === $type ) {
 			echo '<input type="checkbox" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" value="1" ' . checked( (bool) $value, true, false ) . '> ' . esc_html__( 'فعال', 'mtn-cafe-booking' );
 		} else {
@@ -92,7 +99,7 @@ final class MTN_CB_Content {
 
 	public static function render_cafe_meta_box( $post ) {
 		self::meta_box_nonce();
-		self::field( $post->ID, 'mtn_cafe_owner_id', __( 'شناسه کاربری مدیر کافه (اختیاری)', 'mtn-cafe-booking' ), 'number' );
+		self::field( $post->ID, 'mtn_cafe_owner_id', __( 'مالک کافه', 'mtn-cafe-booking' ), 'user_select' );
 		self::field( $post->ID, 'mtn_cafe_city', __( 'شهر', 'mtn-cafe-booking' ) );
 		self::field( $post->ID, 'mtn_cafe_address', __( 'نشانی', 'mtn-cafe-booking' ), 'textarea' );
 		self::field( $post->ID, 'mtn_cafe_phone', __( 'تلفن تماس', 'mtn-cafe-booking' ), 'tel' );
