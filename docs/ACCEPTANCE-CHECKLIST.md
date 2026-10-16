@@ -49,6 +49,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 ## Release quality
 - [x] PHP lint workflow.
 - [x] Booking wizard JavaScript syntax check in CI.
+- [x] Static source-contract regression checks in lint and package workflows.
 - [ ] Unit and integration test suites.
 - [ ] REST permission and privacy tests.
 - [ ] Concurrent booking tests against supported database engines.
