@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '12';
+	const DB_VERSION = '13';
 
 	public static function activate() {
 		global $wpdb;
@@ -152,6 +152,23 @@ final class MTN_CB_Install {
 		) {$collate};";
 		dbDelta( $invites_sql );
 		dbDelta( $notifications_sql );
+		$otp_table = $wpdb->prefix . 'mtn_sms_otps';
+		$otp_sql = "CREATE TABLE {$otp_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			phone varchar(20) NOT NULL,
+			code_hash char(64) NOT NULL,
+			ip_hash char(64) NOT NULL DEFAULT '',
+			attempts smallint(5) unsigned NOT NULL DEFAULT 0,
+			status varchar(20) NOT NULL DEFAULT 'pending',
+			created_at datetime NOT NULL,
+			expires_at datetime NOT NULL,
+			consumed_at datetime NULL,
+			PRIMARY KEY  (id),
+			KEY phone_created (phone,created_at),
+			KEY ip_created (ip_hash,created_at),
+			KEY status_expiry (status,expires_at)
+		) {$collate};";
+		dbDelta( $otp_sql );
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
 		if ( ! wp_next_scheduled( 'mtn_cb_expire_pending_bookings' ) ) {
 			wp_schedule_event( time() + 60, 'mtn_cb_five_minutes', 'mtn_cb_expire_pending_bookings' );
@@ -233,6 +250,7 @@ final class MTN_CB_Install {
 		// Preserve all booking and finance data on deactivation.
 		wp_clear_scheduled_hook( 'mtn_cb_expire_pending_bookings' );
 		wp_clear_scheduled_hook( 'mtn_cb_process_notifications' );
+		wp_clear_scheduled_hook( 'mtn_cb_generate_recurring_events' );
 		flush_rewrite_rules();
 	}
 }
