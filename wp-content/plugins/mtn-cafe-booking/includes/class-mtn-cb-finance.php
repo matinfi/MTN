@@ -304,10 +304,20 @@ final class MTN_CB_Finance {
 		global $wpdb;
 		$cafes = get_posts( array( 'post_type' => 'mtn_cafe', 'post_status' => 'publish', 'posts_per_page' => 200, 'orderby' => 'title', 'order' => 'ASC' ) );
 		$entries = $wpdb->get_results( 'SELECT l.*, cafe.post_title AS cafe_title FROM ' . self::ledger_table() . ' l LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = l.cafe_id ORDER BY l.id DESC LIMIT 200' );
+		$finance_summary = $wpdb->get_results(
+			'SELECT cafe.ID AS cafe_id, cafe.post_title AS cafe_title, l.currency, '
+			. "SUM(CASE WHEN l.entry_type = 'commission_accrued' THEN l.amount ELSE 0 END) AS accrued, "
+			. "SUM(CASE WHEN l.entry_type = 'commission_reversal' THEN l.amount ELSE 0 END) AS reversed, "
+			. "SUM(CASE WHEN l.entry_type = 'settlement_received' THEN -l.amount ELSE 0 END) AS settled, "
+			. "SUM(CASE WHEN l.entry_type = 'manual_adjustment' THEN l.amount ELSE 0 END) AS adjustments, "
+			. 'SUM(l.amount) AS outstanding '
+			. 'FROM ' . self::ledger_table() . ' l INNER JOIN ' . $wpdb->posts . " cafe ON cafe.ID = l.cafe_id AND cafe.post_type = 'mtn_cafe' "
+			. "WHERE cafe.post_status = 'publish' GROUP BY cafe.ID, cafe.post_title, l.currency ORDER BY cafe.post_title ASC"
+		);
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'دفتر مالی و تسویه', 'mtn-cafe-booking' ); ?></h1>
-			<p><?php esc_html_e( 'کارمزد فقط هنگام تکمیل رزرو ثبت می‌شود. پرداخت ثبت‌شده در این صفحه یک ورودی منفی و مستقل در دفتر مالی ایجاد می‌کند؛ این سامانه پول را دریافت نمی‌کند.', 'mtn-cafe-booking' ); ?></p>
+			<p><?php esc_html_e( 'کارمزد طبق وضعیت محرک ذخیره‌شده در هر رزرو ثبت می‌شود (تأیید کافه به‌صورت پیش‌فرض، یا تکمیل در صورت انتخاب مدیر). ثبت تسویه فقط یک رویداد حسابداری دستی است و به معنی دریافت خودکار پول توسط سامانه نیست.', 'mtn-cafe-booking' ); ?></p>
 			<?php if ( isset( $_GET['mtn_finance_notice'] ) ) : ?>
 				<?php $notice = sanitize_key( wp_unslash( $_GET['mtn_finance_notice'] ) ); ?>
 				<div class="notice <?php echo 'settled' === $notice ? 'notice-success' : 'notice-warning'; ?> is-dismissible"><p><?php
@@ -315,6 +325,11 @@ final class MTN_CB_Finance {
 					echo esc_html( isset( $messages[ $notice ] ) ? $messages[ $notice ] : 'درخواست پردازش شد.' );
 				?></p></div>
 			<?php endif; ?>
+			<h2><?php esc_html_e( 'گزارش تطبیق مانده کافه‌ها', 'mtn-cafe-booking' ); ?></h2>
+			<p><?php esc_html_e( 'گزارش از جمع دفتر ثبت‌شده محاسبه می‌شود: کارمزد ناخالص، برگشت کارمزد، تسویه‌های ثبت‌شده، اصلاحیه‌ها و مانده خالص. این گزارش جایگزین تطبیق با صورت‌حساب بانکی نیست. به‌دلیل نبود مهلت سررسید قراردادی برای هر کافه، مبلغ معوق به‌طور خودکار محاسبه نمی‌شود.', 'mtn-cafe-booking' ); ?></p>
+			<table class="widefat striped"><thead><tr><th><?php esc_html_e( 'کافه', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'ارز', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'کارمزد ثبت‌شده', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'برگشت کارمزد', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'تسویه ثبت‌شده', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'اصلاحیه خالص', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'مانده خالص', 'mtn-cafe-booking' ); ?></th></tr></thead><tbody>
+			<?php if ( $finance_summary ) : foreach ( $finance_summary as $summary ) : ?><tr><td><?php echo esc_html( $summary->cafe_title ); ?></td><td><?php echo esc_html( $summary->currency ); ?></td><td><?php echo esc_html( number_format_i18n( (float) $summary->accrued, 2 ) ); ?></td><td><?php echo esc_html( number_format_i18n( (float) $summary->reversed, 2 ) ); ?></td><td><?php echo esc_html( number_format_i18n( (float) $summary->settled, 2 ) ); ?></td><td><?php echo esc_html( number_format_i18n( (float) $summary->adjustments, 2 ) ); ?></td><td><strong><?php echo esc_html( number_format_i18n( (float) $summary->outstanding, 2 ) ); ?></strong></td></tr><?php endforeach; else : ?><tr><td colspan="7"><?php esc_html_e( 'هنوز گردش مالی برای کافه‌های منتشرشده ثبت نشده است.', 'mtn-cafe-booking' ); ?></td></tr><?php endif; ?>
+			</tbody></table>
 			<h2><?php esc_html_e( 'ثبت تسویه دریافت‌شده', 'mtn-cafe-booking' ); ?></h2>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="mtn_cb_record_settlement">
