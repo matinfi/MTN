@@ -85,7 +85,7 @@ The assigned cafe owner or a WordPress administrator can confirm a booking. The 
 
 `GET /cafe/bookings`
 
-Administrators can see all bookings; a user with the `mtn_cafe_manager` role sees only bookings for cafes whose `mtn_cafe_owner_id` matches their account. The owner ID is never exposed through public cafe metadata.
+Administrators can see all bookings; a user with the `mtn_cafe_manager` role sees only bookings for cafes where they are the configured owner or are listed in the private `mtn_cafe_manager_ids` team metadata. The owner ID is never exposed through public cafe metadata.
 
 `POST /cafe/bookings/{id}/assign-table`
 
@@ -113,7 +113,7 @@ The authenticated customer who owns a confirmed booking can issue a one-time, ra
 
 `POST /cafe/check-in`
 
-Requires an authenticated cafe manager assigned as the cafe owner or a WordPress administrator. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Multi-user cafe teams and automated notification of tokens are not implemented.
+Requires an authenticated cafe manager assigned as the cafe owner or a WordPress administrator. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Team members must be assigned by an administrator in the cafe editor; invitation/acceptance and automated notification of tokens are not implemented.
 
 ## Finance behavior
 
@@ -122,7 +122,7 @@ The fixed commission amount, currency and trigger status are snapshotted when a 
 ## Current contract limitations
 
 - Idempotency is optional; clients should send a stable unique `idempotency_key` for each booking attempt. Reusing a key with a different payload returns HTTP 409.
-- Cafe-assigned-table mode does not yet allocate a table automatically. Cafe dashboard access is limited to the single configured owner ID per cafe; staff invitations and multi-user cafe teams are not implemented.
+- Cafe-assigned-table mode does not yet allocate a table automatically. Administrators can assign existing WordPress users as cafe team managers; permissions are scoped to assigned cafes. Invitation and acceptance workflow is not implemented.
 - Event capacity counts active bookings attached to the event post. Each event post is treated as one capacity pool; recurring schedules are not implemented.
 - Locking relies on MySQL/MariaDB `GET_LOCK()`. Validate behavior on the production database and test concurrent requests before launch.
 - Online payments, SMS OTP, automatic WhatsApp delivery and check-in tokens are not implemented.
