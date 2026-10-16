@@ -89,6 +89,10 @@ final class MTN_CB_Bookings {
 		if ( absint( get_post_meta( $event_id, 'mtn_cafe_id', true ) ) !== $cafe_id ) {
 			return new WP_Error( 'mtn_event_cafe_mismatch', __( 'رویداد به این کافه تعلق ندارد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
+		$schedule_check = self::validate_event_schedule( $event_id, $local_date );
+		if ( is_wp_error( $schedule_check ) ) {
+			return $schedule_check;
+		}
 
 		$min_party = absint( get_post_meta( $event_id, 'mtn_min_party_size', true ) );
 		$max_party = absint( get_post_meta( $event_id, 'mtn_max_party_size', true ) );
@@ -242,6 +246,10 @@ final class MTN_CB_Bookings {
 		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || ! $event || 'mtn_event' !== $event->post_type || 'publish' !== $event->post_status || absint( get_post_meta( $event_id, 'mtn_cafe_id', true ) ) !== $cafe_id ) {
 			return new WP_Error( 'mtn_unavailable_listing', __( 'کافه یا رویداد قابل رزرو نیست.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
+		$schedule_check = self::validate_event_schedule( $event_id, $date );
+		if ( is_wp_error( $schedule_check ) ) {
+			return $schedule_check;
+		}
 		$min_party = absint( get_post_meta( $event_id, 'mtn_min_party_size', true ) );
 		$max_party = absint( get_post_meta( $event_id, 'mtn_max_party_size', true ) );
 		$max_party = $max_party ? $max_party : 100;
@@ -381,6 +389,34 @@ final class MTN_CB_Bookings {
 			}
 		}
 		return strtoupper( bin2hex( random_bytes( 12 ) ) );
+	}
+
+	private static function validate_event_schedule( $event_id, $local_date ) {
+		$event_day = sanitize_text_field( get_post_meta( $event_id, 'mtn_event_date', true ) );
+		$start = sanitize_text_field( get_post_meta( $event_id, 'mtn_event_start_time', true ) );
+		$end = sanitize_text_field( get_post_meta( $event_id, 'mtn_event_end_time', true ) );
+		if ( $event_day && ! preg_match( '/^\\d{4}-\\d{2}-\\d{2}$/', $event_day ) ) {
+			return new WP_Error( 'mtn_event_schedule_invalid', __( 'تاریخ برنامه در تنظیمات کافه معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		if ( $event_day && $local_date->format( 'Y-m-d' ) !== $event_day ) {
+			return new WP_Error( 'mtn_event_date_mismatch', __( 'رزرو باید در تاریخ ثبت‌شده برای این برنامه باشد.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		$time = $local_date->format( 'H:i:s' );
+		$start = $start ? ( 5 === strlen( $start ) ? $start . ':00' : $start ) : '';
+		$end = $end ? ( 5 === strlen( $end ) ? $end . ':00' : $end ) : '';
+		if ( ( $start && ! preg_match( '/^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$/', $start ) ) || ( $end && ! preg_match( '/^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$/', $end ) ) ) {
+			return new WP_Error( 'mtn_event_schedule_invalid', __( 'ساعت برنامه در تنظیمات کافه معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		if ( $start && $time < $start ) {
+			return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو پیش از شروع برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		if ( $end && $start && $end > $start && $time >= $end ) {
+			return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو پس از پایان برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		if ( $end && $start && $end < $start && $time >= $end && $time < $start ) {
+			return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو خارج از ساعت برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
+		return true;
 	}
 
 	private static function parse_local_datetime( $value ) {
