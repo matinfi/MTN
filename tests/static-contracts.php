@@ -51,13 +51,17 @@ if ( false === strpos( $content, "if ( current_user_can( 'manage_options' ) )" )
 	exit( 1 );
 }
 
-if ( false === strpos( $install, "const DB_VERSION = '10';" ) ||
+if ( false === strpos( $install, "const DB_VERSION = '11';" ) ||
 	false === strpos( $install, 'commission_trigger_status varchar(20)' ) ||
+	false === strpos( $install, 'commission_reverse_on_cancellation tinyint(1)' ) ||
+	false === strpos( $install, 'commission_reverse_on_no_show tinyint(1)' ) ||
 	false === strpos( $install, 'checkin_token_hash char(64)' ) ||
 	false === strpos( $bookings, "'commission_trigger_status' => $commission_trigger_status" ) ||
+	false === strpos( $bookings, "'commission_reverse_on_cancellation' => $commission_reverse_on_cancellation" ) ||
 	false === strpos( $bookings, 'public static function issue_checkin_token' ) ||
 	false === strpos( $bookings, 'public static function check_in_with_token' ) ||
 	false === strpos( $finance, '$booking->commission_trigger_status' ) ||
+	false === strpos( $finance, 'public static function reverse_commission' ) ||
 	false === strpos( $rest, "'/cafe/check-in'" ) ||
 	false === strpos( $rest, 'MTN_CB_WhatsApp::manual_link' ) ||
 	false === strpos( $rest, "'whatsapp_url'" ) ) {
