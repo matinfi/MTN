@@ -252,17 +252,6 @@ final class MTN_CB_Bookings {
 		}
 		$expiry_minutes = min( 1440, max( 5, absint( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ) ) );
 		$expiry_before = gmdate( 'Y-m-d H:i:s', time() - ( $expiry_minutes * MINUTE_IN_SECONDS ) );
-		$expired_count = $wpdb->query(
-			$wpdb->prepare(
-				"UPDATE " . self::table_name() . " SET status = 'expired', updated_at = %s WHERE cafe_id = %d AND status = 'pending_cafe' AND created_at < %s",
-				current_time( 'mysql', true ),
-				$cafe_id,
-				$expiry_before
-			)
-		);
-		if ( $expired_count ) {
-			do_action( 'mtn_cb_pending_bookings_expired', $cafe_id, absint( $expired_count ) );
-		}
 
 		$min_party = absint( get_post_meta( $event_id, 'mtn_min_party_size', true ) );
 		$max_party = absint( get_post_meta( $event_id, 'mtn_max_party_size', true ) );
@@ -277,8 +266,9 @@ final class MTN_CB_Bookings {
 		$window_end = gmdate( 'Y-m-d H:i:s', $start_ts + ( $duration * MINUTE_IN_SECONDS ) );
 		$event_capacity = absint( get_post_meta( $event_id, 'mtn_event_capacity', true ) );
 		$booked_people = (int) $wpdb->get_var( $wpdb->prepare(
-			"SELECT COALESCE(SUM(party_size), 0) FROM " . self::table_name() . " WHERE event_id = %d AND status IN ('pending_cafe','confirmed')",
-			$event_id
+			"SELECT COALESCE(SUM(party_size), 0) FROM " . self::table_name() . " WHERE event_id = %d AND (status = 'confirmed' OR (status = 'pending_cafe' AND created_at >= %s))",
+			$event_id,
+			$expiry_before
 		) );
 		$remaining = $event_capacity ? max( 0, $event_capacity - $booked_people ) : null;
 		$mode = get_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
@@ -301,8 +291,8 @@ final class MTN_CB_Bookings {
 			) );
 			foreach ( $table_ids as $table_id ) {
 				$conflict = $wpdb->get_var( $wpdb->prepare(
-					"SELECT id FROM " . self::table_name() . " WHERE cafe_id = %d AND table_id = %d AND status IN ('pending_cafe','confirmed') AND booking_at > %s AND booking_at < %s LIMIT 1",
-					$cafe_id, $table_id, $window_start, $window_end
+					"SELECT id FROM " . self::table_name() . " WHERE cafe_id = %d AND table_id = %d AND (status = 'confirmed' OR (status = 'pending_cafe' AND created_at >= %s)) AND booking_at > %s AND booking_at < %s LIMIT 1",
+					$cafe_id, $table_id, $expiry_before, $window_start, $window_end
 				) );
 				if ( ! $conflict ) {
 					$tables[] = array(
