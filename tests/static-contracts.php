@@ -25,14 +25,15 @@ foreach ( array( $rest, $bookings, $content, $install, $finance ) as $source ) {
 }
 
 $route_count = preg_match_all( "/'[^']*\\(\\?P<id>[^']*\\)'/", $rest );
-if ( 9 !== $route_count ) {
-	fwrite( STDERR, "Expected 9 booking routes with an ID pattern; found {$route_count}.\n" );
+if ( 10 !== $route_count ) {
+	fwrite( STDERR, "Expected 10 booking routes with an ID pattern; found {$route_count}.\n" );
 	exit( 1 );
 }
 
 // PHP single-quoted route strings must contain one backslash before d+.
 // Two source backslashes become one literal backslash at runtime and break the regex.
-if ( false !== strpos( $rest, '\\\\d+' ) ) {
+$overescaped_pattern = str_repeat( chr( 92 ), 4 ) . 'd+';
+if ( false !== strpos( $rest, $overescaped_pattern ) ) {
 	fwrite( STDERR, "An over-escaped booking route pattern was found.\n" );
 	exit( 1 );
 }
