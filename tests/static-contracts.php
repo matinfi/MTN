@@ -30,8 +30,7 @@ if ( 10 !== $route_count ) {
 	exit( 1 );
 }
 
-// PHP single-quoted route strings must contain one backslash before d+.
-// Two source backslashes become one literal backslash at runtime and break the regex.
+// Four consecutive source backslashes become two at runtime and break the regex.
 $overescaped_pattern = str_repeat( chr( 92 ), 4 ) . 'd+';
 if ( false !== strpos( $rest, $overescaped_pattern ) ) {
 	fwrite( STDERR, "An over-escaped booking route pattern was found.\n" );
