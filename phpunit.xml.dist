@@ -6,6 +6,7 @@
 			<file>tests/test-permissions.php</file>
 			<file>tests/test-install.php</file>
 			<file>tests/test-concurrency.php</file>
+			<file>tests/test-notifications.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
