@@ -11,7 +11,8 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Serialize booking writes per cafe using MySQL/MariaDB advisory locks.
 - [x] Enforce event headcount capacity and prevent overlapping reservations for a selected table.
 - [x] Optional per-user idempotency key with payload matching and duplicate-request recovery.
-- [ ] Full cancellation policy and expiration worker.
+- [x] Scheduled five-minute expiry worker for stale pending reservations.
+- [ ] Configurable cancellation policy and customer-facing cancellation cutoffs.
 - [x] Append-only booking event history with actor, reason/details and timestamp.
 
 ## Cafe operations
