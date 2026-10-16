@@ -32,10 +32,10 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           cd wp-content/plugins
-          zip -qr ../../../dist/mtn-cafe-booking.zip mtn-cafe-booking
-          cd ../../themes
-          zip -qr ../../../dist/mtn-cafe-theme.zip mtn-cafe-theme
-          cd ../../..
+          zip -qr ../../dist/mtn-cafe-booking.zip mtn-cafe-booking
+          cd ../themes
+          zip -qr ../../dist/mtn-cafe-theme.zip mtn-cafe-theme
+          cd ../..
           test -s dist/mtn-cafe-booking.zip
           test -s dist/mtn-cafe-theme.zip
       - name: Upload package artifacts
