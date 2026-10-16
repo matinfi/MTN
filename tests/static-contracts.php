@@ -9,11 +9,15 @@ $root = dirname( __DIR__ );
 $rest_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-rest.php';
 $bookings_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-bookings.php';
 $content_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-content.php';
+$install_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-install.php';
+$finance_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-finance.php';
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
 $content = file_get_contents( $content_path );
+$install = file_get_contents( $install_path );
+$finance = file_get_contents( $finance_path );
 
-foreach ( array( $rest, $bookings, $content ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -42,6 +46,14 @@ if ( false === strpos( $bookings, "get_option( 'mtn_cb_customer_cancel_cutoff_mi
 if ( false === strpos( $content, "if ( current_user_can( 'manage_options' ) )" ) ||
 	false === strpos( $content, '$keys[] = \'mtn_cafe_owner_id\';' ) ) {
 	fwrite( STDERR, "Cafe owner assignment privilege guard is missing.\n" );
+	exit( 1 );
+}
+
+if ( false === strpos( $install, "const DB_VERSION = '9';" ) ||
+	false === strpos( $install, 'commission_trigger_status varchar(20)' ) ||
+	false === strpos( $bookings, "'commission_trigger_status' => $commission_trigger_status" ) ||
+	false === strpos( $finance, '$booking->commission_trigger_status' ) ) {
+	fwrite( STDERR, "Commission trigger schema/snapshot contract is missing.\\n" );
 	exit( 1 );
 }
 
