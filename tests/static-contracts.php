@@ -16,6 +16,7 @@ $invites_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn
 $sms_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-sms-otp.php';
 $recurrence_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-event-recurrence.php';
 $event_cancel_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-event-cancellation.php';
+$statements_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-statements.php';
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
 $content = file_get_contents( $content_path );
@@ -26,8 +27,9 @@ $invites = file_get_contents( $invites_path );
 $sms = file_get_contents( $sms_path );
 $recurrence = file_get_contents( $recurrence_path );
 $event_cancel = file_get_contents( $event_cancel_path );
+$statements = file_get_contents( $statements_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -80,6 +82,8 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $event_cancel, 'commission_reverse_on_event_cancel' ) ||
 	false === strpos( $content, 'mtn_event_recurrence_until' ) ||
 	false === strpos( $recurrence, "'post_status' => 'draft'" ) ||
+	false === strpos( $statements, 'public static function generate_monthly_statements' ) ||
+	false === strpos( $statements, 'public static function calculate_overdue' ) ||
 	false === strpos( $content, 'mtn_event_recurrence_until' ) ||
 	false === strpos( $recurrence, "'post_status' => 'draft'" ) ||
 	false === strpos( $notifications, 'public static function process_queue' ) ||
