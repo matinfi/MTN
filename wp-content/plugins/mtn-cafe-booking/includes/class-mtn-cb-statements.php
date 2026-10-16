@@ -141,7 +141,7 @@ final class MTN_CB_Statements {
 					continue;
 				}
 				$summary = self::period_summary( $cafe->ID, $currency, $start_utc, $end_utc );
-				$due_at = $period_end->modify( '+' . self::due_days() . ' days' )->format( 'Y-m-d' );
+				$due_at = $period_end->modify( '-1 day' )->modify( '+' . self::due_days() . ' days' )->format( 'Y-m-d' );
 				$overdue = self::calculate_overdue( $cafe->ID, $currency );
 				$body = sprintf(
 					"صورت‌حساب ماهانه کافه: %s\nدوره: %s تا %s\nارز: %s\nکارمزد ثبت‌شده: %s\nبرگشت کارمزد: %s\nتسویه‌های ثبت‌شده: %s\nاصلاحیه خالص: %s\nمانده دفتر در پایان دوره: %s\nمانده معوق بر اساس مهلت %d روزه: %s\nتاریخ سررسید این صورت‌حساب: %s\n\nاین گزارش از دفتر داخلی محاسبه شده و جایگزین تطبیق با رسید بانکی نیست.",
@@ -170,7 +170,7 @@ final class MTN_CB_Statements {
 				$currencies = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT currency FROM ' . MTN_CB_Finance::ledger_table() . ' WHERE cafe_id = %d', absint( $cafe->ID ) ) );
 				if ( empty( $currencies ) ) : ?><tr><td><?php echo esc_html( $cafe->post_title ); ?></td><td><?php echo esc_html( get_post_meta( $cafe->ID, 'mtn_cafe_email', true ) ); ?></td><td colspan="3"><?php esc_html_e( 'گردش مالی ثبت نشده است.', 'mtn-cafe-booking' ); ?></td></tr><?php endif;
 				foreach ( $currencies as $currency ) : ?>
-				<tr><td><?php echo esc_html( $cafe->post_title ); ?></td><td><?php echo esc_html( get_post_meta( $cafe->ID, 'mtn_cafe_email', true ) ); ?></td><td><?php echo esc_html( $currency ); ?></td><td><?php echo esc_html( number_format_i18n( MTN_CB_Finance::get_balance( $cafe->ID ), 2 ) ); ?></td><td><strong><?php echo esc_html( number_format_i18n( self::calculate_overdue( $cafe->ID, $currency ), 2 ) ); ?></strong></td></tr>
+				<tr><td><?php echo esc_html( $cafe->post_title ); ?></td><td><?php echo esc_html( get_post_meta( $cafe->ID, 'mtn_cafe_email', true ) ); ?></td><td><?php echo esc_html( $currency ); ?></td><td><?php echo esc_html( number_format_i18n( $wpdb->get_var( $wpdb->prepare( 'SELECT COALESCE(SUM(amount),0) FROM ' . MTN_CB_Finance::ledger_table() . ' WHERE cafe_id = %d AND currency = %s', absint( $cafe->ID ), $currency ) ), 2 ) ); ?></td><td><strong><?php echo esc_html( number_format_i18n( self::calculate_overdue( $cafe->ID, $currency ), 2 ) ); ?></strong></td></tr>
 				<?php endforeach; endforeach; ?>
 			</tbody></table>
 		</div>
