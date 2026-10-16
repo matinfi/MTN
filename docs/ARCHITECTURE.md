@@ -26,7 +26,7 @@ Booking creation obtains a MySQL/MariaDB advisory lock scoped to the cafe before
 
 The REST API accepts `booking_at` as `YYYY-MM-DD HH:MM:SS` in the WordPress site's configured timezone, rejects past times, and stores the converted UTC value. API consumers must display/submit dates in the site's timezone and interpret returned database timestamps as UTC.
 
-These controls depend on MySQL/MariaDB `GET_LOCK()` support and still need integration/concurrency tests on the supported production database. Cafe-assigned table mode supports manual assignment in the cafe dashboard but not automatic allocation. The five-minute expiry worker uses WP-Cron; configure a real server cron to trigger WordPress cron reliably in production. Full recurring schedules, multi-user cafe teams, automatic notifications and payment integrations remain incomplete. Booking creation supports an optional per-user idempotency key; clients should use one for every create attempt.
+These controls depend on MySQL/MariaDB `GET_LOCK()` support and still need integration/concurrency tests on the supported production database. Cafe-assigned table mode supports manual assignment in the cafe dashboard but not automatic allocation. The five-minute expiry worker uses WP-Cron; configure a real server cron to trigger WordPress cron reliably in production. Full recurring schedules, staff invitation/acceptance, automatic notifications and payment integrations remain incomplete. Administrators can assign existing users to cafe teams; authorization remains cafe-scoped. Booking creation supports an optional per-user idempotency key; clients should use one for every create attempt.
 
 
 ## Security
