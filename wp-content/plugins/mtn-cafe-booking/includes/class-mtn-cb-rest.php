@@ -51,7 +51,7 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
-			'/bookings/(?P<id>\\d+)/history',
+			'/bookings/(?P<id>\d+)/history',
 			array(
 				'methods' => WP_REST_Server::READABLE,
 				'callback' => array( __CLASS__, 'booking_history' ),
@@ -88,7 +88,7 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
-			'/cafe/bookings/(?P<id>\\d+)/complete',
+			'/cafe/bookings/(?P<id>\d+)/complete',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'complete_booking' ),
@@ -99,7 +99,7 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
-			'/cafe/bookings/(?P<id>\\d+)/no-show',
+			'/cafe/bookings/(?P<id>\d+)/no-show',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'mark_no_show' ),
@@ -110,7 +110,7 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
-			'/cafe/bookings/(?P<id>\\d+)/assign-table',
+			'/cafe/bookings/(?P<id>\d+)/assign-table',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'assign_table' ),
@@ -124,7 +124,7 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
-			'/cafe/bookings/(?P<id>\\d+)/cancel',
+			'/cafe/bookings/(?P<id>\d+)/cancel',
 			array(
 				'methods' => WP_REST_Server::CREATABLE,
 				'callback' => array( __CLASS__, 'cancel_by_cafe' ),
