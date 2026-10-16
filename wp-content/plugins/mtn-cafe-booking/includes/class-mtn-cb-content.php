@@ -153,11 +153,19 @@ final class MTN_CB_Content {
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) || ! isset( $_POST['mtn_cb_listing_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_cb_listing_nonce'] ) ), 'mtn_cb_save_listing' ) || ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
-		self::save_fields( $post_id, array( 'mtn_cafe_owner_id', 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre' ), array( 'mtn_cafe_owner_id' ) );
-		$owner_id = absint( get_post_meta( $post_id, 'mtn_cafe_owner_id', true ) );
-		$owner = $owner_id ? get_user_by( 'id', $owner_id ) : false;
-		if ( $owner && ! in_array( 'administrator', (array) $owner->roles, true ) ) {
-			$owner->add_role( 'mtn_cafe_manager' );
+		// Only administrators may assign cafe ownership. Editors who can edit
+		// public cafe content must not be able to grant users manager access.
+		$keys = array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre' );
+		if ( current_user_can( 'manage_options' ) ) {
+			$keys[] = 'mtn_cafe_owner_id';
+		}
+		self::save_fields( $post_id, $keys, array( 'mtn_cafe_owner_id' ) );
+		if ( current_user_can( 'manage_options' ) ) {
+			$owner_id = absint( get_post_meta( $post_id, 'mtn_cafe_owner_id', true ) );
+			$owner = $owner_id ? get_user_by( 'id', $owner_id ) : false;
+			if ( $owner && ! in_array( 'administrator', (array) $owner->roles, true ) ) {
+				$owner->add_role( 'mtn_cafe_manager' );
+			}
 		}
 	}
 
