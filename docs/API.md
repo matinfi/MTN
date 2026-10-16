@@ -117,7 +117,7 @@ Requires an authenticated cafe manager who is the configured owner or an assigne
 
 ## Finance behavior
 
-The fixed commission amount, currency and trigger status are snapshotted when a booking is created. The central setting defaults to accruing commission on `confirmed`, with `completed` available as an alternative; later setting changes affect only new bookings. A no-show does not create a new commission entry, but if commission was accrued at confirmation, this version does not automatically reverse it. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
+The fixed commission amount, currency, trigger status and cancellation/no-show reversal policies are snapshotted when a booking is created. The central setting defaults to accruing commission on `confirmed`, with `completed` available as an alternative; later setting changes affect only new bookings. When the booking-time reversal option is enabled, a later cancellation or no-show appends a negative reversal entry if commission was already accrued. No payment refund is initiated or verified. Cancelled-event reversal is not implemented. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
 
 ## Current contract limitations
 
