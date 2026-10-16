@@ -21,36 +21,36 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Assign the cafe-manager role when an administrator saves an existing user as cafe owner.
 - [x] Cafe owner assignment through the cafe metadata editor.
 - [x] Object-level authorization for the configured cafe owner on booking read/action routes.
-- [ ] Staff invitation and invite-acceptance workflow.
+- [x] Staff invitation and invite-acceptance workflow: administrator-only invitation API, 48-hour token, hash-only storage, account-email matching and single-use acceptance.
 - [x] Administrator confirmation/rejection console with optional reason.
 - [x] Cafe-owner dashboard with confirmation, rejection reason, cancellation and manual table assignment actions.
 - [x] Administrator-managed multi-user cafe team assignment for existing WordPress users; invitation workflow remains outstanding.
 - [x] Event date, start/end time and capacity metadata fields; booking is blocked until date and start time are valid.
-- [ ] Recurrence, media workflow and publication approval.
+- [x] Weekly/monthly recurrence generates draft occurrences for review; content and featured images are inherited, and WordPress publication states provide editorial approval.
 - [x] Hierarchical cafe-location taxonomy supports nested country, city, area and neighborhood terms; administrators maintain the hierarchy.
 
 ## Finance
 - [x] Central setting for default fixed commission amount and currency.
 - [x] Configurable commission trigger (`confirmed` by default or `completed`); amount, currency and trigger status are snapshotted at booking creation.
 - [x] Per-booking snapshot of automatic commission reversal policy for cancellation and no-show after accrual.
-- [ ] Commission reversal policy for cancelled events after commission accrual.
+- [x] Per-booking event-cancellation reversal policy snapshot; unpublishing a published event appends an idempotent commission reversal when enabled.
 - [x] Append-only manual corrections/reversals with actor, timestamp and reason.
 - [x] Manual settlement records, cafe balances and ledger CSV export.
 - [ ] Automated periodic cafe statements and due-date-aware overdue calculation. The admin page now summarizes accrued commissions, reversals, settlements, adjustments and net outstanding balance by cafe/currency; external bank reconciliation and overdue status remain outstanding.
 
 ## Identity and communication
 - [x] Manual WhatsApp URL helper; never reports a link opening as delivery.
-- [ ] Real SMS OTP provider, expiry, throttling, resend and attempt limits.
+- [x] Optional Twilio SMS OTP adapter with five-minute expiry, 60-second resend delay, per-phone/IP limits, five-attempt lockout and OTP WordPress login. Live credentials and delivery verification remain deployment gates.
 - [x] Secure one-time check-in tokens with configurable expiry, hash-only storage and atomic consumption.
 - [x] Check-in audit trail and authorized assigned cafe-owner/administrator action; multi-user staff teams remain outstanding.
-- [ ] Notification queue, retry/idempotency and message history.
+- [x] Email notification queue with idempotency keys, bounded exponential retries and persistent sent/failed message history; actual delivery depends on site mail configuration.
 - [ ] Official WhatsApp API/webhook adapter (not required for v1).
 
 ## Release quality
 - [x] PHP lint workflow.
 - [x] Booking wizard JavaScript syntax check in CI.
 - [x] Static source-contract regression checks in lint and package workflows.
-- [ ] Unit and integration test suites.
+- [x] Initial PHPUnit settings and cafe-team authorization tests plus a WordPress test-suite CI workflow. Full booking lifecycle and concurrency coverage remain outstanding.
 - [ ] REST permission and privacy tests.
 - [ ] Concurrent booking tests against supported database engines.
 - [ ] Clean install, upgrade and backup/restore tests.
