@@ -2,7 +2,7 @@
 
 WordPress-based Persian RTL platform for discovering cafés with live music and night events and requesting table reservations.
 
-## Version 0.4.1 — booking and security fixes
+## Version 0.5.0 — booking policy and location hierarchy
 This repository contains a WordPress plugin and Persian RTL theme for cafe discovery, live music/night-event listings and table reservation requests. Version 0.4.1 includes a public catalog and advisory availability API, a booking wizard, customer booking history/cancellation, admin metadata fields for cafes/events/tables, an administrator booking console, cafe-owner-scoped booking dashboard, append-only commission ledger, manual settlement and adjustment records, CSV export, and cafe/event detail/archive templates. Features requiring external credentials (production SMS/OTP and WhatsApp Business) are not represented as live until configured.
 
 ## Architecture
