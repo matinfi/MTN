@@ -56,6 +56,12 @@ A customer may request cancellation only for their own booking. Cancellation fol
 
 Until cafe ownership and staff authorization are implemented, only WordPress administrators can confirm a booking. The route must not be exposed as a functioning cafe-staff workflow.
 
+## Reject a booking (temporary administrator-only behavior)
+
+`POST /cafe/bookings/{id}/reject`
+
+Optional JSON field: `reason` (plain text). Only administrators may reject until cafe ownership and staff authorization are implemented. The reason is saved as the current cafe note; append-only status history is not implemented yet.
+
 ## Current contract limitations
 
 - Idempotency keys are not implemented; clients should not blindly retry a timed-out create request without first checking whether a booking was created.
