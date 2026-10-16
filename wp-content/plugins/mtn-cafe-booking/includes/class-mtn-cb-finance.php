@@ -192,6 +192,14 @@ final class MTN_CB_Finance {
 		exit;
 	}
 
+	private static function csv_text( $value ) {
+		$value = (string) $value;
+		if ( preg_match( '/^[=+@\\t\\r]/', $value ) || ( isset( $value[0] ) && '-' === $value[0] ) ) {
+			return "'" . $value;
+		}
+		return $value;
+	}
+
 	public static function export_ledger() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'دسترسی کافی ندارید.', 'mtn-cafe-booking' ), '', array( 'response' => 403 ) );
@@ -209,7 +217,7 @@ final class MTN_CB_Finance {
 		fwrite( $output, "\xEF\xBB\xBF" );
 		fputcsv( $output, array( 'id', 'created_at_utc', 'cafe', 'booking_id', 'entry_type', 'amount', 'currency', 'reference', 'note', 'actor_id' ) );
 		foreach ( $rows as $row ) {
-			fputcsv( $output, array( $row['id'], $row['created_at'], $row['cafe_title'], $row['booking_id'], $row['entry_type'], $row['amount'], $row['currency'], $row['reference'], $row['note'], $row['actor_id'] ) );
+			fputcsv( $output, array( $row['id'], $row['created_at'], self::csv_text( $row['cafe_title'] ), $row['booking_id'], self::csv_text( $row['entry_type'] ), $row['amount'], self::csv_text( $row['currency'] ), self::csv_text( $row['reference'] ), self::csv_text( $row['note'] ), $row['actor_id'] ) );
 		}
 		fclose( $output );
 		exit;
