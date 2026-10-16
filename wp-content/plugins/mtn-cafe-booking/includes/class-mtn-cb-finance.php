@@ -111,10 +111,14 @@ final class MTN_CB_Finance {
 		if ( '1' !== (string) $locked ) {
 			self::redirect( 'busy' );
 		}
-		$existing_settlement = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::settlements_table() . ' WHERE request_key = %s', $request_key ) );
+		$existing_settlement = $wpdb->get_row( $wpdb->prepare( 'SELECT id, cafe_id, amount, reference, note FROM ' . self::settlements_table() . ' WHERE request_key = %s', $request_key ) );
 		if ( $existing_settlement ) {
+			$same_request = (int) $existing_settlement->cafe_id === $cafe_id
+				&& abs( (float) $existing_settlement->amount - $amount ) < 0.001
+				&& (string) $existing_settlement->reference === $reference
+				&& (string) $existing_settlement->note === $note;
 			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
-			self::redirect( 'settled' );
+			self::redirect( $same_request ? 'settled' : 'invalid' );
 		}
 		$balance = self::get_balance( $cafe_id );
 		if ( $amount > $balance + 0.001 ) {
