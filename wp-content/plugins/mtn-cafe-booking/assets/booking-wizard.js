@@ -218,7 +218,7 @@
             cell.colSpan = 5;
             const list = el('ul');
             events.forEach((item) => {
-              const statusText = (statusLabels[item.from_status] || item.from_status || '—') + ' ← ' + (statusLabels[item.to_status] || item.to_status || '—');
+              const statusText = (statusLabels[item.from_status] || item.from_status || '—') + ' → ' + (statusLabels[item.to_status] || item.to_status || '—');
               list.append(el('li', '', item.created_at + ' UTC — ' + item.event_type + ' — ' + statusText + (item.details ? ' — ' + item.details : '')));
             });
             if (!events.length) list.append(el('li', '', 'تاریخچه‌ای ثبت نشده است.'));
