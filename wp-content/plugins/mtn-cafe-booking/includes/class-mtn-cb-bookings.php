@@ -222,7 +222,9 @@ final class MTN_CB_Bookings {
 			return new WP_Error( 'mtn_booking_failed', __( 'ثبت رزرو انجام نشد. دوباره تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 500 ) );
 		}
 
-		return self::get_by_id( $wpdb->insert_id );
+		$booking_id = (int) $wpdb->insert_id;
+		self::record_event( $booking_id, $user_id, 'booking_created', '', 'pending_cafe', '' );
+		return self::get_by_id( $booking_id );
 	}
 
 	/**
@@ -397,11 +399,34 @@ final class MTN_CB_Bookings {
 			if ( 1 !== $updated ) {
 				return new WP_Error( 'mtn_booking_update_conflict', __( 'رزرو هم‌زمان تغییر کرده است؛ دوباره تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 			}
+			self::record_event( $booking->id, $actor_id, 'table_assigned', $booking->status, $booking->status, 'table_id=' . absint( $table_id ) );
 			do_action( 'mtn_cb_booking_table_assigned', $booking, absint( $table_id ), absint( $actor_id ) );
 			return self::get_by_id( $booking_id );
 		} finally {
 			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 		}
+	}
+
+	public static function record_event( $booking_id, $actor_id, $event_type, $from_status = '', $to_status = '', $details = '' ) {
+		global $wpdb;
+		return $wpdb->insert(
+			$wpdb->prefix . 'mtn_booking_events',
+			array(
+				'booking_id' => absint( $booking_id ),
+				'actor_id' => absint( $actor_id ),
+				'event_type' => sanitize_key( $event_type ),
+				'from_status' => sanitize_key( $from_status ),
+				'to_status' => sanitize_key( $to_status ),
+				'details' => sanitize_textarea_field( $details ),
+				'created_at' => current_time( 'mysql', true ),
+			),
+			array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
+		);
+	}
+
+	public static function get_history( $booking_id ) {
+		global $wpdb;
+		return $wpdb->get_results( $wpdb->prepare( 'SELECT id, booking_id, actor_id, event_type, from_status, to_status, details, created_at FROM ' . $wpdb->prefix . 'mtn_booking_events WHERE booking_id = %d ORDER BY id ASC', absint( $booking_id ) ) );
 	}
 
 	public static function get_by_id( $id ) {
@@ -478,6 +503,7 @@ final class MTN_CB_Bookings {
 		if ( 1 !== $updated ) {
 			return new WP_Error( 'mtn_transition_conflict', __( 'رزرو هم‌زمان تغییر کرده است؛ صفحه را تازه‌سازی کنید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 		}
+		self::record_event( $booking->id, $actor_id, 'status_changed', $booking->status, $next_status, $reason );
 		do_action( 'mtn_cb_booking_status_changed', $booking, $next_status, absint( $actor_id ), sanitize_textarea_field( $reason ) );
 		return self::get_by_id( $id );
 	}
