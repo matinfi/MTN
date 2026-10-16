@@ -5,6 +5,7 @@
 			var form = root.querySelector('form');
 			var phone = root.querySelector('[name="phone"]');
 			var code = root.querySelector('[name="code"]');
+			var codeField = root.querySelector('.mtn-otp-code-field');
 			var requestButton = root.querySelector('[data-otp-request]');
 			var verifyButton = root.querySelector('[data-otp-verify]');
 			var status = root.querySelector('[role="status"]');
@@ -27,7 +28,7 @@
 				requestButton.disabled = true;
 				send('auth/otp/request', { phone: phone.value.trim() }).then(function (data) {
 					status.textContent = data.message || MTNOTP.requested;
-					code.hidden = false;
+					codeField.hidden = false;
 					verifyButton.hidden = false;
 					code.focus();
 				}).catch(function (error) {
@@ -36,7 +37,7 @@
 			});
 			form.addEventListener('submit', function (event) {
 				event.preventDefault();
-				if (code.hidden) {
+				if (codeField.hidden) {
 					status.textContent = MTNOTP.requested;
 					phone.focus();
 					return;
