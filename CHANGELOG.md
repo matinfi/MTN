@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.0] - 2026-10-16
+- Add booking-time snapshots for automatic commission reversal on cancellation and no-show.
+- Append negative, idempotent commission reversal entries when the configured policy applies after accrual.
+- Upgrade schema to version 11 for per-booking reversal policy snapshots.
+
+
 ## [0.6.0] - 2026-10-16
 - Add one-time, random check-in tokens with configurable expiry and hash-only storage.
 - Add customer token issuance and cafe-owner/admin check-in endpoints with atomic single-use consumption.
