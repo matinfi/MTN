@@ -15,7 +15,8 @@
 - [ ] Full schedule-aware capacity allocation and table assignment
 - [x] Customer booking wizard, booking history and cancellation UI
 - [x] Administrator booking confirmation/rejection console
-- [ ] Cafe owner dashboard, staff authorization and configurable cancellation policy
+- [x] Cafe-owner dashboard for owned bookings with confirm/reject/cancel actions
+- [ ] Staff invitations, multi-user teams and configurable cancellation policy
 - [x] Optional idempotency keys for booking creation
 - [ ] Append-only booking audit log
 
