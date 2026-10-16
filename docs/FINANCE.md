@@ -6,7 +6,8 @@
 - The commission amount and currency are copied to the booking when the booking is created. Changing the default setting later does not change existing booking snapshots.
 - The commission trigger (`confirmed` or `completed`) is selected in central settings and snapshotted on each booking. The default is `confirmed`, matching the v1 project appendix; `completed` is available as an alternative.
 - A positive commission is accrued to the append-only ledger when the booking reaches its snapshotted trigger status. Changing the setting later affects new bookings only.
-- Rejection, cancellation or expiry before the configured trigger does not accrue commission. If the trigger is `confirmed`, a later no-show does not automatically reverse the already accrued commission; no-show reversal policy remains an explicit outstanding requirement.
+- Rejection or expiry before the configured trigger does not accrue commission. Cancellation and no-show reversal policies are snapshotted on each booking at creation; when enabled, a negative append-only reversal entry is written if commission was already accrued. These policies do not initiate refunds or prove money was returned.
+- Cancelled-event reversal remains unimplemented.
 - A recorded settlement adds a negative ledger entry. A signed manual adjustment adds a new entry; existing ledger rows are never edited in the normal UI.
 - The ledger is accounting evidence maintained by this application. It does not prove that money moved and does not connect to a payment processor or bank.
 
@@ -17,6 +18,7 @@ For a cafe, the current ledger balance is the sum of all signed ledger entries i
 - commission_accrued: positive amount owed to the platform.
 - settlement_received: negative amount representing a payment manually confirmed by an administrator.
 - manual_adjustment: signed correction or reversal with a required explanation.
+- commission_reversal: automatic negative entry when a snapshotted cancellation/no-show policy requires reversal.
 
 A positive balance means the cafe owes the platform. A zero balance means the recorded entries net to zero. A negative balance means recorded credits/adjustments exceed recorded charges and must be reviewed.
 
