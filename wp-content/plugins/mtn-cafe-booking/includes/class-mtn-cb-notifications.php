@@ -27,23 +27,20 @@ final class MTN_CB_Notifications {
 			return new WP_Error( 'mtn_notification_invalid', __( 'نشانی یا شناسه اعلان معتبر نیست.', 'mtn-cafe-booking' ) );
 		}
 		$now = current_time( 'mysql', true );
-		$inserted = $wpdb->insert(
-			self::table_name(),
-			array(
-				'dedupe_key' => $dedupe_key,
-				'booking_id' => absint( $booking_id ),
-				'channel' => 'email',
-				'recipient' => $recipient,
-				'subject' => sanitize_text_field( $subject ),
-				'message' => sanitize_textarea_field( $message ),
-				'status' => 'queued',
-				'attempts' => 0,
-				'next_attempt_at' => $now,
-				'last_error' => '',
-				'created_at' => $now,
-			),
-			array( '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s' )
-		);
+		$inserted = $wpdb->query( $wpdb->prepare(
+			'INSERT IGNORE INTO ' . self::table_name() . ' (dedupe_key, booking_id, channel, recipient, subject, message, status, attempts, next_attempt_at, last_error, created_at) VALUES (%s, %d, %s, %s, %s, %s, %s, %d, %s, %s, %s)',
+			$dedupe_key,
+			absint( $booking_id ),
+			'email',
+			$recipient,
+			sanitize_text_field( $subject ),
+			sanitize_textarea_field( $message ),
+			'queued',
+			0,
+			$now,
+			'',
+			$now
+		) );
 		if ( false === $inserted ) {
 			$existing = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::table_name() . ' WHERE dedupe_key = %s', $dedupe_key ) );
 			return $existing ? true : new WP_Error( 'mtn_notification_enqueue_failed', __( 'صف اعلان ثبت نشد.', 'mtn-cafe-booking' ) );
