@@ -69,11 +69,11 @@ A customer may read only their own booking. Administrators may read any booking.
 
 A customer may request cancellation only for their own booking. Cancellation follows the server-side state machine; only pending or confirmed bookings can transition to customer-cancelled.
 
-## Confirm a booking (temporary administrator-only behavior)
+## Confirm a booking
 
 `POST /cafe/bookings/{id}/confirm`
 
-Until cafe ownership and staff authorization are implemented, only WordPress administrators can confirm a booking. The route must not be exposed as a functioning cafe-staff workflow.
+The assigned cafe owner or a WordPress administrator can confirm a booking. The permission callback verifies ownership against the cafe's private `mtn_cafe_owner_id` metadata.
 
 ## Cafe operations
 
