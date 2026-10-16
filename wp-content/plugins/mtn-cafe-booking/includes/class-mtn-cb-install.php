@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '4';
+	const DB_VERSION = '5';
 
 	public static function activate() {
 		global $wpdb;
@@ -47,6 +47,46 @@ final class MTN_CB_Install {
 		) {$collate};";
 
 		dbDelta( $sql );
+
+		$ledger_table = $wpdb->prefix . 'mtn_ledger';
+		$ledger_sql = "CREATE TABLE {$ledger_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			entry_key varchar(100) NOT NULL,
+			booking_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			cafe_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			entry_type varchar(32) NOT NULL,
+			amount decimal(12,2) NOT NULL DEFAULT 0.00,
+			currency varchar(8) NOT NULL DEFAULT '',
+			reference varchar(100) NOT NULL DEFAULT '',
+			note text NULL,
+			actor_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY entry_key (entry_key),
+			KEY cafe_date (cafe_id,created_at),
+			KEY booking_id (booking_id),
+			KEY entry_type (entry_type)
+		) {$collate};";
+
+		$settlements_table = $wpdb->prefix . 'mtn_settlements';
+		$settlements_sql = "CREATE TABLE {$settlements_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			cafe_id bigint(20) unsigned NOT NULL,
+			amount decimal(12,2) NOT NULL DEFAULT 0.00,
+			currency varchar(8) NOT NULL DEFAULT '',
+			reference varchar(100) NOT NULL DEFAULT '',
+			note text NULL,
+			status varchar(20) NOT NULL DEFAULT 'paid',
+			actor_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			paid_at datetime NULL,
+			PRIMARY KEY  (id),
+			KEY cafe_date (cafe_id,created_at),
+			KEY status (status)
+		) {$collate};";
+
+		dbDelta( $ledger_sql );
+		dbDelta( $settlements_sql );
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
 		if ( class_exists( 'MTN_CB_Content' ) ) {
 			MTN_CB_Content::register_types();
