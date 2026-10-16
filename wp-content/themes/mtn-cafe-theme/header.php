@@ -17,6 +17,7 @@
 		<a href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'برنامه‌ها', 'mtn-cafe-theme' ); ?></a>
 		<a href="<?php echo esc_url( home_url( '/book/' ) ); ?>"><?php esc_html_e( 'رزرو میز', 'mtn-cafe-theme' ); ?></a>
 		<a href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>"><?php esc_html_e( 'رزروهای من', 'mtn-cafe-theme' ); ?></a>
+		<?php if ( current_user_can( 'mtn_manage_cafes' ) || current_user_can( 'manage_options' ) ) : ?><a href="<?php echo esc_url( home_url( '/cafe-dashboard/' ) ); ?>"><?php esc_html_e( 'پنل کافه', 'mtn-cafe-theme' ); ?></a><?php endif; ?>
 		<?php if ( is_user_logged_in() ) : ?><a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'خروج', 'mtn-cafe-theme' ); ?></a><?php else : ?><a href="<?php echo esc_url( wp_login_url() ); ?>"><?php esc_html_e( 'ورود', 'mtn-cafe-theme' ); ?></a><?php endif; ?>
 	</nav>
 </header>
