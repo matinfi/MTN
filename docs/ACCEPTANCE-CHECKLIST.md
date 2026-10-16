@@ -40,8 +40,8 @@ This checklist is the release gate. An unchecked item must not be described as i
 ## Identity and communication
 - [x] Manual WhatsApp URL helper; never reports a link opening as delivery.
 - [ ] Real SMS OTP provider, expiry, throttling, resend and attempt limits.
-- [ ] Secure time-limited check-in tokens.
-- [ ] Check-in audit trail and authorized cafe-staff action.
+- [x] Secure one-time check-in tokens with configurable expiry, hash-only storage and atomic consumption.
+- [x] Check-in audit trail and authorized assigned cafe-owner/administrator action; multi-user staff teams remain outstanding.
 - [ ] Notification queue, retry/idempotency and message history.
 - [ ] Official WhatsApp API/webhook adapter (not required for v1).
 
