@@ -30,6 +30,26 @@ final class MTN_CB_Content {
 				'rewrite' => array( 'slug' => 'cafes' ),
 			)
 		);
+		register_taxonomy(
+			'mtn_cafe_location',
+			array( 'mtn_cafe' ),
+			array(
+				'labels' => array(
+					'name' => __( 'موقعیت جغرافیایی', 'mtn-cafe-booking' ),
+					'singular_name' => __( 'موقعیت', 'mtn-cafe-booking' ),
+					'parent_item' => __( 'موقعیت والد', 'mtn-cafe-booking' ),
+					'parent_item_colon' => __( 'موقعیت والد:', 'mtn-cafe-booking' ),
+					'add_new_item' => __( 'افزودن موقعیت', 'mtn-cafe-booking' ),
+					'new_item_name' => __( 'نام موقعیت', 'mtn-cafe-booking' ),
+				),
+				'public' => true,
+				'hierarchical' => true,
+				'show_ui' => true,
+				'show_admin_column' => true,
+				'show_in_rest' => true,
+				'rewrite' => array( 'slug' => 'cafe-location' ),
+			)
+		);
 		register_post_type(
 			'mtn_event',
 			array(
