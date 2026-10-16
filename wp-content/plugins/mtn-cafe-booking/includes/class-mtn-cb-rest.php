@@ -68,9 +68,7 @@ final class MTN_CB_Rest {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'confirm_booking' ),
-				'permission_callback' => static function () {
-					return current_user_can( 'manage_options' ) || current_user_can( 'mtn_manage_cafes' );
-				},
+				'permission_callback' => array( __CLASS__, 'can_manage_booking_request' ),
 				'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
 			)
 		);
@@ -88,6 +86,16 @@ final class MTN_CB_Rest {
 					'id'     => array( 'sanitize_callback' => 'absint' ),
 					'reason' => array( 'required' => false, 'sanitize_callback' => 'sanitize_textarea_field' ),
 				),
+			)
+		);
+
+		register_rest_route(
+			self::NS,
+			'/cafe/bookings',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'cafe_bookings' ),
+				'permission_callback' => array( __CLASS__, 'can_access_cafe_dashboard' ),
 			)
 		);
 
@@ -140,6 +148,44 @@ final class MTN_CB_Rest {
 				'permission_callback' => '__return_true',
 			)
 		);
+	}
+
+	public static function can_access_cafe_dashboard() {
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+		return current_user_can( 'mtn_manage_cafes' ) ? true : new WP_Error( 'mtn_forbidden', __( 'دسترسی مدیر کافه لازم است.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
+	}
+
+	public static function can_manage_booking_request( $request ) {
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+		if ( ! current_user_can( 'mtn_manage_cafes' ) || ! ( $request instanceof WP_REST_Request ) ) {
+			return new WP_Error( 'mtn_forbidden', __( 'دسترسی مدیر کافه لازم است.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
+		}
+		$booking = MTN_CB_Bookings::get_by_id( $request['id'] );
+		if ( ! $booking || absint( get_post_meta( $booking->cafe_id, 'mtn_cafe_owner_id', true ) ) !== get_current_user_id() ) {
+			return new WP_Error( 'mtn_forbidden', __( 'این رزرو متعلق به کافه تحت مدیریت شما نیست.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
+		}
+		return true;
+	}
+
+	public static function cafe_bookings() {
+		global $wpdb;
+		$table = MTN_CB_Bookings::table_name();
+		$sql = 'SELECT b.*, cafe.post_title AS cafe_title, event.post_title AS event_title FROM ' . $table . ' b LEFT JOIN ' . $wpdb->posts . ' cafe ON cafe.ID = b.cafe_id LEFT JOIN ' . $wpdb->posts . ' event ON event.ID = b.event_id';
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$sql .= $wpdb->prepare( ' INNER JOIN ' . $wpdb->postmeta . " owner_meta ON owner_meta.post_id = b.cafe_id AND owner_meta.meta_key = 'mtn_cafe_owner_id' AND owner_meta.meta_value = %s", (string) get_current_user_id() );
+		}
+		$sql .= ' ORDER BY b.created_at DESC LIMIT 200';
+		$rows = $wpdb->get_results( $sql );
+		return rest_ensure_response( array_map( static function ( $booking ) {
+			$data = self::public_booking( $booking );
+			$data['cafe_name'] = $booking->cafe_title ? $booking->cafe_title : '';
+			$data['event_name'] = $booking->event_title ? $booking->event_title : '';
+			return $data;
+		}, $rows ) );
 	}
 
 	public static function catalog() {
@@ -226,10 +272,6 @@ final class MTN_CB_Rest {
 		if ( ! $booking ) {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
-		// Until cafe ownership records are implemented, only administrators may confirm.
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return new WP_Error( 'mtn_forbidden', __( 'مدیریت کافه برای این حساب هنوز پیکربندی نشده است.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
-		}
 		$result = MTN_CB_Bookings::transition( $booking->id, 'confirmed', get_current_user_id(), 'confirmed_by_cafe_admin' );
 		return is_wp_error( $result ) ? $result : rest_ensure_response( self::public_booking( $result ) );
 	}
@@ -238,10 +280,6 @@ final class MTN_CB_Rest {
 		$booking = MTN_CB_Bookings::get_by_id( $request['id'] );
 		if ( ! $booking ) {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
-		}
-		// Until cafe ownership records are implemented, only administrators may reject.
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return new WP_Error( 'mtn_forbidden', __( 'مدیریت کافه برای این حساب هنوز پیکربندی نشده است.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
 		}
 		$reason = $request->get_param( 'reason' );
 		$result = MTN_CB_Bookings::transition( $booking->id, 'rejected', get_current_user_id(), is_string( $reason ) ? $reason : '' );
