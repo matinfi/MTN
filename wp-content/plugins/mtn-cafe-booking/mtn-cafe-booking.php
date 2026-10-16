@@ -24,6 +24,7 @@ require_once MTN_CB_PATH . 'includes/class-mtn-cb-rest.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-settings.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-whatsapp.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-shortcodes.php';
+require_once MTN_CB_PATH . 'includes/class-mtn-cb-admin.php';
 
 register_activation_hook( __FILE__, array( 'MTN_CB_Install', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
@@ -36,5 +37,6 @@ add_action(
 		MTN_CB_Settings::init();
 		MTN_CB_Rest::init();
 		MTN_CB_Shortcodes::init();
+		MTN_CB_Admin::init();
 	}
 );
