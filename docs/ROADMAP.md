@@ -12,7 +12,8 @@
 - [ ] Geographic taxonomy (country, city, area, neighborhood)
 - [x] Basic event headcount limits, selected-table overlap checks and per-cafe database locking (integration/concurrency tests still required)
 - [x] Advisory availability API with event date/hour validation and selected-table filtering
-- [ ] Full schedule-aware capacity allocation and table assignment
+- [x] Manual table assignment from the cafe dashboard with locked overlap validation
+- [ ] Full schedule-aware capacity allocation and automatic table assignment
 - [x] Customer booking wizard, booking history and cancellation UI
 - [x] Administrator booking confirmation/rejection console
 - [x] Cafe-owner dashboard for owned bookings with confirm/reject/cancel actions
