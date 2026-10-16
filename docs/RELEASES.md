@@ -1,7 +1,7 @@
 # Build and release process
 
 ## Versioning
-Use Semantic Versioning. Keep the plugin header, theme header, constants, changelog and release tag aligned.
+Use Semantic Versioning. Keep the plugin header, theme header, constants, changelog and release tag aligned. Current plugin release is 0.4.0; database schema version is 7.
 
 ## CI
 - `.github/workflows/php-lint.yml` runs PHP syntax validation on pushes and pull requests.
@@ -14,7 +14,7 @@ Use Semantic Versioning. Keep the plugin header, theme header, constants, change
 3. Confirm plugin and theme ZIP contents each have the expected top-level directory.
 4. Verify no credentials, customer data, debug dumps or local environment files are packaged.
 5. Update CHANGELOG and release notes.
-6. Tag the approved version (for example `v0.1.0`) and review the resulting artifacts.
+6. Tag the approved version (for example `v0.4.0`) and review the resulting artifacts.
 7. Promote to production only after staging acceptance and backup/rollback verification.
 
 ## Repository visibility
