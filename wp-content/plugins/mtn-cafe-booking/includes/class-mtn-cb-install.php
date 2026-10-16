@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '6';
+	const DB_VERSION = '7';
 
 	public static function activate() {
 		global $wpdb;
@@ -105,6 +105,9 @@ final class MTN_CB_Install {
 		) {$collate};";
 		dbDelta( $audit_sql );
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
+		if ( ! wp_next_scheduled( 'mtn_cb_expire_pending_bookings' ) ) {
+			wp_schedule_event( time() + 60, 'mtn_cb_five_minutes', 'mtn_cb_expire_pending_bookings' );
+		}
 		if ( class_exists( 'MTN_CB_Content' ) ) {
 			MTN_CB_Content::register_types();
 			flush_rewrite_rules();
@@ -170,6 +173,7 @@ final class MTN_CB_Install {
 
 	public static function deactivate() {
 		// Preserve all booking and finance data on deactivation.
+		wp_clear_scheduled_hook( 'mtn_cb_expire_pending_bookings' );
 		flush_rewrite_rules();
 	}
 }
