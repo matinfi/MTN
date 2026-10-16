@@ -103,11 +103,17 @@ final class MTN_CB_Finance {
 		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || $amount <= 0 ) {
 			self::redirect( 'invalid' );
 		}
+		global $wpdb;
+		$lock_name = 'mtn_cb_finance_' . $cafe_id;
+		$locked = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock_name ) );
+		if ( '1' !== (string) $locked ) {
+			self::redirect( 'busy' );
+		}
 		$balance = self::get_balance( $cafe_id );
 		if ( $amount > $balance + 0.001 ) {
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 			self::redirect( 'exceeds_balance' );
 		}
-		global $wpdb;
 		$currency = sanitize_text_field( get_option( 'mtn_cb_currency', 'TRY' ) );
 		$now = current_time( 'mysql', true );
 		$inserted = $wpdb->insert(
@@ -116,6 +122,7 @@ final class MTN_CB_Finance {
 			array( '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
 		);
 		if ( false === $inserted ) {
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 			self::redirect( 'failed' );
 		}
 		$settlement_id = (int) $wpdb->insert_id;
@@ -137,8 +144,10 @@ final class MTN_CB_Finance {
 		);
 		if ( false === $ledger_inserted ) {
 			$wpdb->delete( self::settlements_table(), array( 'id' => $settlement_id ), array( '%d' ) );
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 			self::redirect( 'failed' );
 		}
+		$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 		self::redirect( 'settled' );
 	}
 
@@ -184,7 +193,7 @@ final class MTN_CB_Finance {
 			<?php if ( isset( $_GET['mtn_finance_notice'] ) ) : ?>
 				<?php $notice = sanitize_key( wp_unslash( $_GET['mtn_finance_notice'] ) ); ?>
 				<div class="notice <?php echo 'settled' === $notice ? 'notice-success' : 'notice-warning'; ?> is-dismissible"><p><?php
-					$messages = array( 'settled' => 'تسویه در دفتر ثبت شد.', 'invalid' => 'کافه یا مبلغ معتبر نیست.', 'exceeds_balance' => 'مبلغ تسویه از مانده حساب بیشتر است.', 'failed' => 'ثبت تسویه انجام نشد.' );
+					$messages = array( 'settled' => 'تسویه در دفتر ثبت شد.', 'invalid' => 'کافه یا مبلغ معتبر نیست.', 'exceeds_balance' => 'مبلغ تسویه از مانده حساب بیشتر است.', 'failed' => 'ثبت تسویه انجام نشد.', 'busy' => 'دفتر مالی مشغول است؛ دوباره تلاش کنید.' );
 					echo esc_html( isset( $messages[ $notice ] ) ? $messages[ $notice ] : 'درخواست پردازش شد.' );
 				?></p></div>
 			<?php endif; ?>
