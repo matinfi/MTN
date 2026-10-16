@@ -5,7 +5,7 @@
 2. Booking and financial records must survive theme changes.
 3. Version 1 does not collect online payments from customers.
 4. New bookings start as `pending_cafe` and require cafe confirmation.
-5. Commission defaults to a fixed amount per eligible booking; the applied rate and amount must be snapshotted when a financial ledger entry is created.
+5. Commission defaults to a fixed amount per eligible booking; amount and currency are snapshotted when the booking is created and accrued to the ledger only on completion.
 6. WhatsApp in v1 is manual-link based. Link opening is not proof of sending or delivery.
 7. OTP must use a configured real SMS provider in production; development OTP must never be presented as production authentication.
 8. All privileged REST operations must check capabilities and object ownership on the server.
@@ -16,7 +16,7 @@
 - **WordPress**: user accounts, media, roles/capabilities, options, REST infrastructure and cron.
 
 ## Persistence
-The plugin creates a dedicated bookings table on activation and upgrades it using a schema version. Booking code is random and unique. Status changes are validated against allowed transitions. A later migration will add dedicated tables for cafes, events, tables, assignments, ledger entries, notifications, OTP attempts and audit events.
+The plugin creates versioned custom tables for bookings, append-only finance ledger entries, settlement records and booking audit events. Cafe/event/table content is stored as WordPress custom post types with administrator metadata boxes. Booking codes are random and unique. Status changes are validated against allowed transitions; audit events are appended for creation, status changes, table assignment and expiry.
 
 ## API namespace
 Base namespace: `mtn/v1`. Public read endpoints must return only published public data. Booking creation and private booking reads require authentication. Mutations require a valid WordPress REST nonce/cookie or another supported authenticated mechanism and object-level authorization.
@@ -26,7 +26,7 @@ Booking creation obtains a MySQL/MariaDB advisory lock scoped to the cafe before
 
 The REST API accepts `booking_at` as `YYYY-MM-DD HH:MM:SS` in the WordPress site's configured timezone, rejects past times, and stores the converted UTC value. API consumers must display/submit dates in the site's timezone and interpret returned database timestamps as UTC.
 
-These controls depend on MySQL/MariaDB `GET_LOCK()` support and still need integration/concurrency tests on the supported production database. Cafe-assigned table mode does not yet auto-allocate a specific table; full schedules, event recurrence, and append-only audit history remain incomplete. Booking creation supports an optional per-user idempotency key; clients should use one for every create attempt.
+These controls depend on MySQL/MariaDB `GET_LOCK()` support and still need integration/concurrency tests on the supported production database. Cafe-assigned table mode supports manual assignment in the cafe dashboard but not automatic allocation. The five-minute expiry worker uses WP-Cron; configure a real server cron to trigger WordPress cron reliably in production. Full recurring schedules, multi-user cafe teams, automatic notifications and payment integrations remain incomplete. Booking creation supports an optional per-user idempotency key; clients should use one for every create attempt.
 
 
 ## Security
@@ -36,3 +36,4 @@ These controls depend on MySQL/MariaDB `GET_LOCK()` support and still need integ
 - Never commit secrets, OTP codes, access tokens or customer data.
 - Keep public API responses minimal.
 - Rate-limit OTP and booking endpoints before production.
+- The current build has not passed an end-to-end or concurrency test suite; syntax CI alone is not a production security review.
