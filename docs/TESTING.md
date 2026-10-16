@@ -44,6 +44,7 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | CSV export | Export the ledger as an administrator | CSV includes entries, amounts, currency, reference, actor and UTC timestamp; non-admin is denied |
 | Concurrent table assignment | Assign the same table to overlapping bookings simultaneously | Cafe-scoped lock permits no conflicting assignment |
 | Admin metadata | Save cafe, event and table metadata using the editor | Values persist and are used by catalog, schedule and capacity checks |
+| Location hierarchy | Create nested country, city, area and neighborhood terms and assign a cafe | The hierarchy persists and the cafe is associated with the selected location term |
 | Cafe owner privilege boundary | Sign in as an editor who can edit cafes and submit a forged owner ID in cafe metadata | Owner assignment is ignored; only administrators can change the cafe owner or grant the cafe-manager role |
 | Default pages | Upgrade a site that already has the booking/account pages | A cafe-dashboard page is added without duplicating existing slugs |
 | Frontend assets | Open booking page and inspect browser console | Booking wizard JavaScript loads without syntax/runtime errors |
