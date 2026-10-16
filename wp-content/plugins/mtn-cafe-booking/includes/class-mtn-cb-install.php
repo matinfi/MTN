@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '9';
+	const DB_VERSION = '10';
 
 	public static function activate() {
 		global $wpdb;
@@ -32,6 +32,8 @@ final class MTN_CB_Install {
 			customer_note text NULL,
 			whatsapp_action_status varchar(32) NOT NULL DEFAULT 'manual_required',
 			checkin_status varchar(32) NOT NULL DEFAULT 'not_checked_in',
+			checkin_token_hash char(64) NOT NULL DEFAULT '',
+			checkin_token_expires_at datetime NULL,
 			commission_amount decimal(12,2) NOT NULL DEFAULT 0.00,
 			commission_rate decimal(12,4) NOT NULL DEFAULT 0.0000,
 			commission_currency varchar(8) NOT NULL DEFAULT '',
