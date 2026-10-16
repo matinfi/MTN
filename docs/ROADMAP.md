@@ -1,6 +1,6 @@
 # Delivery roadmap
 
-## Phase 0 — foundation (completed for version 0.1.0)
+## Phase 0 — foundation (completed)
 - [x] Repository and WordPress plugin/theme separation
 - [x] Plugin activation schema and REST route foundation
 - [x] Booking code and controlled status transitions
@@ -8,11 +8,14 @@
 - [x] Architecture, scope and CI documentation
 
 ## Phase 1 — core booking
-- [ ] Cafe, geographic taxonomy, event and table data models/admin screens
+- [x] Cafe, event and table WordPress content types with administrator metadata forms
+- [ ] Geographic taxonomy (country, city, area, neighborhood)
 - [x] Basic event headcount limits, selected-table overlap checks and per-cafe database locking (integration/concurrency tests still required)
-- [ ] Dedicated availability API and full schedule-aware capacity allocation
-- [ ] Customer booking wizard and account booking history
-- [ ] Cafe dashboard, booking confirmation/rejection and cancellation policy
+- [x] Advisory availability API with event date/hour validation and selected-table filtering
+- [ ] Full schedule-aware capacity allocation and table assignment
+- [x] Customer booking wizard, booking history and cancellation UI
+- [x] Administrator booking confirmation/rejection console
+- [ ] Cafe owner dashboard, staff authorization and configurable cancellation policy
 - [x] Optional idempotency keys for booking creation
 - [ ] Append-only booking audit log
 
