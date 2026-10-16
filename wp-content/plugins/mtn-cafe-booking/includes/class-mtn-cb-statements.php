@@ -131,8 +131,8 @@ final class MTN_CB_Statements {
 				continue;
 			}
 			$currencies = $wpdb->get_col( $wpdb->prepare(
-				'SELECT DISTINCT currency FROM ' . MTN_CB_Finance::ledger_table() . ' WHERE cafe_id = %d AND created_at >= %s AND created_at < %s',
-				absint( $cafe->ID ), $start_utc, $end_utc
+				'SELECT DISTINCT currency FROM ' . MTN_CB_Finance::ledger_table() . ' WHERE cafe_id = %d AND created_at < %s',
+				absint( $cafe->ID ), $end_utc
 			) );
 			foreach ( $currencies as $currency ) {
 				$key = 'statement_cafe_' . absint( $cafe->ID ) . '_' . $period_key . '_' . sanitize_key( $currency );
