@@ -11,13 +11,18 @@ $bookings_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mt
 $content_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-content.php';
 $install_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-install.php';
 $finance_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-finance.php';
+$install_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-install.php';
+$notifications_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-notifications.php';
+$invites_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-team-invites.php';
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
 $content = file_get_contents( $content_path );
 $install = file_get_contents( $install_path );
 $finance = file_get_contents( $finance_path );
+$notifications = file_get_contents( $notifications_path );
+$invites = file_get_contents( $invites_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -51,10 +56,17 @@ if ( false === strpos( $content, "if ( current_user_can( 'manage_options' ) )" )
 	exit( 1 );
 }
 
-if ( false === strpos( $install, "const DB_VERSION = '11';" ) ||
+if ( false === strpos( $install, "const DB_VERSION = '12';" ) ||
 	false === strpos( $install, 'commission_trigger_status varchar(20)' ) ||
 	false === strpos( $install, 'commission_reverse_on_cancellation tinyint(1)' ) ||
 	false === strpos( $install, 'commission_reverse_on_no_show tinyint(1)' ) ||
+	false === strpos( $install, 'commission_reverse_on_event_cancel tinyint(1)' ) ||
+	false === strpos( $install, 'mtn_cafe_invites' ) ||
+	false === strpos( $install, 'mtn_notifications' ) ||
+	false === strpos( $notifications, 'public static function process_queue' ) ||
+	false === strpos( $notifications, 'next_attempt_at' ) ||
+	false === strpos( $invites, 'public static function accept_from_form' ) ||
+	false === strpos( $invites, 'hash( \'sha256\', $token )' ) ||
 	false === strpos( $install, 'checkin_token_hash char(64)' ) ||
 	false === strpos( $bookings, "'commission_trigger_status' => $commission_trigger_status" ) ||
 	false === strpos( $bookings, "'commission_reverse_on_cancellation' => $commission_reverse_on_cancellation" ) ||
