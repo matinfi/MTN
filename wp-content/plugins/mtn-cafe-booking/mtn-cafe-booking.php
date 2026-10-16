@@ -19,8 +19,10 @@ define( 'MTN_CB_URL', plugin_dir_url( __FILE__ ) );
 
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-install.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-bookings.php';
+require_once MTN_CB_PATH . 'includes/class-mtn-cb-content.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-rest.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-settings.php';
+require_once MTN_CB_PATH . 'includes/class-mtn-cb-whatsapp.php';
 
 register_activation_hook( __FILE__, array( 'MTN_CB_Install', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
@@ -28,6 +30,7 @@ register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
 add_action(
 	'plugins_loaded',
 	static function () {
+		MTN_CB_Content::init();
 		MTN_CB_Settings::init();
 		MTN_CB_Rest::init();
 	}
