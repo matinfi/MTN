@@ -17,6 +17,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 ## Cafe operations
 - [x] WordPress content models for cafes, events and tables.
 - [x] Cafe owner ID and contact metadata fields for administrator configuration.
+- [x] Assign the cafe-manager role when an administrator saves an existing user as cafe owner.
 - [ ] Cafe owner and staff management screens.
 - [x] Object-level authorization for the configured cafe owner on booking read/action routes.
 - [ ] Staff invitations and multi-user cafe teams.
