@@ -12,6 +12,7 @@ final class MTN_CB_Finance {
 		add_action( 'mtn_cb_booking_status_changed', array( __CLASS__, 'on_booking_status_changed' ), 10, 4 );
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_post_mtn_cb_record_settlement', array( __CLASS__, 'record_settlement' ) );
+		add_action( 'admin_post_mtn_cb_finance_adjustment', array( __CLASS__, 'record_adjustment' ) );
 		add_action( 'admin_post_mtn_cb_export_ledger', array( __CLASS__, 'export_ledger' ) );
 	}
 
@@ -151,6 +152,41 @@ final class MTN_CB_Finance {
 		self::redirect( 'settled' );
 	}
 
+	public static function record_adjustment() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'دسترسی کافی ندارید.', 'mtn-cafe-booking' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'mtn_cb_finance_adjustment' );
+		$cafe_id = isset( $_POST['cafe_id'] ) ? absint( $_POST['cafe_id'] ) : 0;
+		$raw_amount = isset( $_POST['amount'] ) && is_scalar( $_POST['amount'] ) ? wp_unslash( $_POST['amount'] ) : '';
+		$amount = is_numeric( $raw_amount ) ? round( (float) $raw_amount, 2 ) : 0;
+		$reference = isset( $_POST['reference'] ) && is_scalar( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
+		$note = isset( $_POST['note'] ) && is_scalar( $_POST['note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['note'] ) ) : '';
+		$cafe = get_post( $cafe_id );
+		if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status || 0.0 === $amount || '' === $note ) {
+			self::redirect( 'invalid_adjustment' );
+		}
+		global $wpdb;
+		$entry_key = 'adjustment_' . str_replace( '-', '', wp_generate_uuid4() );
+		$inserted = $wpdb->insert(
+			self::ledger_table(),
+			array(
+				'entry_key' => $entry_key,
+				'booking_id' => 0,
+				'cafe_id' => $cafe_id,
+				'entry_type' => 'manual_adjustment',
+				'amount' => number_format( $amount, 2, '.', '' ),
+				'currency' => sanitize_text_field( get_option( 'mtn_cb_currency', 'TRY' ) ),
+				'reference' => $reference,
+				'note' => $note,
+				'actor_id' => get_current_user_id(),
+				'created_at' => current_time( 'mysql', true ),
+			),
+			array( '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s' )
+		);
+		self::redirect( false === $inserted ? 'failed' : 'adjusted' );
+	}
+
 	private static function redirect( $notice ) {
 		wp_safe_redirect( add_query_arg( array( 'page' => 'mtn-cb-finance', 'mtn_finance_notice' => $notice ), admin_url( 'admin.php' ) ) );
 		exit;
@@ -193,7 +229,7 @@ final class MTN_CB_Finance {
 			<?php if ( isset( $_GET['mtn_finance_notice'] ) ) : ?>
 				<?php $notice = sanitize_key( wp_unslash( $_GET['mtn_finance_notice'] ) ); ?>
 				<div class="notice <?php echo 'settled' === $notice ? 'notice-success' : 'notice-warning'; ?> is-dismissible"><p><?php
-					$messages = array( 'settled' => 'تسویه در دفتر ثبت شد.', 'invalid' => 'کافه یا مبلغ معتبر نیست.', 'exceeds_balance' => 'مبلغ تسویه از مانده حساب بیشتر است.', 'failed' => 'ثبت تسویه انجام نشد.', 'busy' => 'دفتر مالی مشغول است؛ دوباره تلاش کنید.' );
+					$messages = array( 'settled' => 'تسویه در دفتر ثبت شد.', 'invalid' => 'کافه یا مبلغ معتبر نیست.', 'exceeds_balance' => 'مبلغ تسویه از مانده حساب بیشتر است.', 'failed' => 'ثبت تسویه انجام نشد.', 'busy' => 'دفتر مالی مشغول است؛ دوباره تلاش کنید.', 'adjusted' => 'اصلاحیه به دفتر اضافه شد.', 'invalid_adjustment' => 'اطلاعات اصلاحیه معتبر نیست؛ دلیل را وارد کنید.' );
 					echo esc_html( isset( $messages[ $notice ] ) ? $messages[ $notice ] : 'درخواست پردازش شد.' );
 				?></p></div>
 			<?php endif; ?>
@@ -210,6 +246,19 @@ final class MTN_CB_Finance {
 				<?php submit_button( __( 'ثبت تسویه دریافت‌شده', 'mtn-cafe-booking' ) ); ?>
 			</form>
 			<p><a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=mtn_cb_export_ledger' ), 'mtn_cb_export_ledger' ) ); ?>"><?php esc_html_e( 'خروجی CSV دفتر مالی', 'mtn-cafe-booking' ); ?></a></p>
+			<h2><?php esc_html_e( 'ثبت اصلاحیه دفتر (غیرقابل‌ویرایش)', 'mtn-cafe-booking' ); ?></h2>
+			<p><?php esc_html_e( 'مبلغ مثبت بدهی کافه را افزایش می‌دهد؛ مبلغ منفی برای اصلاح یا برگشت ثبت قبلی است. دلیل ثبت الزامی است.', 'mtn-cafe-booking' ); ?></p>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="mtn_cb_finance_adjustment">
+				<?php wp_nonce_field( 'mtn_cb_finance_adjustment' ); ?>
+				<table class="form-table"><tbody>
+					<tr><th><label for="mtn-adjust-cafe"><?php esc_html_e( 'کافه', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn-adjust-cafe" name="cafe_id" required><option value=""><?php esc_html_e( 'انتخاب کافه', 'mtn-cafe-booking' ); ?></option><?php foreach ( $cafes as $cafe ) : ?><option value="<?php echo (int) $cafe->ID; ?>"><?php echo esc_html( get_the_title( $cafe ) ); ?></option><?php endforeach; ?></select></td></tr>
+					<tr><th><label for="mtn-adjust-amount"><?php esc_html_e( 'مبلغ مثبت یا منفی', 'mtn-cafe-booking' ); ?></label></th><td><input id="mtn-adjust-amount" type="number" step="0.01" name="amount" required> <?php echo esc_html( get_option( 'mtn_cb_currency', 'TRY' ) ); ?></td></tr>
+					<tr><th><label for="mtn-adjust-reference"><?php esc_html_e( 'مرجع', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn-adjust-reference" name="reference" maxlength="100"></td></tr>
+					<tr><th><label for="mtn-adjust-note"><?php esc_html_e( 'دلیل اصلاحیه (الزامی)', 'mtn-cafe-booking' ); ?></label></th><td><textarea class="large-text" rows="2" id="mtn-adjust-note" name="note" required></textarea></td></tr>
+				</tbody></table>
+				<?php submit_button( __( 'ثبت اصلاحیه جدید', 'mtn-cafe-booking' ) ); ?>
+			</form>
 			<h2><?php esc_html_e( 'آخرین گردش‌های دفتر', 'mtn-cafe-booking' ); ?></h2>
 			<table class="widefat striped"><thead><tr><th>ID</th><th><?php esc_html_e( 'زمان (UTC)', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'کافه', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'رزرو', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'نوع', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'مبلغ', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'مرجع', 'mtn-cafe-booking' ); ?></th></tr></thead><tbody>
 			<?php if ( $entries ) : foreach ( $entries as $entry ) : ?><tr><td><?php echo (int) $entry->id; ?></td><td><?php echo esc_html( $entry->created_at ); ?></td><td><?php echo esc_html( $entry->cafe_title ? $entry->cafe_title : '—' ); ?></td><td><?php echo (int) $entry->booking_id; ?></td><td><?php echo esc_html( $entry->entry_type ); ?></td><td><?php echo esc_html( number_format_i18n( (float) $entry->amount, 2 ) . ' ' . $entry->currency ); ?></td><td><?php echo esc_html( $entry->reference ); ?></td></tr><?php endforeach; else : ?><tr><td colspan="7"><?php esc_html_e( 'هنوز گردش مالی ثبت نشده است.', 'mtn-cafe-booking' ); ?></td></tr><?php endif; ?>
