@@ -93,6 +93,14 @@ final class MTN_CB_Content {
 				echo '<option value="' . (int) $cafe->ID . '" ' . selected( absint( $value ), (int) $cafe->ID, false ) . '>' . esc_html( get_the_title( $cafe ) ) . ' (#' . (int) $cafe->ID . ')</option>';
 			}
 			echo '</select>';
+		} elseif ( 'user_multi_select' === $type ) {
+			$selected_ids = is_array( $value ) ? array_map( 'absint', $value ) : array();
+			$users = get_users( array( 'orderby' => 'display_name', 'order' => 'ASC', 'fields' => array( 'ID', 'display_name' ), 'number' => 500 ) );
+			echo '<select class="widefat" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '[]" multiple size="8">';
+			foreach ( $users as $user ) {
+				echo '<option value="' . (int) $user->ID . '" ' . selected( in_array( (int) $user->ID, $selected_ids, true ), true, false ) . '>' . esc_html( $user->display_name ) . ' (#' . (int) $user->ID . ')</option>';
+			}
+			echo '</select><span class="description">' . esc_html__( 'برای انتخاب چند نفر، کلید Ctrl یا Command را نگه دارید.', 'mtn-cafe-booking' ) . '</span>';
 		} elseif ( 'user_select' === $type ) {
 			$users = get_users( array( 'orderby' => 'display_name', 'order' => 'ASC', 'fields' => array( 'ID', 'display_name' ), 'number' => 500 ) );
 			echo '<select class="widefat" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '"><option value="0">' . esc_html__( 'بدون مالک مشخص', 'mtn-cafe-booking' ) . '</option>';
@@ -121,6 +129,7 @@ final class MTN_CB_Content {
 		self::meta_box_nonce();
 		if ( current_user_can( 'manage_options' ) ) {
 			self::field( $post->ID, 'mtn_cafe_owner_id', __( 'مالک کافه', 'mtn-cafe-booking' ), 'user_select' );
+			self::field( $post->ID, 'mtn_cafe_manager_ids', __( 'مدیران و کارکنان مجاز کافه', 'mtn-cafe-booking' ), 'user_multi_select' );
 		} else {
 			$owner_id = absint( get_post_meta( $post->ID, 'mtn_cafe_owner_id', true ) );
 			$owner = $owner_id ? get_user_by( 'id', $owner_id ) : false;
@@ -187,10 +196,16 @@ final class MTN_CB_Content {
 		}
 		self::save_fields( $post_id, $keys, array( 'mtn_cafe_owner_id' ) );
 		if ( current_user_can( 'manage_options' ) ) {
+			$raw_manager_ids = isset( $_POST['mtn_cafe_manager_ids'] ) && is_array( $_POST['mtn_cafe_manager_ids'] ) ? wp_unslash( $_POST['mtn_cafe_manager_ids'] ) : array();
+			$manager_ids = array_values( array_unique( array_filter( array_map( 'absint', $raw_manager_ids ) ) ) );
+			update_post_meta( $post_id, 'mtn_cafe_manager_ids', $manager_ids );
 			$owner_id = absint( get_post_meta( $post_id, 'mtn_cafe_owner_id', true ) );
-			$owner = $owner_id ? get_user_by( 'id', $owner_id ) : false;
-			if ( $owner && ! in_array( 'administrator', (array) $owner->roles, true ) ) {
-				$owner->add_role( 'mtn_cafe_manager' );
+			$assigned_ids = array_unique( array_merge( $manager_ids, $owner_id ? array( $owner_id ) : array() ) );
+			foreach ( $assigned_ids as $assigned_id ) {
+				$assigned_user = get_user_by( 'id', $assigned_id );
+				if ( $assigned_user && ! in_array( 'administrator', (array) $assigned_user->roles, true ) ) {
+					$assigned_user->add_role( 'mtn_cafe_manager' );
+				}
 			}
 		}
 	}
@@ -201,6 +216,22 @@ final class MTN_CB_Content {
 
 	public static function save_table_meta( $post_id ) {
 		self::save_fields( $post_id, array( 'mtn_cafe_id', 'mtn_table_capacity', 'mtn_table_active' ), array( 'mtn_cafe_id', 'mtn_table_capacity' ), array( 'mtn_table_active' ) );
+	}
+
+	public static function user_can_manage_cafe( $cafe_id, $user_id ) {
+		$cafe_id = absint( $cafe_id );
+		$user_id = absint( $user_id );
+		if ( ! $cafe_id || ! $user_id ) {
+			return false;
+		}
+		if ( user_can( $user_id, 'manage_options' ) ) {
+			return true;
+		}
+		if ( absint( get_post_meta( $cafe_id, 'mtn_cafe_owner_id', true ) ) === $user_id ) {
+			return true;
+		}
+		$manager_ids = get_post_meta( $cafe_id, 'mtn_cafe_manager_ids', true );
+		return is_array( $manager_ids ) && in_array( $user_id, array_map( 'absint', $manager_ids ), true );
 	}
 
 	public static function register_meta() {
@@ -224,6 +255,7 @@ final class MTN_CB_Content {
 		$private_owner_meta = $common;
 		$private_owner_meta['show_in_rest'] = false;
 		register_post_meta( 'mtn_cafe', 'mtn_cafe_owner_id', $private_owner_meta );
+		register_post_meta( 'mtn_cafe', 'mtn_cafe_manager_ids', array( 'single' => true, 'type' => 'array', 'sanitize_callback' => static function ( $value ) { return is_array( $value ) ? array_values( array_unique( array_filter( array_map( 'absint', $value ) ) ) ) : array(); }, 'show_in_rest' => false, 'auth_callback' => static function () { return current_user_can( 'manage_options' ); } ) );
 		register_post_meta( 'mtn_table', 'mtn_cafe_id', $common );
 		register_post_meta( 'mtn_table', 'mtn_table_capacity', $common );
 		register_post_meta( 'mtn_table', 'mtn_table_active', array_merge( $common, array( 'type' => 'boolean', 'sanitize_callback' => 'rest_sanitize_boolean' ) ) );
