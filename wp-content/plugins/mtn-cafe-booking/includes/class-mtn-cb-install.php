@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '3';
+	const DB_VERSION = '4';
 
 	public static function activate() {
 		global $wpdb;
