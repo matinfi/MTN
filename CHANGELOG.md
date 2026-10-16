@@ -8,6 +8,8 @@
 - Harden OTP resends with per-phone advisory locking, invalidation of superseded codes and atomic failed-attempt lockout updates.
 - Expand REST privacy/authorization and OTP abuse regression tests; add serialized event-capacity invariant coverage.
 - Repair CI test setup to use the maintained WP-CLI installer and avoid interactive recreation of the service database.
+- Defer default page creation until WordPress `init` to avoid permalink-state errors during upgrades and automated bootstrap.
+- Use `INSERT IGNORE` for notification deduplication to avoid expected duplicate-key database errors.
 
 
 ## [0.9.0] - 2026-10-16
