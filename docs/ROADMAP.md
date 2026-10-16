@@ -18,7 +18,7 @@
 - [x] Administrator booking confirmation/rejection console
 - [x] Cafe-owner dashboard for owned bookings with confirm/reject/cancel actions
 - [x] Scheduled expiry worker for stale pending reservations
-- [ ] Staff invitations and multi-user teams; configurable customer cancellation cutoff is implemented.
+- [x] Expiring staff invitation and acceptance workflow; multi-user access remains scoped to assigned cafes.
 - [x] Optional idempotency keys for booking creation
 - [x] Append-only booking audit log for creation, status transitions and table assignment
 
@@ -28,16 +28,18 @@
 - [x] Administrator reconciliation summary by cafe/currency (accruals, reversals, settlements, adjustments and net outstanding balance)
 - [ ] Automated periodic cafe statements, due-date policy and overdue calculation
 - [x] Secure one-time check-in token, configurable expiry and append-only audit history (end-to-end tests still required)
+- [x] Event cancellation commission reversal policy snapshotted per booking
 - [x] Manual settlement records and ledger CSV export
 
 ## Phase 3 — communications and identity
-- [ ] Real SMS provider adapter, OTP expiry, resend limits and attempt throttling
+- [x] Optional Twilio SMS OTP adapter with expiry, resend limits, attempt throttling and WordPress login (live provider configuration/verification required)
 - [ ] WhatsApp manual-link templates and truthful action statuses
 - [ ] Optional official WhatsApp Business API + webhook adapter in a later release
-- [ ] Notification queue, retry policy and duplicate prevention
+- [x] Email notification queue, bounded retries, message history and duplicate prevention
 
 ## Phase 4 — release readiness
-- [ ] Unit, integration, REST authorization and concurrency tests (static source-contract checks are not substitutes).
+- [x] Initial PHPUnit settings and cafe-team authorization tests plus WordPress CI harness
+- [ ] Full booking integration, REST privacy and concurrency tests (static source-contract checks are not substitutes).
 - [ ] Accessibility and responsive QA
 - [ ] Clean WordPress install/upgrade/uninstall tests
 - [ ] Independent theme/plugin ZIP packaging and release workflow
