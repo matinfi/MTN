@@ -12,7 +12,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Enforce event headcount capacity and prevent overlapping reservations for a selected table.
 - [x] Optional per-user idempotency key with payload matching and duplicate-request recovery.
 - [ ] Full cancellation policy and expiration worker.
-- [ ] Append-only status history with actor, reason and timestamp.
+- [x] Append-only booking event history with actor, reason/details and timestamp.
 
 ## Cafe operations
 - [x] WordPress content models for cafes, events and tables.
