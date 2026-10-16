@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '5';
+	const DB_VERSION = '6';
 
 	public static function activate() {
 		global $wpdb;
@@ -87,6 +87,23 @@ final class MTN_CB_Install {
 
 		dbDelta( $ledger_sql );
 		dbDelta( $settlements_sql );
+
+		$audit_table = $wpdb->prefix . 'mtn_booking_events';
+		$audit_sql = "CREATE TABLE {$audit_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			booking_id bigint(20) unsigned NOT NULL,
+			actor_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			event_type varchar(32) NOT NULL,
+			from_status varchar(32) NOT NULL DEFAULT '',
+			to_status varchar(32) NOT NULL DEFAULT '',
+			details text NULL,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY booking_date (booking_id,created_at),
+			KEY actor_date (actor_id,created_at),
+			KEY event_type (event_type)
+		) {$collate};";
+		dbDelta( $audit_sql );
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
 		if ( class_exists( 'MTN_CB_Content' ) ) {
 			MTN_CB_Content::register_types();
