@@ -28,7 +28,7 @@ This repository contains a WordPress plugin and Persian RTL theme for cafe disco
 - Do not treat this foundation as a production-ready reservation engine until concurrency, authorization, integration and acceptance tests pass.
 
 ## Development
-Run PHP lint over PHP files:
+Run the lightweight static source-contract regression checks (these are not a replacement for integration tests), then lint PHP files:
 ```bash
 find wp-content -name '*.php' -print0 | xargs -0 -n1 php -l
 ```
