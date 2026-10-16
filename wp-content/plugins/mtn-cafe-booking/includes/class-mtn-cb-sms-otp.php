@@ -89,6 +89,25 @@ final class MTN_CB_SMS_OTP {
 		if ( ! self::valid_phone( $phone ) ) {
 			return new WP_Error( 'mtn_otp_phone_invalid', __( 'شماره باید با قالب بین‌المللی مانند +905xxxxxxxxx وارد شود.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
+		// Serialize requests for the same phone so parallel resends cannot leave multiple valid challenges.
+		$lock_name = 'mtn_cb_otp_' . substr( hash( 'sha256', $phone ), 0, 32 );
+		$locked = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 2)', $lock_name ) );
+		if ( '1' !== (string) $locked ) {
+			return new WP_Error( 'mtn_otp_rate_limited', __( 'درخواست پیامک بیش از حد مجاز است؛ کمی بعد دوباره تلاش کنید.', 'mtn-cafe-booking' ), array( 'status' => 429 ) );
+		}
+		try {
+			return self::request_code_locked( $request );
+		} finally {
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+		}
+	}
+
+	private static function request_code_locked( $request ) {
+		global $wpdb;
+		$phone = sanitize_text_field( $request['phone'] );
+		if ( ! self::valid_phone( $phone ) ) {
+			return new WP_Error( 'mtn_otp_phone_invalid', __( 'شماره باید با قالب بین‌المللی مانند +905xxxxxxxxx وارد شود.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		}
 		if ( ! self::provider_ready() ) {
 			return new WP_Error( 'mtn_otp_provider_unconfigured', __( 'سرویس پیامک پیکربندی نشده است.', 'mtn-cafe-booking' ), array( 'status' => 503 ) );
 		}
