@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MTN Cafe Booking
  * Description: Reservation foundation for cafes, live music and night events.
- * Version: 0.8.0
+ * Version: 0.9.0
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Text Domain: mtn-cafe-booking
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MTN_CB_VERSION', '0.8.0' );
+define( 'MTN_CB_VERSION', '0.9.0' );
 define( 'MTN_CB_FILE', __FILE__ );
 define( 'MTN_CB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MTN_CB_URL', plugin_dir_url( __FILE__ ) );
@@ -30,6 +30,7 @@ require_once MTN_CB_PATH . 'includes/class-mtn-cb-notifications.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-team-invites.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-event-cancellation.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-event-recurrence.php';
+require_once MTN_CB_PATH . 'includes/class-mtn-cb-sms-otp.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-notifications.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-team-invites.php';
 
@@ -63,6 +64,7 @@ add_action(
 		MTN_CB_Team_Invites::init();
 		MTN_CB_Event_Cancellation::init();
 		MTN_CB_Event_Recurrence::init();
+		MTN_CB_SMS_OTP::init();
 		MTN_CB_Notifications::init();
 		MTN_CB_Team_Invites::init();
 	}
