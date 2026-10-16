@@ -5,7 +5,7 @@
 - Add per-IP OTP throttling regression coverage and eliminate duplicate-key database noise in idempotent notification enqueue.
 - Defer default page creation until WordPress `init` and remove duplicate cafe invitation shortcode registration.
 - Improve keyboard skip navigation, visible form focus, form-control boundary contrast, reduced-motion support and OTP field labeling.
-- Verify PHP/JavaScript source checks and WordPress integration tests on MySQL 8.0 and MariaDB 10.11 (17 tests, 75 assertions per engine before the final accessibility-only changes; latest CI is being re-run).
+- Verify PHP/JavaScript source checks and WordPress integration tests on MySQL 8.0 and MariaDB 10.11; the latest patch passed on both engines with 17 tests and 75 assertions per engine.
 
 ## [0.10.0] - 2026-10-16
 - Add automated monthly cafe statement emails through the idempotent notification queue.
