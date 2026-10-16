@@ -4,7 +4,7 @@
 - Add an append-only commission ledger with commission amount/currency snapshotted at booking creation and accrual on completion.
 - Add manual settlement records, cafe balance checks, append-only adjustments/reversals and ledger CSV export.
 - Add administrator actions for completed/no-show bookings and cafe-owner completion/no-show actions.
-- Require a table assignment before completion when the cafe-assigned-table mode is active.
+- Require a table assignment before confirmation or completion when the cafe-assigned-table mode is active.
 - Upgrade schema to version 5 with ledger and settlement tables.
 - Upgrade schema to version 6 with append-only booking audit events and add an owner-scoped history API.
 - Upgrade schema to version 7 and schedule a five-minute pending-reservation expiry worker with audit entries.
