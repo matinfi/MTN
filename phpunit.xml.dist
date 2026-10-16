@@ -8,6 +8,7 @@
 			<file>tests/test-concurrency.php</file>
 			<file>tests/test-notifications.php</file>
 			<file>tests/test-sms-otp.php</file>
+			<file>tests/test-sms-otp-ip.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
