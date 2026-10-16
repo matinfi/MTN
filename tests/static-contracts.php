@@ -72,9 +72,7 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $sms, 'MTN_CB_TWILIO_ACCOUNT_SID' ) ||
 	false === strpos( $sms, 'wp_set_auth_cookie' ) ||
 	false === strpos( $sms, 'mtn_sms_login' ) ||
-	false === strpos( $sms, 'MTN_CB_TWILIO_ACCOUNT_SID' ) ||
-	false === strpos( $sms, 'wp_set_auth_cookie' ) ||
-	false === strpos( $sms, 'mtn_sms_login' ) ||
+
 	false === strpos( $sms, 'public static function request_code' ) ||
 	false === strpos( $sms, 'public static function verify_code' ) ||
 	false === strpos( $sms, 'MTN_CB_TWILIO_AUTH_TOKEN' ) ||
