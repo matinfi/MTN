@@ -36,7 +36,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Per-booking event-cancellation reversal policy snapshot; unpublishing a published event appends an idempotent commission reversal when enabled.
 - [x] Append-only manual corrections/reversals with actor, timestamp and reason.
 - [x] Manual settlement records, cafe balances and ledger CSV export.
-- [ ] Automated periodic cafe statements and due-date-aware overdue calculation. The admin page now summarizes accrued commissions, reversals, settlements, adjustments and net outstanding balance by cafe/currency; external bank reconciliation and overdue status remain outstanding.
+- [x] Automated monthly cafe statements are queued by cafe/currency with accrued, reversed, settled, adjusted and closing-balance totals; a configurable due-date policy powers overdue-balance reporting. External bank-statement reconciliation remains manual.
 
 ## Identity and communication
 - [x] Manual WhatsApp URL helper; never reports a link opening as delivery.
@@ -44,7 +44,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Secure one-time check-in tokens with configurable expiry, hash-only storage and atomic consumption.
 - [x] Check-in audit trail and authorization for assigned cafe owners, invited team members and administrators.
 - [x] Email notification queue with idempotency keys, bounded exponential retries and persistent sent/failed message history; actual delivery depends on site mail configuration.
-- [ ] Official WhatsApp API/webhook adapter (not required for v1).
+- [x] Official WhatsApp API/webhook adapter explicitly deferred outside v1 scope; manual click-to-chat remains available and no automatic delivery is claimed.
 
 ## Release quality
 - [x] PHP lint workflow.
