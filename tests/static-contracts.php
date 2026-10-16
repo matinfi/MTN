@@ -82,6 +82,8 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $event_cancel, 'commission_reverse_on_event_cancel' ) ||
 	false === strpos( $content, 'mtn_event_recurrence_until' ) ||
 	false === strpos( $recurrence, "'post_status' => 'draft'" ) ||
+	false === strpos( $content, 'mtn_event_recurrence_until' ) ||
+	false === strpos( $recurrence, "'post_status' => 'draft'" ) ||
 	false === strpos( $notifications, 'public static function process_queue' ) ||
 	false === strpos( $notifications, 'next_attempt_at' ) ||
 	false === strpos( $invites, 'public static function accept_from_form' ) ||
