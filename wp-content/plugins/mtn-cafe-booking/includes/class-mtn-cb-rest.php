@@ -235,6 +235,9 @@ final class MTN_CB_Rest {
 				'description' => wp_strip_all_tags( get_the_excerpt( $event ) ),
 				'min_party_size' => absint( get_post_meta( $event->ID, 'mtn_min_party_size', true ) ),
 				'max_party_size' => absint( get_post_meta( $event->ID, 'mtn_max_party_size', true ) ) ?: 100,
+				'event_date' => sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_date', true ) ),
+				'event_start_time' => sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_start_time', true ) ),
+				'event_end_time' => sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_end_time', true ) ),
 			);
 		}
 		return rest_ensure_response( array( 'cafes' => $cafes, 'events' => $events, 'timezone' => wp_timezone_string(), 'booking_mode' => get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) );
