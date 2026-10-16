@@ -1,6 +1,6 @@
 # Booking engine test plan
 
-Run these checks on a disposable WordPress installation with the same MySQL/MariaDB major version intended for staging. The current CI workflow runs PHP syntax checks only; it does not execute these integration scenarios.
+Run these checks on a disposable WordPress installation with the same MySQL/MariaDB major version intended for staging. The lint workflow runs PHP/JavaScript syntax and static source contracts. A WordPress PHPUnit workflow covers initial settings and cafe-team authorization tests; the complete scenarios below still require execution on staging.
 
 ## Setup
 1. Install and activate the plugin on a clean WordPress site.
@@ -64,6 +64,13 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | Cafe owner privilege boundary | Sign in as an editor who can edit cafes and submit a forged owner ID in cafe metadata | Owner assignment is ignored; only administrators can change the cafe owner or grant the cafe-manager role |
 | Default pages | Upgrade a site that already has the booking/account pages | A cafe-dashboard page is added without duplicating existing slugs |
 | Frontend assets | Open booking page and inspect browser console | Booking wizard JavaScript loads without syntax/runtime errors |
+| SMS OTP provider configuration | Request an OTP with provider constants absent, then with test Twilio credentials configured | Missing credentials fail closed; configured requests are throttled, codes expire in five minutes, wrong attempts lock at five and valid codes authenticate only the matching assigned phone account |
+| OTP abuse limits | Request more than three codes for one phone or ten per IP within 15 minutes; request again within 60 seconds | HTTP 429; no additional SMS is sent |
+| Team invitation | Invite an email to a published cafe, accept from a logged-in account with matching email, then replay or use an expired token | Invitation token is hash-only, expires after 48 hours, is single-use, and membership is limited to the assigned cafe |
+| Recurring event drafts | Configure a weekly/monthly published source event with an end date and run the generator twice | Each date is generated at most once as a draft, inherits source content/featured image and requires editorial publication approval |
+| Event cancellation reversal | Accrue commission, enable the booking's event-cancel snapshot, then unpublish its event | A single negative ledger reversal is appended; repeated unpublish transitions do not duplicate the reversal |
+| Monthly statement generation | Run statement generation twice after a calendar month closes for a cafe with a valid statement email | One idempotent statement notification per cafe/currency/period; statement includes accruals, reversals, settlements, adjustments, closing balance, due date and current overdue balance |
+| Statement overdue allocation | Add old commission accrual, newer accrual, a reversal and a settlement; evaluate due dates | Reversals reduce their booking's accrual first; settlements/credits reduce oldest open items first; overdue balance is reported by currency |
 | Status transition | Attempt to confirm/reject a cancelled booking | HTTP 409 |
 | Concurrent capacity | Fire simultaneous requests for the final available seats/table | At most one conflicting reservation is created |
 | Lock failure | Simulate unavailable advisory locking on a disposable test DB | HTTP 503; no booking row is inserted |
