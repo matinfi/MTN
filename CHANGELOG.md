@@ -3,6 +3,8 @@
 ## [0.2.0] - 2026-10-16
 - Serialize booking creation per cafe using database advisory locks.
 - Enforce configured event headcount limits and selected-table time-window conflicts.
+- Expire stale pending booking holds when new requests are processed.
+- Add an administrator-only rejection endpoint with an optional reason.
 - Parse reservation times in the WordPress site timezone and store UTC timestamps.
 - Add configurable table-occupancy duration and a schema migration for the supporting index.
 - Hide cafe owner identifiers from public REST metadata.
