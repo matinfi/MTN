@@ -167,6 +167,11 @@ final class MTN_CB_Finance {
 			self::redirect( 'invalid_adjustment' );
 		}
 		global $wpdb;
+		$lock_name = 'mtn_cb_finance_' . $cafe_id;
+		$locked = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock_name ) );
+		if ( '1' !== (string) $locked ) {
+			self::redirect( 'busy' );
+		}
 		$entry_key = 'adjustment_' . str_replace( '-', '', wp_generate_uuid4() );
 		$inserted = $wpdb->insert(
 			self::ledger_table(),
@@ -184,6 +189,7 @@ final class MTN_CB_Finance {
 			),
 			array( '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s' )
 		);
+		$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 		self::redirect( false === $inserted ? 'failed' : 'adjusted' );
 	}
 
