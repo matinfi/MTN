@@ -105,6 +105,8 @@ final class MTN_CB_SMS_OTP {
 		}
 		$user_ids = get_users( array( 'meta_key' => 'mtn_cb_phone', 'meta_value' => $phone, 'number' => 1, 'fields' => 'ids' ) );
 		$code = (string) random_int( 100000, 999999 );
+		// A resend invalidates every older code so only the newest challenge can authenticate.
+		$wpdb->query( $wpdb->prepare( "UPDATE " . self::table_name() . " SET status = 'superseded' WHERE phone = %s AND status IN ('pending', 'sent') AND consumed_at IS NULL", $phone ) );
 		$inserted = $wpdb->insert( self::table_name(), array(
 			'phone' => $phone,
 			'code_hash' => hash_hmac( 'sha256', $phone . '|' . $code, wp_salt( 'auth' ) ),
@@ -152,7 +154,11 @@ final class MTN_CB_SMS_OTP {
 		$attempts = absint( $row->attempts ) + 1;
 		$matches = hash_equals( $row->code_hash, hash_hmac( 'sha256', $phone . '|' . $code, wp_salt( 'auth' ) ) );
 		if ( ! $matches ) {
-			$wpdb->update( self::table_name(), array( 'attempts' => $attempts, 'status' => $attempts >= 5 ? 'locked' : 'sent' ), array( 'id' => absint( $row->id ), 'status' => 'sent', 'consumed_at' => null ), array( '%d', '%s' ), array( '%d', '%s', '%s' ) );
+			// Increment in SQL under a conditional update to prevent concurrent attempts bypassing the lockout.
+			$updated = $wpdb->query( $wpdb->prepare( "UPDATE " . self::table_name() . " SET status = IF(attempts >= 4, 'locked', 'sent'), attempts = attempts + 1 WHERE id = %d AND status = 'sent' AND consumed_at IS NULL AND attempts < 5", absint( $row->id ) ) );
+			if ( 1 !== $updated ) {
+				return new WP_Error( 'mtn_otp_expired', __( 'کد تأیید منقضی شده یا وجود ندارد.', 'mtn-cafe-booking' ), array( 'status' => 401 ) );
+			}
 			return new WP_Error( 'mtn_otp_wrong_code', __( 'کد تأیید صحیح نیست.', 'mtn-cafe-booking' ), array( 'status' => 401 ) );
 		}
 		$consumed = $wpdb->update( self::table_name(), array( 'status' => 'consumed', 'attempts' => $attempts, 'consumed_at' => $now ), array( 'id' => absint( $row->id ), 'status' => 'sent', 'consumed_at' => null ), array( '%s', '%d', '%s' ), array( '%d', '%s', '%s' ) );
