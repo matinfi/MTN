@@ -267,8 +267,14 @@ final class MTN_CB_Rest {
 			'post_type' => 'mtn_event',
 			'post_status' => 'publish',
 			'posts_per_page' => 200,
-			'orderby' => 'date',
-			'order' => 'DESC',
+			'meta_key' => 'mtn_event_date',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'meta_query' => array(
+				'relation' => 'AND',
+				array( 'key' => 'mtn_event_date', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ),
+				array( 'key' => 'mtn_event_start_time', 'value' => '', 'compare' => '!=' ),
+			),
 		) );
 		$events = array();
 		foreach ( $event_posts as $event ) {
