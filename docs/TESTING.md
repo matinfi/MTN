@@ -77,4 +77,4 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 
 ## Release gate
 
-Do not mark integration/concurrency tests complete until these scenarios run automatically or are captured as repeatable staging evidence. Also test upgrade from schema versions 1 through 10, ZIP installation, backup/restore, REST nonce behavior, and permissions on the actual hosting stack.
+Do not mark integration/concurrency tests complete until these scenarios run automatically or are captured as repeatable staging evidence. Also test upgrade from schema versions 1 through 12, ZIP installation, backup/restore, REST nonce behavior, and permissions on the actual hosting stack.
