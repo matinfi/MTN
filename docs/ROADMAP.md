@@ -9,7 +9,7 @@
 
 ## Phase 1 — core booking
 - [x] Cafe, event and table WordPress content types with administrator metadata forms
-- [ ] Geographic taxonomy (country, city, area, neighborhood)
+- [x] Hierarchical cafe-location taxonomy supports country, city, area and neighborhood terms.
 - [x] Basic event headcount limits, selected-table overlap checks and per-cafe database locking (integration/concurrency tests still required)
 - [x] Advisory availability API with event date/hour validation and selected-table filtering
 - [x] Manual table assignment from the cafe dashboard with locked overlap validation
@@ -18,7 +18,7 @@
 - [x] Administrator booking confirmation/rejection console
 - [x] Cafe-owner dashboard for owned bookings with confirm/reject/cancel actions
 - [x] Scheduled expiry worker for stale pending reservations
-- [ ] Staff invitations, multi-user teams and configurable cancellation policy
+- [ ] Staff invitations and multi-user teams; configurable customer cancellation cutoff is implemented.
 - [x] Optional idempotency keys for booking creation
 - [x] Append-only booking audit log for creation, status transitions and table assignment
 
@@ -36,7 +36,7 @@
 - [ ] Notification queue, retry policy and duplicate prevention
 
 ## Phase 4 — release readiness
-- [ ] Unit, integration, REST authorization and concurrency tests
+- [ ] Unit, integration, REST authorization and concurrency tests (static source-contract checks are not substitutes).
 - [ ] Accessibility and responsive QA
 - [ ] Clean WordPress install/upgrade/uninstall tests
 - [ ] Independent theme/plugin ZIP packaging and release workflow
