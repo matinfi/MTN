@@ -80,11 +80,12 @@
     } catch (error) {
       setStatus(root, error.message || window.MTNCB.catalogError, 'error');
     }
-    cafe.addEventListener('change', updateEvents);
-    event.addEventListener('change', () => { applyEventSchedule(); resetAvailability(); });
-    party.addEventListener('change', resetAvailability);
-    date.addEventListener('change', resetAvailability);
-    table.addEventListener('change', () => { if (lastAvailability) submitButton.disabled = !lastAvailability.available || (lastAvailability.table_selection_required && !table.value); });
+    cafe.addEventListener('change', () => { idempotencyKey = ''; updateEvents(); });
+    event.addEventListener('change', () => { idempotencyKey = ''; applyEventSchedule(); resetAvailability(); });
+    party.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
+    date.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
+    table.addEventListener('change', () => { idempotencyKey = ''; if (lastAvailability) submitButton.disabled = !lastAvailability.available || (lastAvailability.table_selection_required && !table.value); });
+    form.elements.customer_note.addEventListener('input', () => { idempotencyKey = ''; });
     checkButton.addEventListener('click', async () => {
       if (!form.reportValidity()) return;
       const params = new URLSearchParams({
