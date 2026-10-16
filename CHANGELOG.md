@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0] - 2026-10-16
+- Add one-time, random check-in tokens with configurable expiry and hash-only storage.
+- Add customer token issuance and cafe-owner/admin check-in endpoints with atomic single-use consumption.
+- Record token issuance and customer check-in events in the booking audit timeline.
+- Upgrade schema to version 10 and index token hashes.
+
+
 ## [0.5.0] - 2026-10-16
 - Snapshot commission trigger status per booking; default accrual occurs on cafe confirmation, with completion available as an alternative.
 - Upgrade database schema to version 9 for commission trigger snapshots.
