@@ -5,6 +5,7 @@
 - Add customer token issuance and cafe-owner/admin check-in endpoints with atomic single-use consumption.
 - Record token issuance and customer check-in events in the booking audit timeline.
 - Add a customer-facing manual WhatsApp link when the cafe's contact number is valid, without claiming delivery.
+- Add administrator-managed cafe team assignments for existing WordPress users with per-cafe REST authorization.
 - Upgrade schema to version 10 and index token hashes.
 
 
