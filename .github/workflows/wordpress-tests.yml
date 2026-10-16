@@ -36,3 +36,24 @@ jobs:
         env:
           WP_TESTS_DIR: /tmp/wordpress-tests-lib
         run: phpunit -c phpunit.xml.dist
+      - name: Verify database backup and restore
+        env:
+          DB_NAME: wordpress_test
+          DB_USER: root
+          DB_PASSWORD: password
+          DB_HOST: 127.0.0.1
+        run: |
+          set -euo pipefail
+          table_counts() {
+            local database="$1"
+            while IFS= read -r table; do
+              count=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$database" -Nse "SELECT COUNT(*) FROM `$table`")
+              printf '%s:%s\n' "$table" "$count"
+            done < <(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$database" -Nse "SHOW TABLES" | sort)
+          }
+          mysqldump --single-transaction --skip-lock-tables -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" > /tmp/mtn-db-backup.sql
+          mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" -e "CREATE DATABASE wordpress_restore_test"
+          mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" wordpress_restore_test < /tmp/mtn-db-backup.sql
+          table_counts "$DB_NAME" > /tmp/source-table-counts.txt
+          table_counts wordpress_restore_test > /tmp/restored-table-counts.txt
+          diff -u /tmp/source-table-counts.txt /tmp/restored-table-counts.txt
