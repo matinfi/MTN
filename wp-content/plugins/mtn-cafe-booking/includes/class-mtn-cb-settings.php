@@ -41,7 +41,8 @@ final class MTN_CB_Settings {
 		if ( $value !== $current ) {
 			global $wpdb;
 			$bookings_exist = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . MTN_CB_Bookings::table_name() );
-			if ( $bookings_exist > 0 ) {
+			$ledger_exists = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . MTN_CB_Finance::ledger_table() );
+			if ( $bookings_exist > 0 || $ledger_exists > 0 ) {
 				return $current;
 			}
 		}
