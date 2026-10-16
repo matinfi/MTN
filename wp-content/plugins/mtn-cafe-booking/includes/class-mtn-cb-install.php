@@ -52,6 +52,7 @@ final class MTN_CB_Install {
 			MTN_CB_Content::register_types();
 			flush_rewrite_rules();
 		}
+		self::ensure_roles();
 		self::ensure_default_pages();
 		add_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) );
 		add_option( 'mtn_cb_currency', 'TRY' );
@@ -61,6 +62,22 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
 	}
 
+	public static function ensure_roles() {
+		$role = get_role( 'mtn_cafe_manager' );
+		if ( ! $role ) {
+			add_role( 'mtn_cafe_manager', 'مدیر کافه', array( 'read' => true, 'mtn_manage_cafes' => true ) );
+			$role = get_role( 'mtn_cafe_manager' );
+		}
+		if ( $role ) {
+			$role->add_cap( 'read' );
+			$role->add_cap( 'mtn_manage_cafes' );
+		}
+		$admin = get_role( 'administrator' );
+		if ( $admin ) {
+			$admin->add_cap( 'mtn_manage_cafes' );
+		}
+	}
+
 	public static function ensure_default_pages() {
 		if ( get_option( 'mtn_cb_default_pages_created' ) ) {
 			return;
@@ -68,6 +85,7 @@ final class MTN_CB_Install {
 		$pages = array(
 			'book' => array( 'title' => 'رزرو کافه', 'content' => '[mtn_booking_form]' ),
 			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]' ),
+			'cafe-dashboard' => array( 'title' => 'مدیریت کافه', 'content' => '[mtn_cafe_dashboard]' ),
 		);
 		foreach ( $pages as $slug => $page ) {
 			if ( ! get_page_by_path( $slug, OBJECT, 'page' ) ) {
@@ -88,6 +106,7 @@ final class MTN_CB_Install {
 		if ( (string) get_option( 'mtn_cb_db_version', '0' ) !== self::DB_VERSION ) {
 			self::activate();
 		}
+		self::ensure_roles();
 		self::ensure_default_pages();
 	}
 
