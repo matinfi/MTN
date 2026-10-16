@@ -3,7 +3,7 @@ Theme Name: MTN Cafe
 Theme URI: https://github.com/matinfi/MTN
 Author: MTN Project
 Description: Lightweight Persian RTL theme for cafe discovery and live music reservations.
-Version: 0.1.0
+Version: 0.2.0
 Requires at least: 6.4
 Requires PHP: 8.1
 Text Domain: mtn-cafe-theme
@@ -30,3 +30,18 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--mtn-accent);outline
 .card h3{margin-top:0}.notice{padding:1rem;border:1px solid #65502d;border-radius:12px;background:#292219}
 .site-footer{margin-top:3rem;color:var(--mtn-muted)}
 @media(max-width:600px){.site-header{align-items:flex-start;flex-direction:column}.nav-links{gap:.65rem}.section-heading{align-items:flex-start;flex-direction:column}}
+
+/* Booking flow and directory cards */
+.mtn-booking-panel{max-width:900px;margin:2rem auto;padding:clamp(1rem,3vw,2rem);background:var(--mtn-surface);border:1px solid #302e38;border-radius:var(--mtn-radius)}
+.mtn-booking-panel h2{margin:.25rem 0 .5rem}.mtn-booking-form label{display:block;margin-bottom:.35rem;font-weight:700}
+.mtn-booking-form input,.mtn-booking-form select,.mtn-booking-form textarea{width:100%;min-height:46px;padding:.7rem .8rem;border:1px solid #494652;border-radius:10px;background:#111116;color:var(--mtn-text);font:inherit}
+.mtn-booking-form textarea{resize:vertical}.mtn-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem 1rem}
+.mtn-booking-actions{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}.mtn-booking-actions button{border:0;cursor:pointer;font:inherit}.mtn-booking-actions button:disabled{opacity:.45;cursor:not-allowed}
+.mtn-booking-status{padding:.65rem .8rem;border-radius:9px;background:#25242c}.mtn-booking-status[data-state="success"]{border:1px solid #477b5c}.mtn-booking-status[data-state="error"]{border:1px solid #a54d4d}
+.mtn-booking-login a{text-decoration:underline;color:var(--mtn-accent)}.mtn-booking-disclaimer{font-size:.9rem;color:var(--mtn-muted)}
+.mtn-bookings-table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}.mtn-bookings-table th,.mtn-bookings-table td{padding:.7rem;text-align:right;border-bottom:1px solid #383640;white-space:nowrap}
+.mtn-listing-meta{display:flex;gap:.5rem;flex-wrap:wrap;color:var(--mtn-muted);font-size:.92rem}.mtn-listing-meta span{padding:.2rem .55rem;border:1px solid #383640;border-radius:999px}
+.mtn-card-image{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#292831}.mtn-listing-card{display:flex;flex-direction:column;gap:.6rem}.mtn-listing-card .button{align-self:flex-start;margin-top:auto}
+.mtn-content{max-width:850px;margin-inline:auto}.mtn-content img{max-width:100%;height:auto;border-radius:12px}
+.mtn-empty-state{padding:2rem;text-align:center;border:1px dashed #494652;border-radius:var(--mtn-radius);color:var(--mtn-muted)}
+@media(max-width:640px){.mtn-form-grid{grid-template-columns:1fr}.mtn-booking-actions{flex-direction:column;align-items:stretch}.mtn-booking-actions .button{width:100%}}
