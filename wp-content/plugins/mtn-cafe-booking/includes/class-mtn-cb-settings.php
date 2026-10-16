@@ -1,0 +1,73 @@
+<?php
+/**
+ * Plugin settings.
+ *
+ * @package MTN_Cafe_Booking
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+final class MTN_CB_Settings {
+	public static function init() {
+		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
+		add_action( 'admin_init', array( __CLASS__, 'register' ) );
+	}
+
+	public static function menu() {
+		add_options_page(
+			__( 'تنظیمات رزرو کافه', 'mtn-cafe-booking' ),
+			__( 'رزرو کافه MTN', 'mtn-cafe-booking' ),
+			'manage_options',
+			'mtn-cafe-booking',
+			array( __CLASS__, 'render' )
+		);
+	}
+
+	public static function register() {
+		register_setting( 'mtn_cb_settings', 'mtn_cb_brand_name', array( 'sanitize_callback' => 'sanitize_text_field', 'default' => get_bloginfo( 'name' ) ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_currency', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_currency' ), 'default' => 'TRY' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_default_commission', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_amount' ), 'default' => '0' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_expiry_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_minutes' ), 'default' => 30 ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_mode', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_mode' ), 'default' => 'customer_selects_table' ) );
+	}
+
+	public static function sanitize_currency( $value ) {
+		$value = strtoupper( sanitize_text_field( $value ) );
+		return preg_match( '/^[A-Z]{3,8}$/', $value ) ? $value : 'TRY';
+	}
+
+	public static function sanitize_amount( $value ) {
+		return is_numeric( $value ) && (float) $value >= 0 ? number_format( (float) $value, 2, '.', '' ) : '0.00';
+	}
+
+	public static function sanitize_minutes( $value ) {
+		return min( 1440, max( 5, absint( $value ) ) );
+	}
+
+	public static function sanitize_mode( $value ) {
+		return in_array( $value, array( 'customer_selects_table', 'cafe_assigns_table' ), true ) ? $value : 'customer_selects_table';
+	}
+
+	public static function render() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="wrap">
+			<h1><?php esc_html_e( 'تنظیمات رزرو کافه MTN', 'mtn-cafe-booking' ); ?></h1>
+			<p><?php esc_html_e( 'پرداخت آنلاین مشتری در نسخه اول غیرفعال است. کارمزد ثبت‌شده به معنی وجه وصول‌شده نیست.', 'mtn-cafe-booking' ); ?></p>
+			<form method="post" action="options.php">
+				<?php settings_fields( 'mtn_cb_settings' ); ?>
+				<table class="form-table" role="presentation">
+					<tr><th><label for="mtn_cb_brand_name"><?php esc_html_e( 'نام برند', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_brand_name" name="mtn_cb_brand_name" value="<?php echo esc_attr( get_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_currency"><?php esc_html_e( 'واحد پول', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_currency" name="mtn_cb_currency" value="<?php echo esc_attr( get_option( 'mtn_cb_currency', 'TRY' ) ); ?>" maxlength="8"></td></tr>
+					<tr><th><label for="mtn_cb_default_commission"><?php esc_html_e( 'کارمزد ثابت هر رزرو واجد شرایط', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="0" step="0.01" id="mtn_cb_default_commission" name="mtn_cb_default_commission" value="<?php echo esc_attr( get_option( 'mtn_cb_default_commission', '0' ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_booking_expiry_minutes"><?php esc_html_e( 'مهلت تأیید رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="5" max="1440" id="mtn_cb_booking_expiry_minutes" name="mtn_cb_booking_expiry_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_booking_mode"><?php esc_html_e( 'روش انتخاب میز', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_booking_mode" name="mtn_cb_booking_mode"><option value="customer_selects_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'customer_selects_table' ); ?>><?php esc_html_e( 'انتخاب توسط مشتری', 'mtn-cafe-booking' ); ?></option><option value="cafe_assigns_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'cafe_assigns_table' ); ?>><?php esc_html_e( 'تخصیص توسط کافه', 'mtn-cafe-booking' ); ?></option></select></td></tr>
+				</table>
+				<?php submit_button(); ?>
+			</form>
+		</div>
+		<?php
+	}
+}
