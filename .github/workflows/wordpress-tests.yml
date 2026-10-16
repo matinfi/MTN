@@ -36,9 +36,22 @@ jobs:
         run: |
           curl -fsSL https://develop.svn.wordpress.org/trunk/bin/install-wp-tests.sh -o /tmp/install-wp-tests.sh
           bash /tmp/install-wp-tests.sh wordpress_test root password 127.0.0.1 latest
+      - name: Package and install plugin/theme into clean WordPress test core
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/wordpress/wp-content/plugins /tmp/wordpress/wp-content/themes
+          cd wp-content/plugins
+          zip -qr /tmp/mtn-cafe-booking.zip mtn-cafe-booking
+          cd ../themes
+          zip -qr /tmp/mtn-cafe-theme.zip mtn-cafe-theme
+          unzip -q /tmp/mtn-cafe-booking.zip -d /tmp/wordpress/wp-content/plugins
+          unzip -q /tmp/mtn-cafe-theme.zip -d /tmp/wordpress/wp-content/themes
+          test -f /tmp/wordpress/wp-content/plugins/mtn-cafe-booking/mtn-cafe-booking.php
+          test -f /tmp/wordpress/wp-content/themes/mtn-cafe-theme/style.css
       - name: Run integration tests
         env:
           WP_TESTS_DIR: /tmp/wordpress-tests-lib
+          MTN_PLUGIN_PATH: /tmp/wordpress/wp-content/plugins/mtn-cafe-booking/mtn-cafe-booking.php
         run: phpunit -c phpunit.xml.dist
       - name: Verify database backup and restore
         env:
