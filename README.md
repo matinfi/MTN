@@ -2,8 +2,8 @@
 
 WordPress-based Persian RTL platform for discovering cafés with live music and night events and requesting table reservations.
 
-## Version 0.3.0 — booking experience
-This repository contains a WordPress plugin and Persian RTL theme for cafe discovery, live music/night-event listings and table reservation requests. Version 0.3.0 adds a public catalog and advisory availability API, a booking wizard, customer booking history/cancellation, admin metadata fields for cafes/events/tables, an administrator booking console, cafe-owner-scoped booking dashboard, and cafe/event detail/archive templates. Features requiring external credentials (production SMS/OTP and WhatsApp Business) are not represented as live until configured.
+## Version 0.4.0 — finance ledger
+This repository contains a WordPress plugin and Persian RTL theme for cafe discovery, live music/night-event listings and table reservation requests. Version 0.4.0 adds a public catalog and advisory availability API, a booking wizard, customer booking history/cancellation, admin metadata fields for cafes/events/tables, an administrator booking console, cafe-owner-scoped booking dashboard, append-only commission ledger, manual settlement and adjustment records, CSV export, and cafe/event detail/archive templates. Features requiring external credentials (production SMS/OTP and WhatsApp Business) are not represented as live until configured.
 
 ## Architecture
 - `wp-content/plugins/mtn-cafe-booking/`: business rules, booking persistence, REST API, permissions and settings.
@@ -24,7 +24,7 @@ This repository contains a WordPress plugin and Persian RTL theme for cafe disco
 
 ## Current scope and limitations
 - Implemented: versioned REST APIs for catalog, availability, booking creation/read/cancel/history and admin confirmation/rejection; per-cafe advisory locks; event headcount and schedule checks; selected-table overlap validation; optional idempotency; expiry of stale pending holds during booking creation; customer booking wizard/history; administrator booking console; cafe-manager dashboard scoped to owned cafes; cafe/event/table metadata boxes; responsive RTL listing/detail templates.
-- Incomplete: staff invitation/management beyond assigning a cafe owner, automatic table allocation (manual assignment is available from the cafe dashboard), append-only audit log, finance ledger/settlements, check-in, production OTP, WhatsApp API delivery, automated integration/concurrency tests and production deployment. Availability is advisory; booking creation is authoritative. Database locking and all upgrade paths still require testing on the target hosting stack.
+- Incomplete: staff invitation/management beyond assigning a cafe owner, automatic table allocation (manual assignment is available from the cafe dashboard), booking status audit history, check-in, production OTP, WhatsApp API delivery, automated integration/concurrency tests and production deployment. Commission is snapshotted when the booking is created and accrued only when it is marked completed; it is a ledger entry, not proof that money was collected. Availability is advisory; booking creation is authoritative. Database locking and all upgrade paths still require testing on the target hosting stack.
 - Do not treat this foundation as a production-ready reservation engine until concurrency, authorization, integration and acceptance tests pass.
 
 ## Development
