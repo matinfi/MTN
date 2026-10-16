@@ -95,6 +95,10 @@ Cancels a pending or confirmed booking for a cafe managed by the current user (o
 
 Optional JSON field: `reason` (plain text). Only the assigned cafe owner or an administrator may reject. The reason is saved as the current cafe note; append-only status history is not implemented yet.
 
+## Finance behavior
+
+The fixed commission amount and currency are snapshotted when a booking is created. A positive commission is added to the append-only ledger only when an administrator or the assigned cafe owner marks a confirmed booking as completed. Marking a booking as no-show does not accrue commission. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
+
 ## Current contract limitations
 
 - Idempotency is optional; clients should send a stable unique `idempotency_key` for each booking attempt. Reusing a key with a different payload returns HTTP 409.
