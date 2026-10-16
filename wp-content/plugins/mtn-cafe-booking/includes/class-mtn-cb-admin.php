@@ -27,7 +27,7 @@ final class MTN_CB_Admin {
 
 	public static function handle_booking_action() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'دسترسی کافی ندارید.', 'mtn-cafe-booking' ), 403 );
+			wp_die( esc_html__( 'دسترسی کافی ندارید.', 'mtn-cafe-booking' ), '', array( 'response' => 403 ) );
 		}
 		$booking_id = isset( $_POST['booking_id'] ) ? absint( $_POST['booking_id'] ) : 0;
 		check_admin_referer( 'mtn_cb_admin_booking_' . $booking_id );
