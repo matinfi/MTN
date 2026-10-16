@@ -57,6 +57,7 @@ final class MTN_CB_Event_Recurrence {
 					break;
 				}
 				$date = $next->format( 'Y-m-d' );
+				$next = self::next_date( $next, $frequency, $monthly_day );
 				$exists = get_posts( array(
 					'post_type' => 'mtn_event',
 					'post_status' => array( 'publish', 'draft', 'pending', 'private', 'trash' ),
@@ -93,7 +94,6 @@ final class MTN_CB_Event_Recurrence {
 					set_post_thumbnail( $clone_id, $thumbnail_id );
 				}
 				do_action( 'mtn_cb_recurring_event_created', $clone_id, $source->ID, $date );
-				$next = self::next_date( $next, $frequency, $monthly_day );
 			}
 		}
 	}
