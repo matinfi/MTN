@@ -4,6 +4,7 @@
 		<testsuite name="MTN Cafe Booking">
 			<file>tests/test-settings.php</file>
 			<file>tests/test-permissions.php</file>
+			<file>tests/test-install.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
