@@ -251,6 +251,24 @@ final class MTN_CB_Rest {
 		}, $rows ) );
 	}
 
+	private static function cafe_location_path( $cafe_id ) {
+		$terms = wp_get_object_terms( absint( $cafe_id ), 'mtn_cafe_location' );
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+		$term = reset( $terms );
+		$ancestor_ids = array_reverse( get_ancestors( $term->term_id, 'mtn_cafe_location', 'taxonomy' ) );
+		$path = array();
+		foreach ( $ancestor_ids as $ancestor_id ) {
+			$ancestor = get_term( $ancestor_id, 'mtn_cafe_location' );
+			if ( $ancestor && ! is_wp_error( $ancestor ) ) {
+				$path[] = $ancestor->name;
+			}
+		}
+		$path[] = $term->name;
+		return array_values( array_map( 'sanitize_text_field', $path ) );
+	}
+
 	public static function catalog() {
 		$cafe_posts = get_posts( array(
 			'post_type' => 'mtn_cafe',
@@ -261,7 +279,7 @@ final class MTN_CB_Rest {
 		) );
 		$cafes = array();
 		foreach ( $cafe_posts as $cafe ) {
-			$cafes[] = array( 'id' => (int) $cafe->ID, 'name' => get_the_title( $cafe ), 'url' => get_permalink( $cafe ), 'description' => wp_strip_all_tags( get_the_excerpt( $cafe ) ) );
+			$cafes[] = array( 'id' => (int) $cafe->ID, 'name' => get_the_title( $cafe ), 'url' => get_permalink( $cafe ), 'description' => wp_strip_all_tags( get_the_excerpt( $cafe ) ), 'location_path' => self::cafe_location_path( $cafe->ID ) );
 		}
 		$event_posts = get_posts( array(
 			'post_type' => 'mtn_event',
