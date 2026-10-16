@@ -85,6 +85,10 @@ Administrators can see all bookings; a user with the `mtn_cafe_manager` role see
 
 Required JSON field: `table_id`. Assigns a published, active table belonging to the cafe, checks party capacity and overlapping active reservations, and saves the assignment while holding the cafe's database lock. Only the assigned cafe owner or an administrator may use it.
 
+`POST /cafe/bookings/{id}/complete` and `POST /cafe/bookings/{id}/no-show`
+
+Move a confirmed booking to completed or no-show. Completing a booking triggers commission accrual from the amount snapshotted at booking creation. In cafe-assigned-table mode, the booking must have a table before it can be completed.
+
 `POST /cafe/bookings/{id}/cancel`
 
 Cancels a pending or confirmed booking for a cafe managed by the current user (or any booking for an administrator). Optional JSON field: `reason`.
