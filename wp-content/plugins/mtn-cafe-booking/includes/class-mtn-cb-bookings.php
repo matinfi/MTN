@@ -407,14 +407,18 @@ final class MTN_CB_Bookings {
 		if ( ( $start && ! preg_match( '/^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$/', $start ) ) || ( $end && ! preg_match( '/^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$/', $end ) ) ) {
 			return new WP_Error( 'mtn_event_schedule_invalid', __( 'ساعت برنامه در تنظیمات کافه معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
-		if ( $start && $time < $start ) {
-			return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو پیش از شروع برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
-		}
-		if ( $end && $start && $end > $start && $time >= $end ) {
-			return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو پس از پایان برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
-		}
-		if ( $end && $start && $end < $start && $time >= $end && $time < $start ) {
-			return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو خارج از ساعت برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+		$overnight = $start && $end && $end < $start;
+		if ( $overnight ) {
+			if ( $time < $start && $time >= $end ) {
+				return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو خارج از ساعت برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+			}
+		} else {
+			if ( $start && $time < $start ) {
+				return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو پیش از شروع برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+			}
+			if ( $end && $time >= $end ) {
+				return new WP_Error( 'mtn_event_outside_hours', __( 'زمان رزرو پس از پایان برنامه است.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
+			}
 		}
 		return true;
 	}
