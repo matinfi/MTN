@@ -26,15 +26,15 @@
 - [x] Append-only commission ledger and manual correction/reversal entries
 - [x] Fixed commission amount/currency and configurable trigger (`confirmed` by default, `completed` optional) snapshotted at booking creation
 - [x] Administrator reconciliation summary by cafe/currency (accruals, reversals, settlements, adjustments and net outstanding balance)
-- [ ] Automated periodic cafe statements, due-date policy and overdue calculation
+- [x] Monthly cafe statement emails, configurable due-date policy and overdue balance report (external bank reconciliation remains manual)
 - [x] Secure one-time check-in token, configurable expiry and append-only audit history (end-to-end tests still required)
 - [x] Event cancellation commission reversal policy snapshotted per booking
 - [x] Manual settlement records and ledger CSV export
 
 ## Phase 3 — communications and identity
 - [x] Optional Twilio SMS OTP adapter with expiry, resend limits, attempt throttling and WordPress login (live provider configuration/verification required)
-- [ ] WhatsApp manual-link templates and truthful action statuses
-- [ ] Optional official WhatsApp Business API + webhook adapter in a later release
+- [x] Manual WhatsApp link helper and truthful action status; no delivery claim
+- [x] Official WhatsApp Business API/webhook explicitly deferred outside v1 scope
 - [x] Email notification queue, bounded retries, message history and duplicate prevention
 
 ## Phase 4 — release readiness
