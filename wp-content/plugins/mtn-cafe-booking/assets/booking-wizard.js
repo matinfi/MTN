@@ -43,6 +43,12 @@
       select.replaceChildren(new Option(placeholder, ''));
       items.forEach((item) => select.add(new Option(text(item[labelKey]), text(item[valueKey]))));
     }
+    function applyEventSchedule() {
+      const selected = catalog.events.find((item) => String(item.id) === String(event.value));
+      if (selected && selected.event_date && selected.event_start_time) {
+        date.value = selected.event_date + 'T' + selected.event_start_time.slice(0, 5);
+      }
+    }
     function updateEvents() {
       const cafeId = Number(cafe.value || 0);
       const items = catalog.events.filter((item) => Number(item.cafe_id) === cafeId);
@@ -52,6 +58,7 @@
         event.value = root.dataset.defaultEvent;
         root.dataset.defaultEvent = '';
       }
+      applyEventSchedule();
       resetAvailability();
     }
     function resetAvailability() {
@@ -74,7 +81,7 @@
       setStatus(root, error.message || window.MTNCB.catalogError, 'error');
     }
     cafe.addEventListener('change', updateEvents);
-    event.addEventListener('change', resetAvailability);
+    event.addEventListener('change', () => { applyEventSchedule(); resetAvailability(); });
     party.addEventListener('change', resetAvailability);
     date.addEventListener('change', resetAvailability);
     table.addEventListener('change', () => { if (lastAvailability) submitButton.disabled = !lastAvailability.available || (lastAvailability.table_selection_required && !table.value); });
