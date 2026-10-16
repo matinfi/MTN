@@ -14,6 +14,8 @@
 	<nav class="nav-links" aria-label="<?php esc_attr_e( 'منوی اصلی', 'mtn-cafe-theme' ); ?>">
 		<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'خانه', 'mtn-cafe-theme' ); ?></a>
 		<a href="<?php echo esc_url( home_url( '/cafes/' ) ); ?>"><?php esc_html_e( 'کشف کافه‌ها', 'mtn-cafe-theme' ); ?></a>
+		<a href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'برنامه‌ها', 'mtn-cafe-theme' ); ?></a>
+		<a href="<?php echo esc_url( home_url( '/book/' ) ); ?>"><?php esc_html_e( 'رزرو میز', 'mtn-cafe-theme' ); ?></a>
 		<a href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>"><?php esc_html_e( 'رزروهای من', 'mtn-cafe-theme' ); ?></a>
 		<?php if ( is_user_logged_in() ) : ?><a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'خروج', 'mtn-cafe-theme' ); ?></a><?php else : ?><a href="<?php echo esc_url( wp_login_url() ); ?>"><?php esc_html_e( 'ورود', 'mtn-cafe-theme' ); ?></a><?php endif; ?>
 	</nav>
