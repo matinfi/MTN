@@ -14,6 +14,7 @@ Run these checks on a disposable WordPress installation with the same MySQL/Mari
 | --- | --- | --- |
 | Authentication | Submit booking creation as a logged-out visitor | HTTP 401 |
 | Listing relationship | Use an event linked to a different cafe | HTTP 400 |
+| Missing schedule | Publish an event without a valid date/start time and request availability | HTTP 400 until the schedule is configured |
 | Party validation | Request more than event max or table capacity | HTTP 400 |
 | Past time | Submit a local site time in the past | HTTP 400 |
 | Timezone conversion | Submit a known local time and inspect the database row | UTC timestamp matches the configured site's timezone |
