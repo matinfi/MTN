@@ -22,7 +22,7 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] Object-level authorization for the configured cafe owner on booking read/action routes.
 - [ ] Staff invitations and multi-user cafe teams.
 - [x] Administrator confirmation/rejection console with optional reason.
-- [x] Cafe-owner dashboard with confirmation, rejection reason and cancellation actions.
+- [x] Cafe-owner dashboard with confirmation, rejection reason, cancellation and manual table assignment actions.
 - [ ] Staff/team management UI.
 - [x] Event date, start/end time and capacity metadata fields.
 - [ ] Recurrence, media workflow and publication approval.
