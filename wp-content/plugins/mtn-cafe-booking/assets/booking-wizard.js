@@ -263,6 +263,26 @@
   });
   document.querySelectorAll('[data-mtn-cafe-dashboard]').forEach(async (root) => {
     const list = root.querySelector('.mtn-cafe-booking-list');
+    const checkinForm = root.querySelector('.mtn-checkin-form');
+    if (checkinForm) {
+      checkinForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!checkinForm.reportValidity()) return;
+        const input = checkinForm.elements.token;
+        const button = checkinForm.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+          const booking = await request(api + 'cafe/check-in', { method: 'POST', headers, credentials: 'same-origin', body: JSON.stringify({ token: input.value.trim() }) });
+          checkinForm.reset();
+          setStatus(root, 'حضور مشتری برای رزرو ' + booking.booking_code + ' ثبت شد.', 'success');
+          await load();
+        } catch (error) {
+          setStatus(root, error.message, 'error');
+        } finally {
+          button.disabled = false;
+        }
+      });
+    }
     const labels = {
       pending_cafe: 'در انتظار تأیید', confirmed: 'تأیید شده', rejected: 'رد شده',
       cancelled_by_customer: 'لغو توسط مشتری', cancelled_by_cafe: 'لغو توسط کافه',
