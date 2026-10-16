@@ -30,6 +30,7 @@ register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
 add_action(
 	'plugins_loaded',
 	static function () {
+		MTN_CB_Install::maybe_upgrade();
 		MTN_CB_Content::init();
 		MTN_CB_Settings::init();
 		MTN_CB_Rest::init();
