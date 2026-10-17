@@ -16,6 +16,12 @@ final class MTN_CB_Shortcodes {
 	}
 
 	public static function register_assets() {
+		wp_register_style(
+			'mtn-cb-booking-wizard',
+			MTN_CB_URL . 'assets/booking-wizard.css',
+			array(),
+			MTN_CB_VERSION
+		);
 		wp_register_script(
 			'mtn-cb-wizard',
 			MTN_CB_URL . 'assets/booking-wizard.js',
@@ -26,6 +32,7 @@ final class MTN_CB_Shortcodes {
 	}
 
 	private static function enqueue_assets() {
+		wp_enqueue_style( 'mtn-cb-booking-wizard' );
 		wp_enqueue_script( 'mtn-cb-wizard' );
 		wp_localize_script(
 			'mtn-cb-wizard',
