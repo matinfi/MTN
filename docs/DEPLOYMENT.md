@@ -28,6 +28,9 @@ The plugin schedules a five-minute WP-Cron event to expire stale pending booking
 
 ## Before production
 
+Complete the evidence-based [staging and production release gate](STAGING-RELEASE-GATE.md) before approving release. Do not substitute source inspection or CI results for browser/device, hosting-specific security/performance, provider-delivery, or restore-rehearsal evidence.
+
+
 - Verify `GET_LOCK` behavior and timeout handling on the actual database/hosting platform.
 - Run schema upgrades from versions 1–12 on disposable database copies.
 - Validate login, REST nonce behavior, cafe-owner isolation, cancellation, table assignment, finance balance and CSV export permissions.
