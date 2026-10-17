@@ -170,9 +170,9 @@ if ( false === strpos( $theme_settings, "'sanitize_callback' => 'sanitize_hex_co
 	false === strpos( $theme_polish, '.mtn-theme-toggle' ) ||
 	false === strpos( $settings_wizard, 'checkValidity()' ) ||
 	false === strpos( $settings_wizard, 'mtn_cb_booking_duration_minutes' ) ||
-	false === strpos( $plugin_main, "Version: 0.14.0" ) ||
-	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.14.0' )" ) ||
-	false === strpos( $theme_style, 'Version: 0.5.0' ) ) {
+	false === strpos( $plugin_main, "Version: 0.15.0" ) ||
+	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.15.0' )" ) ||
+	false === strpos( $theme_style, 'Version: 0.6.0' ) ) {
 	fwrite( STDERR, "Theme preferences, persistent shell controls, settings wizard, or release versions are missing.\n" );
 	exit( 1 );
 }
