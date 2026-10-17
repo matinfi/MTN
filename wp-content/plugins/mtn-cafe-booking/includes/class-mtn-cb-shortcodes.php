@@ -81,7 +81,7 @@ final class MTN_CB_Shortcodes {
 				<p class="mtn-booking-status" role="status" aria-live="polite"></p>
 				<p class="mtn-booking-login" hidden></p>
 			</form>
-			<p class="mtn-booking-disclaimer"><?php esc_html_e( 'لغو رزرو فقط تا ۳ ساعت پس از ثبت درخواست ممکن است. پیش‌پرداخت ۱۰۰ لیر در صورت لغو مشتری قابل استرداد نیست. باقی مبلغ در محل کافه پرداخت می‌شود. پرداخت آنلاین در نسخه اول فعال نیست؛ شماره پیگیری انتقال وجه باید برای بررسی مدیر ثبت شود.', 'mtn-cafe-booking' ); ?></p>
+			<p class="mtn-booking-disclaimer"><?php esc_html_e( 'لغو رزرو فقط تا ۳ ساعت پس از ثبت درخواست ممکن است. پیش‌پرداخت ۱۰۰ لیر در صورت لغو مشتری قابل استرداد نیست. باقی مبلغ در محل کافه پرداخت می‌شود. پرداخت آنلاین در نسخه اول فعال نیست؛ شماره پیگیری انتقال وجه باید برای بررسی مدیر ثبت شود. قوانین کامل را در صفحه <a href="' . esc_url( home_url( '/booking-policy/' ) ) . '">قوانین رزرو و پیش‌پرداخت</a> بخوانید.', 'mtn-cafe-booking' ); ?></p>
 		</section>
 		<?php
 		return ob_get_clean();
