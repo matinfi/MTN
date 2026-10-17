@@ -142,7 +142,7 @@ final class MTN_CB_Settings {
 	}
 
 	public static function sanitize_mode( $value ) {
-		return in_array( $value, array( 'customer_selects_table', 'cafe_assigns_table' ), true ) ? $value : 'customer_selects_table';
+		return 'cafe_assigns_table';
 	}
 
 	public static function render() {
@@ -177,7 +177,7 @@ final class MTN_CB_Settings {
 					<tr><th><label for="mtn_cb_bank_iban"><?php esc_html_e( 'شماره IBAN حساب مقصد', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" dir="ltr" id="mtn_cb_bank_iban" name="mtn_cb_bank_iban" value="<?php echo esc_attr( get_option( 'mtn_cb_bank_iban', '' ) ); ?>" maxlength="34"><p class="description"><?php esc_html_e( 'حساب بانکی تأییدشده سایت را وارد کنید. برای انتشار عمومی، صحت مالکیت حساب را بررسی کنید.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_bank_instructions"><?php esc_html_e( 'راهنمای انتقال وجه', 'mtn-cafe-booking' ); ?></label></th><td><textarea class="large-text" rows="3" id="mtn_cb_bank_instructions" name="mtn_cb_bank_instructions"><?php echo esc_textarea( get_option( 'mtn_cb_bank_instructions', '' ) ); ?></textarea></td></tr>
 					<tr><th><label for="mtn_cb_support_whatsapp"><?php esc_html_e( 'واتساپ پشتیبانی', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" dir="ltr" id="mtn_cb_support_whatsapp" name="mtn_cb_support_whatsapp" value="<?php echo esc_attr( get_option( 'mtn_cb_support_whatsapp', '' ) ); ?>"><p class="description"><?php esc_html_e( 'شماره بین‌المللی فقط با ارقام؛ لینک چت دستی ساخته می‌شود و ربات یا ارسال خودکار پیام بدون اتصال رسمی فعال نیست.', 'mtn-cafe-booking' ); ?></p></td></tr>
-					<tr><th><label for="mtn_cb_booking_mode"><?php esc_html_e( 'روش انتخاب میز', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_booking_mode" name="mtn_cb_booking_mode"><option value="customer_selects_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'customer_selects_table' ); ?>><?php esc_html_e( 'انتخاب توسط مشتری', 'mtn-cafe-booking' ); ?></option><option value="cafe_assigns_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'cafe_assigns_table' ); ?>><?php esc_html_e( 'تخصیص توسط کافه', 'mtn-cafe-booking' ); ?></option></select></td></tr>
+					<tr><th><?php esc_html_e( 'تخصیص میز در نسخه اول', 'mtn-cafe-booking' ); ?></th><td><input type="hidden" name="mtn_cb_booking_mode" value="cafe_assigns_table"><strong><?php esc_html_e( 'تخصیص توسط مدیریت/مکان؛ انتخاب میز دقیق توسط مشتری در فاز بعد', 'mtn-cafe-booking' ); ?></strong></td></tr>
 				</table>
 				<?php submit_button(); ?>
 			</form>
