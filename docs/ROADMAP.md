@@ -10,7 +10,7 @@
 ## Phase 1 — core booking
 - [x] Cafe, event and table WordPress content types with administrator metadata forms
 - [x] Hierarchical cafe-location taxonomy supports country, city, area and neighborhood terms.
-- [x] Basic event headcount limits, selected-table overlap checks and per-cafe database locking (integration/concurrency tests still required)
+- [x] Basic event headcount limits, selected-table overlap checks and per-cafe database locking (overlap and lock-contention integration tests pass; multi-process race remains)
 - [x] Advisory availability API with event date/hour validation and selected-table filtering
 - [x] Manual table assignment from the cafe dashboard with locked overlap validation
 - [ ] Full schedule-aware capacity allocation and automatic table assignment
@@ -27,7 +27,7 @@
 - [x] Fixed commission amount/currency and configurable trigger (`confirmed` by default, `completed` optional) snapshotted at booking creation
 - [x] Administrator reconciliation summary by cafe/currency (accruals, reversals, settlements, adjustments and net outstanding balance)
 - [x] Monthly cafe statement emails, configurable due-date policy and overdue balance report (external bank reconciliation remains manual)
-- [x] Secure one-time check-in token, configurable expiry and append-only audit history (end-to-end tests still required)
+- [x] Secure one-time check-in token, configurable expiry and append-only audit history (privacy/authorization are tested; full staging journey remains)
 - [x] Event cancellation commission reversal policy snapshotted per booking
 - [x] Manual settlement records and ledger CSV export
 
@@ -39,8 +39,11 @@
 
 ## Phase 4 — release readiness
 - [x] Initial PHPUnit settings and cafe-team authorization tests plus WordPress CI harness
-- [ ] Full booking integration, REST privacy and concurrency tests (static source-contract checks are not substitutes).
+- [x] Booking lifecycle/commission reversal, idempotency/customer isolation, overlapping-table rejection, selected REST privacy, OTP authentication/replay and abuse-control integration tests.
+- [ ] Full REST permission/privacy matrix and true multi-process capacity-race test.
 - [ ] Accessibility and responsive QA
-- [ ] Clean WordPress install/upgrade/uninstall tests
-- [ ] Independent theme/plugin ZIP packaging and release workflow
-- [ ] Security review, staging acceptance and operational runbook
+- [x] Clean WordPress plugin/theme package extraction and schema activation smoke test.
+- [ ] Historical schema migrations from every supported old version and uninstall/data-retention review.
+- [x] Independent plugin/theme ZIP packaging workflow and extraction smoke test.
+- [x] Deployment and operational runbook.
+- [ ] Independent security review and staging acceptance.
