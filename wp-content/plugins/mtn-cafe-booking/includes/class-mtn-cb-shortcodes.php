@@ -14,13 +14,14 @@ final class MTN_CB_Shortcodes {
 		add_shortcode( 'mtn_cafe_dashboard', array( __CLASS__, 'cafe_dashboard' ) );
 		add_shortcode( 'mtn_support_whatsapp', array( __CLASS__, 'support_whatsapp' ) );
 		add_shortcode( 'mtn_event_search', array( __CLASS__, 'event_search' ) );
+		add_shortcode( 'mtn_my_favorites', array( __CLASS__, 'my_favorites' ) );
 		add_shortcode( 'mtn_cafe_invite_accept', array( 'MTN_CB_Team_Invites', 'accept_form' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 	}
 
 	public static function register_assets() {
 		wp_register_script( 'mtn-cb-discovery', MTN_CB_URL . 'assets/event-discovery.js', array(), MTN_CB_VERSION, true );
-		wp_localize_script( 'mtn-cb-discovery', 'MTNCBDiscovery', array( 'restUrl' => esc_url_raw( rest_url( 'mtn/v1/' ) ), 'nonce' => wp_create_nonce( 'wp_rest' ) ) );
+		wp_localize_script( 'mtn-cb-discovery', 'MTNCBDiscovery', array( 'restUrl' => esc_url_raw( rest_url( 'mtn/v1/' ) ), 'nonce' => wp_create_nonce( 'wp_rest' ), 'loggedIn' => is_user_logged_in(), 'loginUrl' => wp_login_url( get_permalink() ) ) );
 		wp_register_script(
 			'mtn-cb-wizard',
 			MTN_CB_URL . 'assets/booking-wizard.js',
@@ -84,6 +85,23 @@ final class MTN_CB_Shortcodes {
 		</section>
 		<?php
 		return ob_get_clean();
+	}
+
+	public static function my_favorites() {
+		if ( ! is_user_logged_in() ) {
+			return '<section class="mtn-booking-panel"><p>' . esc_html__( 'برای مشاهده برنامه‌های ذخیره‌شده وارد حساب شوید.', 'mtn-cafe-booking' ) . '</p><a class="button" href="' . esc_url( wp_login_url( get_permalink() ) ) . '">' . esc_html__( 'ورود به حساب', 'mtn-cafe-booking' ) . '</a></section>';
+		}
+		$ids = get_user_meta( get_current_user_id(), 'mtn_cb_favorite_event_ids', true );
+		$ids = is_array( $ids ) ? array_values( array_filter( array_map( 'absint', $ids ) ) ) : array();
+		$events = $ids ? get_posts( array( 'post_type' => 'mtn_event', 'post_status' => 'publish', 'post__in' => $ids, 'orderby' => 'post__in', 'numberposts' => 100 ) ) : array();
+		$out = '<section class="mtn-booking-panel"><h2>' . esc_html__( 'برنامه‌های ذخیره‌شده', 'mtn-cafe-booking' ) . '</h2>';
+		if ( ! $events ) return $out . '<p>' . esc_html__( 'هنوز برنامه‌ای ذخیره نکرده‌اید.', 'mtn-cafe-booking' ) . '</p><a class="button" href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'جست‌وجوی برنامه‌ها', 'mtn-cafe-booking' ) . '</a></section>';
+		$out .= '<ul>';
+		foreach ( $events as $event ) {
+			$date = get_post_meta( $event->ID, 'mtn_event_date', true );
+			$out .= '<li><a href="' . esc_url( get_permalink( $event ) ) . '">' . esc_html( get_the_title( $event ) ) . '</a>' . ( $date ? ' — ' . esc_html( $date ) : '' ) . '</li>';
+		}
+		return $out . '</ul></section>';
 	}
 
 	public static function event_search() {
