@@ -8,6 +8,16 @@
     <a class="button" href="<?php echo esc_url( home_url( '/book/' ) ); ?>"><?php esc_html_e( 'رزرو میز', 'mtn-cafe-theme' ); ?></a>
   </div>
 </section>
+<section class="mtn-home-search" data-mtn-home-search aria-labelledby="mtn-home-search-title">
+  <div class="mtn-home-search-head"><div><p class="eyebrow">جست‌وجوی هوشمند</p><h2 id="mtn-home-search-title">کافه یا برنامه بعدی‌ات را پیدا کن</h2></div><span class="mtn-nav-icon" aria-hidden="true">⌕</span></div>
+  <form class="mtn-home-search-form" role="search">
+    <input class="mtn-search-query" type="search" name="q" autocomplete="off" placeholder="نام کافه، شهر، هنرمند یا برنامه…" aria-label="جست‌وجو در کافه‌ها و برنامه‌ها">
+    <select name="kind" aria-label="نوع نتیجه"><option value="all">همه موارد</option><option value="cafe">فقط کافه‌ها</option><option value="event">فقط برنامه‌ها</option></select>
+    <button class="button" type="submit">جست‌وجو</button>
+  </form>
+  <p class="mtn-search-status" data-search-status role="status" aria-live="polite">در حال آماده‌سازی جست‌وجو…</p>
+  <div class="mtn-home-search-results" data-search-results></div>
+</section>
 <section class="section container">
   <div class="section-heading"><div><p class="eyebrow"><?php esc_html_e( 'برنامه‌های تازه', 'mtn-cafe-theme' ); ?></p><h2><?php esc_html_e( 'این شب‌ها چه خبره؟', 'mtn-cafe-theme' ); ?></h2></div><a href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'همه برنامه‌ها', 'mtn-cafe-theme' ); ?> ←</a></div>
   <?php $mtn_events = new WP_Query( array( 'post_type' => 'mtn_event', 'post_status' => 'publish', 'posts_per_page' => 3, 'meta_key' => 'mtn_event_date', 'orderby' => 'meta_value', 'order' => 'ASC', 'meta_query' => array( 'relation' => 'AND', array( 'key' => 'mtn_event_date', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ), array( 'key' => 'mtn_event_start_time', 'value' => '', 'compare' => '!=' ) ) ) ); ?>

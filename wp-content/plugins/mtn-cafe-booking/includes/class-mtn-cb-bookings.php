@@ -228,7 +228,11 @@ final class MTN_CB_Bookings {
 
 		$booking_id = (int) $wpdb->insert_id;
 		self::record_event( $booking_id, $user_id, 'booking_created', '', 'pending_cafe', '' );
-		return self::get_by_id( $booking_id );
+		$booking = self::get_by_id( $booking_id );
+		if ( $booking ) {
+			do_action( 'mtn_cb_booking_created', $booking );
+		}
+		return $booking;
 	}
 
 	/**

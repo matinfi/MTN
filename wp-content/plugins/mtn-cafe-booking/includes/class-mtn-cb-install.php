@@ -211,13 +211,13 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( '4' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
+		if ( '6' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
 			'book' => array( 'title' => 'رزرو کافه', 'content' => '[mtn_booking_form]' ),
 			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]' ),
-			'cafe-dashboard' => array( 'title' => 'مدیریت کافه', 'content' => '[mtn_cafe_dashboard]' ),
+			'cooperation' => array( 'title' => 'درخواست همکاری', 'content' => '[mtn_cooperation_form]' ),
 		);
 		foreach ( $pages as $slug => $page ) {
 			if ( ! get_page_by_path( $slug, OBJECT, 'page' ) ) {
@@ -230,6 +230,10 @@ final class MTN_CB_Install {
 					'post_author' => get_current_user_id(),
 				) );
 			}
+		}
+		$legacy_dashboard = get_page_by_path( 'cafe-dashboard', OBJECT, 'page' );
+		if ( $legacy_dashboard && false !== strpos( (string) $legacy_dashboard->post_content, '[mtn_cafe_dashboard]' ) ) {
+			wp_update_post( array( 'ID' => $legacy_dashboard->ID, 'post_status' => 'draft' ) );
 		}
 		update_option( 'mtn_cb_default_pages_created', 1 );
 		$account_page = get_page_by_path( 'my-account', OBJECT, 'page' );
@@ -244,7 +248,7 @@ final class MTN_CB_Install {
 				wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_content ) );
 			}
 		}
-		update_option( 'mtn_cb_default_pages_version', '4' );
+		update_option( 'mtn_cb_default_pages_version', '6' );
 	}
 
 	public static function maybe_upgrade() {

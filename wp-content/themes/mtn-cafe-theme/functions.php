@@ -18,7 +18,12 @@ function mtn_cafe_theme_setup() {
 add_action( 'after_setup_theme', 'mtn_cafe_theme_setup' );
 
 function mtn_cafe_enqueue_assets() {
-	wp_enqueue_style( 'mtn-cafe-style', get_stylesheet_uri(), array(), '0.2.1' );
+	wp_enqueue_style( 'mtn-cafe-style', get_stylesheet_uri(), array(), '0.3.0' );
+	wp_enqueue_script( 'mtn-cafe-app', get_template_directory_uri() . '/assets/app-shell.js', array(), '0.3.0', true );
+	if ( is_front_page() ) {
+		wp_enqueue_script( 'mtn-cafe-home-search', get_template_directory_uri() . '/assets/home-search.js', array(), '0.3.0', true );
+		wp_localize_script( 'mtn-cafe-home-search', 'MTNHomeSearch', array( 'catalogUrl' => esc_url_raw( rest_url( 'mtn/v1/catalog' ) ) ) );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'mtn_cafe_enqueue_assets' );
 
