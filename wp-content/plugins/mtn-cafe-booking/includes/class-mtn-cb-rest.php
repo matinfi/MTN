@@ -377,6 +377,11 @@ final class MTN_CB_Rest {
 				array( 'key' => 'mtn_event_start_time', 'value' => '', 'compare' => '!=' ),
 			),
 		) );
+		$popular_counts = array();
+		if ( 'popular' === $sort ) {
+			$count_rows = $wpdb->get_results( "SELECT event_id, COUNT(*) AS total FROM " . MTN_CB_Bookings::table_name() . " WHERE status IN ('pending_cafe','confirmed','completed','no_show') GROUP BY event_id" );
+			foreach ( $count_rows as $count_row ) $popular_counts[ absint( $count_row->event_id ) ] = (int) $count_row->total;
+		}
 		$items = array();
 		foreach ( $posts as $event ) {
 			$cafe_id = absint( get_post_meta( $event->ID, 'mtn_cafe_id', true ) );
@@ -405,10 +410,7 @@ final class MTN_CB_Rest {
 				$a = sin( ( ( (float) $clat - $lat ) * $rad ) / 2 ) ** 2 + cos( $lat * $rad ) * cos( (float) $clat * $rad ) * sin( ( ( (float) $clng - $lng ) * $rad ) / 2 ) ** 2;
 				$distance = 6371 * 2 * atan2( sqrt( $a ), sqrt( max( 0, 1 - $a ) ) );
 			}
-			$booking_count = 0;
-			if ( 'popular' === $sort ) {
-				$booking_count = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . MTN_CB_Bookings::table_name() . ' WHERE event_id = %d AND status IN (%s,%s,%s,%s)', $event->ID, 'pending_cafe', 'confirmed', 'completed', 'no_show' ) );
-			}
+			$booking_count = isset( $popular_counts[ $event->ID ] ) ? $popular_counts[ $event->ID ] : 0;
 			$items[] = array(
 				'id' => (int) $event->ID, 'name' => get_the_title( $event ), 'url' => get_permalink( $event ),
 				'description' => wp_strip_all_tags( get_the_excerpt( $event ) ), 'cafe_id' => $cafe_id, 'cafe_name' => get_the_title( $cafe ),
