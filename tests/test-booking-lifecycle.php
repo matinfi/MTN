@@ -38,6 +38,10 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 		) );
 		$this->assertNotWPError( $booking );
 		$this->assertSame( 'pending_cafe', $booking->status );
+		$unpaid_confirmation = MTN_CB_Bookings::transition( $booking->id, 'confirmed', $admin_id, 'must_be_blocked_until_deposit_verified' );
+		$this->assertWPError( $unpaid_confirmation );
+		$this->assertSame( 'mtn_deposit_unverified', $unpaid_confirmation->get_error_code() );
+		$wpdb->update( MTN_CB_Bookings::table_name(), array( 'deposit_status' => 'verified' ), array( 'id' => $booking->id ), array( '%s' ), array( '%d' ) );
 		$confirmed = MTN_CB_Bookings::transition( $booking->id, 'confirmed', $admin_id, 'lifecycle_test_confirmed' );
 		$this->assertNotWPError( $confirmed );
 		$this->assertSame( 'confirmed', $confirmed->status );
