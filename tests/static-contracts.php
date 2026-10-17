@@ -114,8 +114,8 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $invites, 'public static function accept_from_form' ) ||
 	false === strpos( $invites, 'hash( \'sha256\', $token )' ) ||
 	false === strpos( $install, 'checkin_token_hash char(64)' ) ||
-	false === strpos( $bookings, "'commission_trigger_status' => $commission_trigger_status" ) ||
-	false === strpos( $bookings, "'commission_reverse_on_cancellation' => $commission_reverse_on_cancellation" ) ||
+	false === strpos( $bookings, "'commission_trigger_status' => \$commission_trigger_status" ) ||
+	false === strpos( $bookings, "'commission_reverse_on_cancellation' => \$commission_reverse_on_cancellation" ) ||
 	false === strpos( $bookings, 'public static function issue_checkin_token' ) ||
 	false === strpos( $bookings, 'public static function check_in_with_token' ) ||
 	false === strpos( $finance, '$booking->commission_trigger_status' ) ||
