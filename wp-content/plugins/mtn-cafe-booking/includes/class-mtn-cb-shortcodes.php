@@ -11,7 +11,6 @@ final class MTN_CB_Shortcodes {
 	public static function init() {
 		add_shortcode( 'mtn_booking_form', array( __CLASS__, 'booking_form' ) );
 		add_shortcode( 'mtn_my_bookings', array( __CLASS__, 'my_bookings' ) );
-		add_shortcode( 'mtn_cafe_dashboard', array( __CLASS__, 'cafe_dashboard' ) );
 		add_shortcode( 'mtn_cafe_invite_accept', array( 'MTN_CB_Team_Invites', 'accept_form' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 	}
@@ -74,17 +73,6 @@ final class MTN_CB_Shortcodes {
 		</section>
 		<?php
 		return ob_get_clean();
-	}
-
-	public static function cafe_dashboard() {
-		self::enqueue_assets();
-		if ( ! is_user_logged_in() ) {
-			return '<section class="mtn-booking-panel"><p>' . esc_html__( 'برای مدیریت رزروها وارد حساب مدیر کافه شوید.', 'mtn-cafe-booking' ) . '</p><a class="button" href="' . esc_url( wp_login_url( get_permalink() ) ) . '">' . esc_html__( 'ورود به حساب', 'mtn-cafe-booking' ) . '</a></section>';
-		}
-		if ( ! current_user_can( 'mtn_manage_cafes' ) && ! current_user_can( 'manage_options' ) ) {
-			return '<section class="mtn-booking-panel"><p>' . esc_html__( 'این حساب به پنل مدیریت کافه دسترسی ندارد.', 'mtn-cafe-booking' ) . '</p></section>';
-		}
-		return '<section class="mtn-booking-panel" data-mtn-cafe-dashboard><h2>' . esc_html__( 'مدیریت رزروهای کافه', 'mtn-cafe-booking' ) . '</h2><p class="mtn-booking-status" role="status" aria-live="polite">' . esc_html__( 'در حال دریافت رزروها…', 'mtn-cafe-booking' ) . '</p><form class="mtn-checkin-form"><label for="mtn-checkin-token">' . esc_html__( 'کد یک‌بارمصرف اعلام حضور مشتری', 'mtn-cafe-booking' ) . '</label><div class="mtn-booking-actions"><input id="mtn-checkin-token" name="token" type="text" inputmode="text" autocomplete="off" pattern="[a-fA-F0-9]{64}" maxlength="64" required><button type="submit" class="button">' . esc_html__( 'ثبت حضور', 'mtn-cafe-booking' ) . '</button></div></form><div class="mtn-cafe-booking-list"></div></section>';
 	}
 
 	public static function my_bookings() {
