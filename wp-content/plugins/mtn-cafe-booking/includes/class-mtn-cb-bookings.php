@@ -214,7 +214,7 @@ final class MTN_CB_Bookings {
 				'created_at'             => $now,
 				'updated_at'             => $now,
 			),
-			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%s', '%s', '%d', '%d', '%d', '%s', '%s' )
 		);
 
 		if ( false === $inserted ) {
