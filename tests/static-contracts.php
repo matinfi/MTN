@@ -30,9 +30,11 @@ $app_shell_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/app-shell.js
 $home_search_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/home-search.js';
 $theme_settings_path = $root . '/wp-content/themes/mtn-cafe-theme/inc/theme-settings.php';
 $settings_wizard_path = $root . '/wp-content/plugins/mtn-cafe-booking/assets/settings-wizard.js';
+$admin_design_path = $root . '/wp-content/plugins/mtn-cafe-booking/assets/admin-design-system.css';
 $plugin_main_path = $root . '/wp-content/plugins/mtn-cafe-booking/mtn-cafe-booking.php';
 $theme_settings = file_get_contents( $theme_settings_path );
 $settings_wizard = file_get_contents( $settings_wizard_path );
+$admin_design = file_get_contents( $admin_design_path );
 $plugin_main = file_get_contents( $plugin_main_path );
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
@@ -57,7 +59,7 @@ $cooperation = file_get_contents( $cooperation_path );
 $app_shell = file_get_contents( $app_shell_path );
 $home_search = file_get_contents( $home_search_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style, $cafe_actions, $cooperation, $app_shell, $home_search, $theme_polish, $theme_functions, $theme_home, $theme_settings, $settings_wizard, $plugin_main ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style, $cafe_actions, $cooperation, $app_shell, $home_search, $theme_polish, $theme_functions, $theme_home, $theme_settings, $settings_wizard, $plugin_main, $admin_design ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -173,11 +175,11 @@ if ( false === strpos( $theme_settings, "'sanitize_callback' => 'sanitize_hex_co
 	exit( 1 );
 }
 
-if ( false === strpos( $cooperation, "wp_mail( $admin_email, $subject, $message )" ) ||
+if ( false === strpos( $cooperation, 'wp_mail( $admin_email, $subject, $message )' ) ||
 	false === strpos( $cooperation, "admin_url( 'edit.php?post_type=mtn_cooperation_request' )" ) ||
 	false === strpos( $plugin_main, "'mtn_cb_whatsapp_number'" ) ||
 	false === strpos( $theme_polish, '.mtn-whatsapp-float' ) ||
-	false === strpos( $theme_polish, '.mtn-admin-metrics' ) ) {
+	false === strpos( $admin_design, '.mtn-admin-metrics' ) ) {
 	fwrite( STDERR, "Cooperation notification, WhatsApp contact, or admin dashboard UI contract is missing.\n" );
 	exit( 1 );
 }
