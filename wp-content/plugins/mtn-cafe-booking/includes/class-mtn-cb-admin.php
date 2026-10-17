@@ -36,7 +36,7 @@ final class MTN_CB_Admin {
 		$pending_deposits = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$bookings_table} WHERE deposit_status = %s", 'under_review' ) );
 		$published_cafes = (int) wp_count_posts( 'mtn_cafe' )->publish;
 		$published_events = (int) wp_count_posts( 'mtn_event' )->publish;
-		$pending_applications = (int) wp_count_posts( 'mtn_partner_application' )->pending;
+		$pending_applications = (int) wp_count_posts( 'mtn_application' )->pending;
 		$bank_configured = '' !== trim( (string) get_option( 'mtn_cb_bank_account_name', '' ) ) && '' !== trim( (string) get_option( 'mtn_cb_bank_iban', '' ) );
 		?>
 		<div class="wrap mtn-admin-dashboard">
@@ -64,7 +64,7 @@ final class MTN_CB_Admin {
 						<a title="کافه‌ها و رستوران‌ها" aria-label="کافه‌ها و رستوران‌ها" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_cafe' ) ); ?>"><span aria-hidden="true">☕</span> <span class="mtn-admin-nav-label">کافه‌ها و رستوران‌ها</span></a>
 						<a title="برنامه‌ها و تأیید انتشار" aria-label="برنامه‌ها و تأیید انتشار" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_event' ) ); ?>"><span aria-hidden="true">♫</span> <span class="mtn-admin-nav-label">برنامه‌ها و تأیید انتشار</span></a>
 						<a title="هنرمندان" aria-label="هنرمندان" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_artist' ) ); ?>"><span aria-hidden="true">♪</span> <span class="mtn-admin-nav-label">هنرمندان</span></a>
-						<a title="درخواست‌های همکاری" aria-label="درخواست‌های همکاری" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_partner_application' ) ); ?>"><span aria-hidden="true">✉</span> <span class="mtn-admin-nav-label">درخواست‌های همکاری</span></a>
+						<a title="درخواست‌های همکاری" aria-label="درخواست‌های همکاری" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_application' ) ); ?>"><span aria-hidden="true">✉</span> <span class="mtn-admin-nav-label">درخواست‌های همکاری</span></a>
 						<a title="تنظیمات و بانک" aria-label="تنظیمات و بانک" href="<?php echo esc_url( admin_url( 'options-general.php?page=mtn-cafe-booking' ) ); ?>"><span aria-hidden="true">⚙</span> <span class="mtn-admin-nav-label">تنظیمات و بانک</span></a>
 					</nav>
 				</aside>
@@ -76,7 +76,7 @@ final class MTN_CB_Admin {
 						<div class="mtn-admin-card"><span><?php esc_html_e( 'انتقال‌های در انتظار تطبیق', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $pending_deposits; ?></strong><a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>"><?php esc_html_e( 'تطبیق رسیدها', 'mtn-cafe-booking' ); ?></a></div>
 						<div class="mtn-admin-card"><span><?php esc_html_e( 'کافه/رستوران منتشرشده', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $published_cafes; ?></strong><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_cafe' ) ); ?>"><?php esc_html_e( 'مدیریت مکان‌ها', 'mtn-cafe-booking' ); ?></a></div>
 						<div class="mtn-admin-card"><span><?php esc_html_e( 'برنامه منتشرشده', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $published_events; ?></strong><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_event' ) ); ?>"><?php esc_html_e( 'مدیریت برنامه‌ها', 'mtn-cafe-booking' ); ?></a></div>
-						<div class="mtn-admin-card"><span><?php esc_html_e( 'درخواست همکاری در صف', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $pending_applications; ?></strong><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_partner_application' ) ); ?>"><?php esc_html_e( 'بررسی همکاری‌ها', 'mtn-cafe-booking' ); ?></a></div>
+						<div class="mtn-admin-card"><span><?php esc_html_e( 'درخواست همکاری در صف', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $pending_applications; ?></strong><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_application' ) ); ?>"><?php esc_html_e( 'بررسی همکاری‌ها', 'mtn-cafe-booking' ); ?></a></div>
 					</div>
 				</main>
 			</div>
