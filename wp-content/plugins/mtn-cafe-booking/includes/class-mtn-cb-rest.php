@@ -196,6 +196,16 @@ final class MTN_CB_Rest {
 
 		register_rest_route(
 			self::NS,
+			'/events',
+			array(
+				'methods' => WP_REST_Server::READABLE,
+				'callback' => array( __CLASS__, 'events_search' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		register_rest_route(
+			self::NS,
 			'/availability',
 			array(
 				'methods' => WP_REST_Server::READABLE,
@@ -329,6 +339,76 @@ final class MTN_CB_Rest {
 			);
 		}
 		return rest_ensure_response( array( 'cafes' => $cafes, 'events' => $events, 'timezone' => wp_timezone_string(), 'booking_mode' => get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) );
+	}
+
+	public static function events_search( WP_REST_Request $request ) {
+		global $wpdb;
+		$page = max( 1, absint( $request->get_param( 'page' ) ) );
+		$per_page = min( 24, max( 1, absint( $request->get_param( 'per_page' ) ) ?: 12 ) );
+		$search = sanitize_text_field( (string) $request->get_param( 'q' ) );
+		$city_filter = sanitize_text_field( (string) $request->get_param( 'city' ) );
+		$genre_filter = sanitize_text_field( (string) $request->get_param( 'genre' ) );
+		$type_filter = sanitize_text_field( (string) $request->get_param( 'venue_type' ) );
+		$artist_filter = sanitize_text_field( (string) $request->get_param( 'artist' ) );
+		$date_from = sanitize_text_field( (string) $request->get_param( 'date_from' ) );
+		$date_to = sanitize_text_field( (string) $request->get_param( 'date_to' ) );
+		$min_price = null !== $request->get_param( 'min_price' ) && '' !== $request->get_param( 'min_price' ) ? max( 0, (float) $request->get_param( 'min_price' ) ) : null;
+		$max_price = null !== $request->get_param( 'max_price' ) && '' !== $request->get_param( 'max_price' ) ? max( 0, (float) $request->get_param( 'max_price' ) ) : null;
+		$lat = is_numeric( $request->get_param( 'lat' ) ) ? (float) $request->get_param( 'lat' ) : null;
+		$lng = is_numeric( $request->get_param( 'lng' ) ) ? (float) $request->get_param( 'lng' ) : null;
+		$sort = sanitize_key( (string) $request->get_param( 'sort' ) );
+		$posts = get_posts( array(
+			'post_type' => 'mtn_event', 'post_status' => 'publish', 'posts_per_page' => 500,
+			'meta_key' => 'mtn_event_date', 'orderby' => 'meta_value', 'order' => 'ASC',
+			'meta_query' => array( 'relation' => 'AND',
+				array( 'key' => 'mtn_event_date', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=', 'type' => 'DATE' ),
+				array( 'key' => 'mtn_event_start_time', 'value' => '', 'compare' => '!=' ),
+			),
+		) );
+		$items = array();
+		foreach ( $posts as $event ) {
+			$cafe_id = absint( get_post_meta( $event->ID, 'mtn_cafe_id', true ) );
+			$cafe = get_post( $cafe_id );
+			if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status ) continue;
+			$artist = sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_artist', true ) );
+			$city = sanitize_text_field( get_post_meta( $cafe_id, 'mtn_cafe_city', true ) );
+			$genre = sanitize_text_field( get_post_meta( $cafe_id, 'mtn_cafe_music_genre', true ) );
+			$venue_type = sanitize_text_field( get_post_meta( $cafe_id, 'mtn_cafe_type', true ) );
+			$price = (float) get_post_meta( $event->ID, 'mtn_event_price', true );
+			$date = sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_date', true ) );
+			if ( $search && false === stripos( get_the_title( $event ) . ' ' . get_the_title( $cafe ) . ' ' . $artist . ' ' . $city, $search ) ) continue;
+			if ( $city_filter && false === stripos( $city, $city_filter ) ) continue;
+			if ( $genre_filter && false === stripos( $genre, $genre_filter ) ) continue;
+			if ( $type_filter && $venue_type !== $type_filter ) continue;
+			if ( $artist_filter && false === stripos( $artist, $artist_filter ) ) continue;
+			if ( $date_from && $date < $date_from ) continue;
+			if ( $date_to && $date > $date_to ) continue;
+			if ( null !== $min_price && $price < $min_price ) continue;
+			if ( null !== $max_price && $price > $max_price ) continue;
+			$clat = get_post_meta( $cafe_id, 'mtn_cafe_latitude', true );
+			$clng = get_post_meta( $cafe_id, 'mtn_cafe_longitude', true );
+			$distance = null;
+			if ( null !== $lat && null !== $lng && is_numeric( $clat ) && is_numeric( $clng ) ) {
+				$rad = M_PI / 180;
+				$a = sin( ( ( (float) $clat - $lat ) * $rad ) / 2 ) ** 2 + cos( $lat * $rad ) * cos( (float) $clat * $rad ) * sin( ( ( (float) $clng - $lng ) * $rad ) / 2 ) ** 2;
+				$distance = 6371 * 2 * atan2( sqrt( $a ), sqrt( max( 0, 1 - $a ) ) );
+			}
+			$booking_count = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . MTN_CB_Bookings::table_name() . ' WHERE event_id = %d AND status IN (%s,%s,%s,%s)', $event->ID, 'pending_cafe', 'confirmed', 'completed', 'no_show' ) );
+			$items[] = array(
+				'id' => (int) $event->ID, 'name' => get_the_title( $event ), 'url' => get_permalink( $event ),
+				'description' => wp_strip_all_tags( get_the_excerpt( $event ) ), 'cafe_id' => $cafe_id, 'cafe_name' => get_the_title( $cafe ),
+				'city' => $city, 'genre' => $genre, 'venue_type' => $venue_type, 'artist' => $artist, 'price' => $price,
+				'event_date' => $date, 'event_start_time' => get_post_meta( $event->ID, 'mtn_event_start_time', true ),
+				'image' => get_the_post_thumbnail_url( $event, 'large' ) ?: '', 'latitude' => is_numeric( $clat ) ? (float) $clat : null,
+				'longitude' => is_numeric( $clng ) ? (float) $clng : null, 'distance_km' => null === $distance ? null : round( $distance, 1 ),
+				'booking_count' => $booking_count,
+			);
+		}
+		if ( 'popular' === $sort ) usort( $items, static function ( $a, $b ) { return $b['booking_count'] <=> $a['booking_count']; } );
+		elseif ( 'distance' === $sort && null !== $lat && null !== $lng ) usort( $items, static function ( $a, $b ) { return ( $a['distance_km'] ?? PHP_FLOAT_MAX ) <=> ( $b['distance_km'] ?? PHP_FLOAT_MAX ); } );
+		$total = count( $items );
+		$items = array_slice( $items, ( $page - 1 ) * $per_page, $per_page );
+		return rest_ensure_response( array( 'items' => $items, 'page' => $page, 'per_page' => $per_page, 'total' => $total, 'has_more' => $page * $per_page < $total ) );
 	}
 
 	public static function availability( WP_REST_Request $request ) {
