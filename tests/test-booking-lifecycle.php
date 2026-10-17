@@ -100,4 +100,34 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 		$this->assertNotWPError( $other_customer );
 		$this->assertNotSame( (int) $first->id, (int) $other_customer->id, 'Idempotency keys must not collide across customers.' );
 	}
+
+	public function test_overlapping_reservations_cannot_claim_the_same_table() {
+		$cafe_id = self::factory()->post->create( array( 'post_type' => 'mtn_cafe', 'post_status' => 'publish' ) );
+		$event_id = self::factory()->post->create( array( 'post_type' => 'mtn_event', 'post_status' => 'publish' ) );
+		$table_id = self::factory()->post->create( array( 'post_type' => 'mtn_table', 'post_status' => 'publish' ) );
+		$event_date = new DateTimeImmutable( 'tomorrow', wp_timezone() );
+		update_post_meta( $event_id, 'mtn_cafe_id', $cafe_id );
+		update_post_meta( $event_id, 'mtn_event_date', $event_date->format( 'Y-m-d' ) );
+		update_post_meta( $event_id, 'mtn_event_start_time', '18:00' );
+		update_post_meta( $event_id, 'mtn_event_end_time', '23:00' );
+		update_post_meta( $event_id, 'mtn_event_capacity', 10 );
+		update_post_meta( $event_id, 'mtn_max_party_size', 4 );
+		update_post_meta( $table_id, 'mtn_cafe_id', $cafe_id );
+		update_post_meta( $table_id, 'mtn_table_capacity', 4 );
+		update_post_meta( $table_id, 'mtn_table_active', 1 );
+		$args = array(
+			'cafe_id' => $cafe_id,
+			'event_id' => $event_id,
+			'table_id' => $table_id,
+			'party_size' => 2,
+			'booking_at' => $event_date->setTime( 20, 0 )->format( 'Y-m-d H:i:s' ),
+		);
+		wp_set_current_user( self::factory()->user->create() );
+		$first = MTN_CB_Bookings::create( $args );
+		$this->assertNotWPError( $first );
+		wp_set_current_user( self::factory()->user->create() );
+		$second = MTN_CB_Bookings::create( $args );
+		$this->assertWPError( $second );
+		$this->assertSame( 'mtn_table_time_conflict', $second->get_error_code() );
+	}
 }
