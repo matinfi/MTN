@@ -15,6 +15,11 @@ function setMobile(open){
 }
 if(sideToggle){
  try{if(!mobile()&&localStorage.getItem(storageKey)==='1')shell.classList.add('is-sidebar-collapsed');}catch(e){}
+ const initiallyCollapsed=shell.classList.contains('is-sidebar-collapsed');
+ sideToggle.setAttribute('aria-expanded',initiallyCollapsed?'false':'true');
+ sideToggle.setAttribute('aria-label',initiallyCollapsed?'باز کردن منو':'جمع کردن منو');
+ const initialLabel=sideToggle.querySelector('.mtn-nav-text');
+ if(initialLabel)initialLabel.textContent=initiallyCollapsed?'باز کردن منو':'جمع کردن منو';
  sideToggle.addEventListener('click',function(){
   const collapsed=shell.classList.toggle('is-sidebar-collapsed');
   sideToggle.setAttribute('aria-expanded',collapsed?'false':'true');\n  sideToggle.setAttribute('aria-label',collapsed?'باز کردن منو':'جمع کردن منو');
