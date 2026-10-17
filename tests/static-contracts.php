@@ -134,7 +134,7 @@ if ( false === strpos( $theme_header, 'class="skip-link"' ) || false === strpos(
 	exit( 1 );
 }
 
-if ( false === strpos( $rest, "'artists' => $artists" ) ||
+if ( false === strpos( $rest, "'artists' => \\$artists" ) ||
 	false === strpos( $home_search, "data.artists" ) ||
 	false === strpos( $theme_home, 'option value="artist"' ) ||
 	false === strpos( $theme_functions, 'filemtime( $polish_file )' ) ||
