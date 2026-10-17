@@ -1,0 +1,71 @@
+(function () {
+  'use strict';
+  if (!window.MTNCBDiscovery) return;
+  document.querySelectorAll('[data-mtn-event-search]').forEach((root) => {
+    const form = root.querySelector('form');
+    const results = root.querySelector('.mtn-event-results');
+    const loadMore = root.querySelector('.mtn-event-load-more');
+    const status = root.querySelector('[role="status"]');
+    let page = 1;
+    let busy = false;
+    let filters = {};
+    function node(tag, cls, value) {
+      const el = document.createElement(tag);
+      if (cls) el.className = cls;
+      if (value !== undefined) el.textContent = String(value == null ? '' : value);
+      return el;
+    }
+    function buildCard(item) {
+      const card = node('article', 'card mtn-listing-card');
+      if (item.image) {
+        const link = node('a'); link.href = item.url;
+        const img = node('img', 'mtn-card-image'); img.src = item.image; img.alt = item.name; img.loading = 'lazy';
+        link.append(img); card.append(link);
+      }
+      const titleLink = node('a'); titleLink.href = item.url; titleLink.textContent = item.name;
+      card.append(node('h2', '', '').appendChild(titleLink).parentNode);
+      card.append(node('p', 'mtn-listing-meta', [item.cafe_name, item.city, item.event_date, item.event_start_time].filter(Boolean).join(' · ')));
+      if (item.artist) card.append(node('p', 'muted', 'هنرمند: ' + item.artist));
+      if (item.genre) card.append(node('p', 'muted', 'سبک موسیقی: ' + item.genre));
+      card.append(node('p', 'muted', item.price > 0 ? 'قیمت ورودی: ' + item.price + ' لیر' : 'قیمت ورودی: رایگان / اعلام‌نشده'));
+      if (item.distance_km !== null && item.distance_km !== undefined) card.append(node('p', 'muted', 'فاصله تقریبی: ' + item.distance_km + ' کیلومتر'));
+      if (item.latitude !== null && item.longitude !== null) {
+        const map = node('a', 'button', 'نمایش روی نقشه');
+        map.href = 'https://www.openstreetmap.org/?mlat=' + encodeURIComponent(item.latitude) + '&mlon=' + encodeURIComponent(item.longitude) + '#map=16/' + encodeURIComponent(item.latitude) + '/' + encodeURIComponent(item.longitude);
+        map.target = '_blank'; map.rel = 'noopener noreferrer'; card.append(map);
+      }
+      const booking = node('a', 'button', 'جزئیات و رزرو'); booking.href = item.url; card.append(booking);
+      return card;
+    }
+    async function load(reset) {
+      if (busy) return;
+      busy = true;
+      if (reset) { page = 1; results.replaceChildren(); }
+      status.textContent = 'در حال جست‌وجو…';
+      loadMore.disabled = true;
+      try {
+        const params = new URLSearchParams(filters);
+        params.set('page', String(page)); params.set('per_page', '12');
+        const response = await fetch(window.MTNCBDiscovery.restUrl + 'events?' + params.toString(), { headers: { 'X-WP-Nonce': window.MTNCBDiscovery.nonce } });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || 'جست‌وجو انجام نشد.');
+        (payload.items || []).forEach((item) => results.append(buildCard(item)));
+        status.textContent = payload.total ? 'تعداد نتایج: ' + payload.total : 'برنامه‌ای مطابق فیلترها پیدا نشد.';
+        loadMore.hidden = !payload.has_more;
+        page += 1;
+      } catch (error) {
+        status.textContent = error.message || 'ارتباط با سرور برقرار نشد.';
+      } finally {
+        busy = false; loadMore.disabled = false;
+      }
+    }
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      filters = {};
+      new FormData(form).forEach((value, key) => { if (String(value).trim()) filters[key] = String(value).trim(); });
+      load(true);
+    });
+    loadMore.addEventListener('click', () => load(false));
+    load(true);
+  });
+})();
