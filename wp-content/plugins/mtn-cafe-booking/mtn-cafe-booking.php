@@ -54,6 +54,10 @@ function mtn_cb_enqueue_admin_design( $hook_suffix ) {
 	$file_path = MTN_CB_PATH . $relative_path;
 	$version = file_exists( $file_path ) ? (string) filemtime( $file_path ) : MTN_CB_VERSION;
 	wp_enqueue_style( 'mtn-cb-admin-design-system', MTN_CB_URL . $relative_path, array(), $version );
+	if ( isset( $_GET['page'] ) && 'mtn-cafe-booking' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+		$wizard_path = MTN_CB_PATH . 'assets/settings-wizard.js';
+		wp_enqueue_script( 'mtn-cb-settings-wizard', MTN_CB_URL . 'assets/settings-wizard.js', array(), file_exists( $wizard_path ) ? (string) filemtime( $wizard_path ) : MTN_CB_VERSION, true );
+	}
 }
 add_action( 'admin_enqueue_scripts', 'mtn_cb_enqueue_admin_design' );
 
