@@ -99,7 +99,7 @@ final class MTN_CB_Cafe_Actions {
 					<select id="mtn-cafe-decision-table" name="table_id" required>
 						<option value="">انتخاب میز</option>
 						<?php foreach ( MTN_CB_Bookings::get_assignable_tables( $booking_id ) as $table ) : ?>
-							<option value="<?php echo esc_attr( (string) $table->id ); ?>"><?php echo esc_html( $table->title . ' — ظرفیت ' . $table->capacity ); ?></option>
+							<option value="<?php echo esc_attr( (string) $table->id ); ?>"><?php echo esc_html( $table->name . ' — ظرفیت ' . $table->capacity ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				<?php endif; ?>
