@@ -65,3 +65,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .mtn-deposit-reference-form{display:grid;gap:.5rem;max-width:100%}.mtn-favorite-toggle{margin-inline-end:.4rem}
 .mtn-support-whatsapp{margin-block:.5rem}
 @media(max-width:640px){.mtn-event-discovery .mtn-form-grid{grid-template-columns:1fr}.mtn-event-discovery .button{width:100%}}
+
+.mtn-support-widget{margin:1rem 0;padding:1rem;border:1px solid #383640;border-radius:12px;background:var(--mtn-surface)}
+.mtn-support-widget summary{cursor:pointer;font-weight:800;color:var(--mtn-accent)}
+.mtn-support-faq{padding-top:.75rem}.mtn-support-faq p{margin:.75rem 0}
