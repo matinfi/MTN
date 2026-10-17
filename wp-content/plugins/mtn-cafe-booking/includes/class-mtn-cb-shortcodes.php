@@ -12,6 +12,7 @@ final class MTN_CB_Shortcodes {
 		add_shortcode( 'mtn_booking_form', array( __CLASS__, 'booking_form' ) );
 		add_shortcode( 'mtn_my_bookings', array( __CLASS__, 'my_bookings' ) );
 		add_shortcode( 'mtn_cafe_dashboard', array( __CLASS__, 'cafe_dashboard' ) );
+		add_shortcode( 'mtn_support_whatsapp', array( __CLASS__, 'support_whatsapp' ) );
 		add_shortcode( 'mtn_cafe_invite_accept', array( 'MTN_CB_Team_Invites', 'accept_form' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 	}
@@ -39,6 +40,12 @@ final class MTN_CB_Shortcodes {
 				'catalogError' => __( 'بارگذاری فهرست با خطا روبه‌رو شد. صفحه را تازه‌سازی کنید.', 'mtn-cafe-booking' ),
 				'loginRequired' => __( 'برای ثبت نهایی رزرو ابتدا وارد حساب شوید.', 'mtn-cafe-booking' ),
 				'genericError' => __( 'درخواست انجام نشد. دوباره تلاش کنید.', 'mtn-cafe-booking' ),
+				'depositAmount' => '100.00',
+				'depositCurrency' => 'TRY',
+				'bankAccountName' => sanitize_text_field( get_option( 'mtn_cb_bank_account_name', '' ) ),
+				'bankIban' => sanitize_text_field( get_option( 'mtn_cb_bank_iban', '' ) ),
+				'bankInstructions' => sanitize_textarea_field( get_option( 'mtn_cb_bank_instructions', '' ) ),
+				'supportWhatsApp' => preg_replace( '/[^0-9]/', '', (string) get_option( 'mtn_cb_support_whatsapp', '' ) ),
 			)
 		);
 	}
@@ -55,7 +62,7 @@ final class MTN_CB_Shortcodes {
 			<div class="mtn-booking-intro">
 				<p class="eyebrow"><?php esc_html_e( 'رزرو آنلاین', 'mtn-cafe-booking' ); ?></p>
 				<h2><?php esc_html_e( 'میزت را برای یک شب خوب رزرو کن', 'mtn-cafe-booking' ); ?></h2>
-				<p class="muted"><?php esc_html_e( 'ابتدا ظرفیت را بررسی کن؛ درخواست تا تأیید کافه قطعی نیست.', 'mtn-cafe-booking' ); ?></p>
+				<p class="muted"><?php esc_html_e( 'ابتدا ظرفیت را بررسی کن. پیش‌پرداخت رزرو ۱۰۰ لیر است و با حواله بانکی پرداخت می‌شود؛ پرداخت پس از بررسی مدیر سایت تأیید خواهد شد.', 'mtn-cafe-booking' ); ?></p>
 			</div>
 			<form class="mtn-booking-form" id="<?php echo esc_attr( $id ); ?>">
 				<div class="mtn-form-grid">
@@ -70,10 +77,19 @@ final class MTN_CB_Shortcodes {
 				<p class="mtn-booking-status" role="status" aria-live="polite"></p>
 				<p class="mtn-booking-login" hidden></p>
 			</form>
-			<p class="mtn-booking-disclaimer"><?php esc_html_e( 'بررسی ظرفیت به‌تنهایی میز را نگه نمی‌دارد. ظرفیت نهایی هنگام ثبت درخواست دوباره کنترل می‌شود.', 'mtn-cafe-booking' ); ?></p>
+			<p class="mtn-booking-disclaimer"><?php esc_html_e( 'لغو رزرو فقط تا ۳ ساعت پس از ثبت درخواست ممکن است. پیش‌پرداخت ۱۰۰ لیر در صورت لغو مشتری قابل استرداد نیست. باقی مبلغ در محل کافه پرداخت می‌شود. پرداخت آنلاین در نسخه اول فعال نیست؛ شماره پیگیری انتقال وجه باید برای بررسی مدیر ثبت شود.', 'mtn-cafe-booking' ); ?></p>
 		</section>
 		<?php
 		return ob_get_clean();
+	}
+
+	public static function support_whatsapp() {
+		$phone = preg_replace( '/[^0-9]/', '', (string) get_option( 'mtn_cb_support_whatsapp', '' ) );
+		if ( '' === $phone ) {
+			return current_user_can( 'manage_options' ) ? '<p>' . esc_html__( 'برای فعال‌سازی پشتیبانی واتساپ، شماره را در تنظیمات رزرو MTN وارد کنید.', 'mtn-cafe-booking' ) . '</p>' : '';
+		}
+		$url = 'https://wa.me/' . $phone . '?text=' . rawurlencode( 'سلام، برای همکاری با پلتفرم MTN به راهنمایی پشتیبانی نیاز دارم.' );
+		return '<a class="button mtn-support-whatsapp" href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'گفت‌وگو با پشتیبانی در واتساپ', 'mtn-cafe-booking' ) . '</a><p class="muted">' . esc_html__( 'این لینک گفت‌وگوی مستقیم را باز می‌کند؛ ربات یا ارسال خودکار پیام بدون اتصال رسمی واتساپ فعال نیست.', 'mtn-cafe-booking' ) . '</p>';
 	}
 
 	public static function cafe_dashboard() {
