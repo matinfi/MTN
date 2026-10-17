@@ -1,5 +1,5 @@
 <!doctype html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?> data-mtn-default-theme="<?php echo esc_attr( get_option( 'mtn_cafe_theme_default_mode', 'dark' ) ); ?>">
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
