@@ -2,14 +2,16 @@
 
 WordPress-based Persian RTL platform for discovering cafés with live music and night events and requesting table reservations.
 
-## Version 0.10.1 — security and accessibility hardening
-This repository contains a WordPress plugin and Persian RTL theme for cafe discovery, live music/night-event listings and table reservation requests. Version 0.10.1 includes OTP resend/lockout hardening, keyboard skip navigation, improved form focus and contrast, reduced-motion support, and a public catalog and advisory availability API, a booking wizard, customer booking history/cancellation, admin metadata fields for cafes/events/tables, an administrator booking console, cafe-owner-scoped booking dashboard, append-only commission ledger, manual settlement and adjustment records, an admin finance reconciliation summary, CSV export, expiring cafe-team invitations, a retryable email notification queue, optional Twilio OTP sign-in, recurring event draft generation, monthly cafe statements with due-date-aware overdue reporting, and cafe/event detail/archive templates. Features requiring external credentials (production SMS/OTP and WhatsApp Business) are not represented as live until configured.
+## Version 0.11.0 — final v1 scope, discovery and manual deposit
+This repository contains a WordPress plugin and Persian RTL theme for cafe discovery, live music/night-event listings and table reservation requests. Version 0.11.0 adds AJAX event discovery (search, city, artist, date, price, music genre, venue type, progressive loading, popular sorting and opt-in nearby distance), event price/artist and cafe coordinates metadata, centrally reviewed partner applications with customer status tracking, a manual 100 TRY bank-transfer deposit flow with customer reference submission and administrator reconciliation, the fixed three-hour cancellation window, and configurable direct WhatsApp support. The cafe-owner operational dashboard is retired from v1; administrators centrally approve bookings and events. Features requiring external credentials (production SMS/OTP and WhatsApp Business) are not represented as live until configured.
+
+See [docs/V1-SCOPE.md](docs/V1-SCOPE.md) for the final v1 scope, explicit exclusions and payment/cancellation rules.
 
 ## Architecture
 - `wp-content/plugins/mtn-cafe-booking/`: business rules, booking persistence, REST API, permissions and settings.
 - `wp-content/themes/mtn-cafe-theme/`: presentation only; reservation records remain if the theme changes.
 - WordPress APIs, capability checks, REST permission callbacks, nonce support, prepared SQL, and semantic versioning.
-- No online customer payments in v1. Default booking state is `pending_cafe`; commission is not revenue collected.
+- No online payment gateway in v1. A fixed 100 TRY reservation deposit is paid by bank transfer/card-to-card to a site-owned account, customer reference is submitted for review, and an administrator must reconcile the actual bank statement before the booking can be confirmed. The deposit is non-refundable on customer cancellation; the remainder is paid at the venue. Configure the real IBAN/account owner before public launch.
 - WhatsApp v1 exposes a prepared manual link in the customer's booking list when the cafe has a valid WhatsApp number; opening the link does not imply sent/delivered.
 - OTP production authentication requires Twilio credentials, a verified sender and live delivery/login testing.
 
@@ -17,9 +19,9 @@ This repository contains a WordPress plugin and Persian RTL theme for cafe disco
 1. Install a supported WordPress site with PHP 8.1+ and MySQL/MariaDB.
 2. Copy `wp-content/plugins/mtn-cafe-booking` to `wp-content/plugins/` and activate **MTN Cafe Booking**.
 3. Copy `wp-content/themes/mtn-cafe-theme` to `wp-content/themes/` and activate **MTN Cafe**.
-4. Activate the plugin and theme. The plugin creates `/book/`, `/my-account/` and `/cafe-dashboard/` pages when those slugs do not already exist. Cafe/event archives are `/cafes/` and `/events/`.
+4. Activate the plugin and theme. The plugin creates `/book/`, `/my-account/` and `/cooperation/` pages when those slugs do not already exist. Cafe/event archives are `/cafes/` and `/events/`.
 5. Create and publish a cafe, assign its nested location term (country → city → area → neighborhood) in the Cafe Locations taxonomy, set its city/contact/music metadata and (optionally) select an existing WordPress user as owner. Saving the cafe assigns that user the cafe-manager role. Then create and publish an event, select its host cafe, set capacity/date/start/end time and party limits. Create published table posts, select their host cafe, set a capacity and enable the active checkbox.
-6. Configure the site timezone, currency, brand, fixed commission, commission trigger (`confirmed` by default or `completed`), cancellation cutoff and booking policy in WordPress settings/plugin settings.
+6. Configure the site timezone, currency, brand, fixed commission and commission trigger in WordPress settings. In **Settings → رزرو کافه MTN**, set and verify the real bank account owner, IBAN, transfer instructions and support WhatsApp number. Customer cancellation is fixed to three hours after booking creation; the 100 TRY deposit is non-refundable.
 7. Do not use production customer data until deployment hardening, provider configuration, acceptance tests and staging sign-off are complete.
 
 ## Current scope and limitations
@@ -35,4 +37,4 @@ find wp-content tests -name '*.php' -print0 | xargs -0 -n1 php -l
 node --check wp-content/plugins/mtn-cafe-booking/assets/booking-wizard.js
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/FINANCE.md](docs/FINANCE.md), [docs/TESTING.md](docs/TESTING.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/STAGING-RELEASE-GATE.md](docs/STAGING-RELEASE-GATE.md), [docs/ROADMAP.md](docs/ROADMAP.md), and [CHANGELOG.md](CHANGELOG.md).
+See [docs/V1-SCOPE.md](docs/V1-SCOPE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/FINANCE.md](docs/FINANCE.md), [docs/TESTING.md](docs/TESTING.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/STAGING-RELEASE-GATE.md](docs/STAGING-RELEASE-GATE.md), [docs/ROADMAP.md](docs/ROADMAP.md), and [CHANGELOG.md](CHANGELOG.md).
