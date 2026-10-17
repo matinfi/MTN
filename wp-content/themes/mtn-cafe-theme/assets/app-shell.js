@@ -29,4 +29,25 @@ document.addEventListener('pointerdown',function(e){if(!shell.classList.contains
 if(sidebar){sidebar.addEventListener('click',function(e){if(mobile()&&e.target.closest('a'))setMobile(false);});}
 window.addEventListener('resize',function(){if(!mobile()){shell.classList.remove('is-mobile-menu-open');if(sidebar)sidebar.removeAttribute('aria-hidden');}else if(!shell.classList.contains('is-mobile-menu-open')&&sidebar){sidebar.setAttribute('aria-hidden','true');}});
 if(mobile()&&sidebar)sidebar.setAttribute('aria-hidden','true');
+
+const themeToggle=document.querySelector('[data-mtn-theme-toggle]');
+const themeKey='mtn-color-theme';
+function setTheme(theme){
+ document.documentElement.setAttribute('data-mtn-theme',theme);
+ if(themeToggle){
+  const light=theme==='light';
+  themeToggle.setAttribute('aria-pressed',light?'true':'false');
+  themeToggle.setAttribute('aria-label',light?'فعال‌سازی پوسته تاریک':'فعال‌سازی پوسته روشن');
+  const label=themeToggle.querySelector('.mtn-theme-toggle-label');
+  if(label)label.textContent=light?'پوسته تاریک':'پوسته روشن';
+ }
+}
+let initialTheme='dark';
+try{const savedTheme=localStorage.getItem(themeKey);if(savedTheme==='light'||savedTheme==='dark')initialTheme=savedTheme;}catch(e){}
+setTheme(initialTheme);
+if(themeToggle)themeToggle.addEventListener('click',function(){
+ const next=document.documentElement.getAttribute('data-mtn-theme')==='light'?'dark':'light';
+ setTheme(next);
+ try{localStorage.setItem(themeKey,next);}catch(e){}
+});
 })();

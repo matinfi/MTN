@@ -35,6 +35,28 @@ require_once MTN_CB_PATH . 'includes/class-mtn-cb-statements.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-cafe-actions.php';
 require_once MTN_CB_PATH . 'includes/class-mtn-cb-cooperation.php';
 
+/**
+ * Load the shared admin design layer only on MTN-owned admin screens.
+ *
+ * @param string $hook_suffix Current admin page hook.
+ */
+function mtn_cb_enqueue_admin_design( $hook_suffix ) {
+	if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+	$screen_id = $screen && isset( $screen->id ) ? (string) $screen->id : '';
+	$is_mtn_screen = false !== strpos( $screen_id, 'mtn-cb' ) || false !== strpos( $screen_id, 'mtn-cafe-booking' );
+	if ( ! $is_mtn_screen ) {
+		return;
+	}
+	$relative_path = 'assets/admin-design-system.css';
+	$file_path = MTN_CB_PATH . $relative_path;
+	$version = file_exists( $file_path ) ? (string) filemtime( $file_path ) : MTN_CB_VERSION;
+	wp_enqueue_style( 'mtn-cb-admin-design-system', MTN_CB_URL . $relative_path, array(), $version );
+}
+add_action( 'admin_enqueue_scripts', 'mtn_cb_enqueue_admin_design' );
+
 register_activation_hook( __FILE__, array( 'MTN_CB_Install', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
 add_action( 'init', array( 'MTN_CB_Install', 'ensure_default_pages' ), 20 );

@@ -1,0 +1,66 @@
+/* MTN WordPress admin design system — scoped to MTN plugin screens. */
+body[class*="toplevel_page_mtn-cb-"] #wpcontent,
+body[class*="mtn-cb_page_"] #wpcontent { background: #f4f6fa; }
+body[class*="toplevel_page_mtn-cb-"] #wpbody-content,
+body[class*="mtn-cb_page_"] #wpbody-content { padding-bottom: 32px; }
+body[class*="toplevel_page_mtn-cb-"] .wrap,
+body[class*="mtn-cb_page_"] .wrap { max-width: 1440px; margin: 24px 24px 0 12px; color: #20283a; }
+body[class*="toplevel_page_mtn-cb-"] .wrap > h1,
+body[class*="mtn-cb_page_"] .wrap > h1 { margin: 0 0 8px; font-size: clamp(24px, 2vw, 32px); font-weight: 750; letter-spacing: -.025em; line-height: 1.35; color: #151b2a; }
+body[class*="toplevel_page_mtn-cb-"] .wrap > p,
+body[class*="mtn-cb_page_"] .wrap > p { max-width: 900px; color: #687287; font-size: 14px; line-height: 1.9; }
+body[class*="toplevel_page_mtn-cb-"] .notice,
+body[class*="mtn-cb_page_"] .notice { margin: 16px 0; border: 1px solid #d9e1ed; border-inline-start-width: 4px; border-radius: 10px; box-shadow: 0 4px 14px rgb(27 39 64 / 4%); }
+body[class*="toplevel_page_mtn-cb-"] .widefat,
+body[class*="mtn-cb_page_"] .widefat { overflow: hidden; border: 1px solid #e1e6ef; border-radius: 14px; border-spacing: 0; box-shadow: 0 8px 28px rgb(25 39 67 / 5%); background: #fff; }
+body[class*="toplevel_page_mtn-cb-"] .widefat thead th,
+body[class*="mtn-cb_page_"] .widefat thead th { padding: 14px 12px; background: #f7f9fc; color: #46536b; font-weight: 700; border-bottom: 1px solid #e5eaf2; }
+body[class*="toplevel_page_mtn-cb-"] .widefat td,
+body[class*="mtn-cb_page_"] .widefat td { padding: 13px 12px; vertical-align: middle; line-height: 1.8; border-bottom-color: #edf0f5; }
+body[class*="toplevel_page_mtn-cb-"] .widefat.striped > tbody > :nth-child(odd),
+body[class*="mtn-cb_page_"] .widefat.striped > tbody > :nth-child(odd) { background: #fbfcfe; }
+body[class*="toplevel_page_mtn-cb-"] .widefat tbody tr:hover td,
+body[class*="mtn-cb_page_"] .widefat tbody tr:hover td { background: #f1f6ff; }
+body[class*="toplevel_page_mtn-cb-"] .button,
+body[class*="mtn-cb_page_"] .button { min-height: 36px; padding: 4px 13px; border-radius: 8px; font-weight: 600; }
+body[class*="toplevel_page_mtn-cb-"] .button-primary,
+body[class*="mtn-cb_page_"] .button-primary { background: #315ee7; border-color: #315ee7; box-shadow: 0 3px 8px rgb(49 94 231 / 16%); }
+body[class*="toplevel_page_mtn-cb-"] input:not([type="checkbox"]):not([type="radio"]),
+body[class*="toplevel_page_mtn-cb-"] select,
+body[class*="toplevel_page_mtn-cb-"] textarea,
+body[class*="mtn-cb_page_"] input:not([type="checkbox"]):not([type="radio"]),
+body[class*="mtn-cb_page_"] select,
+body[class*="mtn-cb_page_"] textarea { min-height: 38px; max-width: 100%; padding: 6px 10px; border: 1px solid #ccd5e3; border-radius: 8px; background-color: #fff; color: #20283a; box-shadow: none; }
+body[class*="toplevel_page_mtn-cb-"] input:focus,
+body[class*="toplevel_page_mtn-cb-"] select:focus,
+body[class*="toplevel_page_mtn-cb-"] textarea:focus,
+body[class*="mtn-cb_page_"] input:focus,
+body[class*="mtn-cb_page_"] select:focus,
+body[class*="mtn-cb_page_"] textarea:focus { border-color: #315ee7; box-shadow: 0 0 0 3px rgb(49 94 231 / 13%); outline: 0; }
+body[class*="toplevel_page_mtn-cb-"] form[method="get"],
+body[class*="mtn-cb_page_"] form[method="get"] { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 14px; border: 1px solid #e1e6ef; border-radius: 12px; background: #fff; }
+body[class*="toplevel_page_mtn-cb-"] .form-table,
+body[class*="mtn-cb_page_"] .form-table { border-collapse: separate; border-spacing: 0; background: #fff; border: 1px solid #e1e6ef; border-radius: 14px; overflow: hidden; }
+body[class*="toplevel_page_mtn-cb-"] .form-table th,
+body[class*="mtn-cb_page_"] .form-table th { width: 32%; padding: 18px 20px; color: #354158; }
+body[class*="toplevel_page_mtn-cb-"] .form-table td,
+body[class*="mtn-cb_page_"] .form-table td { padding: 15px 20px; }
+body[class*="toplevel_page_mtn-cb-"] .description,
+body[class*="mtn-cb_page_"] .description { color: #6c778c; line-height: 1.8; }
+body[class*="toplevel_page_mtn-cb-"] :where(a, button, input, select, textarea):focus-visible,
+body[class*="mtn-cb_page_"] :where(a, button, input, select, textarea):focus-visible { outline: 3px solid #8bb2ff; outline-offset: 2px; }
+@media (max-width: 782px) {
+ body[class*="toplevel_page_mtn-cb-"] .wrap,
+ body[class*="mtn-cb_page_"] .wrap { margin: 16px 10px 0; }
+ body[class*="toplevel_page_mtn-cb-"] .widefat,
+ body[class*="mtn-cb_page_"] .widefat { display: block; max-width: 100%; overflow-x: auto; }
+ body[class*="toplevel_page_mtn-cb-"] .form-table th,
+ body[class*="mtn-cb_page_"] .form-table th,
+ body[class*="toplevel_page_mtn-cb-"] .form-table td,
+ body[class*="mtn-cb_page_"] .form-table td { display: block; width: auto; padding: 12px 14px; }
+}
+@media (prefers-color-scheme: dark) {
+ /* Keep the WordPress admin's own theme authoritative; this layer only styles MTN content. */
+ body[class*="toplevel_page_mtn-cb-"] .wrap,
+ body[class*="mtn-cb_page_"] .wrap { color: inherit; }
+}
