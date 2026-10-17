@@ -25,6 +25,8 @@ if(sideToggle){
 }
 if(mobileToggle)mobileToggle.addEventListener('click',function(){setMobile(!shell.classList.contains('is-mobile-menu-open'));});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&shell.classList.contains('is-mobile-menu-open')){setMobile(false);if(mobileToggle)mobileToggle.focus();}});
+document.addEventListener('pointerdown',function(e){if(!shell.classList.contains('is-mobile-menu-open'))return;if(sidebar&&!sidebar.contains(e.target)&&mobileToggle&&!mobileToggle.contains(e.target)){setMobile(false);}});
+if(sidebar){sidebar.addEventListener('click',function(e){if(mobile()&&e.target.closest('a'))setMobile(false);});}
 window.addEventListener('resize',function(){if(!mobile()){shell.classList.remove('is-mobile-menu-open');if(sidebar)sidebar.removeAttribute('aria-hidden');}else if(!shell.classList.contains('is-mobile-menu-open')&&sidebar){sidebar.setAttribute('aria-hidden','true');}});
 if(mobile()&&sidebar)sidebar.setAttribute('aria-hidden','true');
 })();

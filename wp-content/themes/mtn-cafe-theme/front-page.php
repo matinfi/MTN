@@ -12,7 +12,7 @@
   <div class="mtn-home-search-head"><div><p class="eyebrow">جست‌وجوی هوشمند</p><h2 id="mtn-home-search-title">کافه یا برنامه بعدی‌ات را پیدا کن</h2></div><span class="mtn-nav-icon" aria-hidden="true">⌕</span></div>
   <form class="mtn-home-search-form" role="search">
     <input class="mtn-search-query" type="search" name="q" autocomplete="off" placeholder="نام کافه، شهر، هنرمند یا برنامه…" aria-label="جست‌وجو در کافه‌ها و برنامه‌ها">
-    <select name="kind" aria-label="نوع نتیجه"><option value="all">همه موارد</option><option value="cafe">فقط کافه‌ها</option><option value="event">فقط برنامه‌ها</option></select>
+    <select name="kind" aria-label="نوع نتیجه"><option value="all">همه موارد</option><option value="cafe">فقط کافه‌ها</option><option value="event">فقط برنامه‌ها</option><option value="artist">فقط هنرمندان</option></select>
     <button class="button" type="submit">جست‌وجو</button>
   </form>
   <p class="mtn-search-status" data-search-status role="status" aria-live="polite">در حال آماده‌سازی جست‌وجو…</p>

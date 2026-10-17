@@ -18,10 +18,17 @@ function mtn_cafe_theme_setup() {
 add_action( 'after_setup_theme', 'mtn_cafe_theme_setup' );
 
 function mtn_cafe_enqueue_assets() {
-	wp_enqueue_style( 'mtn-cafe-style', get_stylesheet_uri(), array(), '0.3.0' );
-	wp_enqueue_script( 'mtn-cafe-app', get_template_directory_uri() . '/assets/app-shell.js', array(), '0.3.0', true );
+	$theme_dir = get_template_directory();
+	$theme_uri = get_template_directory_uri();
+	$style_file = $theme_dir . '/style.css';
+	$polish_file = $theme_dir . '/assets/ui-polish.css';
+	$app_file = $theme_dir . '/assets/app-shell.js';
+	wp_enqueue_style( 'mtn-cafe-style', get_stylesheet_uri(), array(), file_exists( $style_file ) ? (string) filemtime( $style_file ) : '0.3.1' );
+	wp_enqueue_style( 'mtn-cafe-ui-polish', $theme_uri . '/assets/ui-polish.css', array( 'mtn-cafe-style' ), file_exists( $polish_file ) ? (string) filemtime( $polish_file ) : '0.3.1' );
+	wp_enqueue_script( 'mtn-cafe-app', $theme_uri . '/assets/app-shell.js', array(), file_exists( $app_file ) ? (string) filemtime( $app_file ) : '0.3.1', true );
 	if ( is_front_page() ) {
-		wp_enqueue_script( 'mtn-cafe-home-search', get_template_directory_uri() . '/assets/home-search.js', array(), '0.3.0', true );
+		$search_file = $theme_dir . '/assets/home-search.js';
+		wp_enqueue_script( 'mtn-cafe-home-search', $theme_uri . '/assets/home-search.js', array(), file_exists( $search_file ) ? (string) filemtime( $search_file ) : '0.3.1', true );
 		wp_localize_script( 'mtn-cafe-home-search', 'MTNHomeSearch', array( 'catalogUrl' => esc_url_raw( rest_url( 'mtn/v1/catalog' ) ) ) );
 	}
 }

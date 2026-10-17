@@ -1,3 +1,21 @@
+## 0.12.0 — 2026-10-17
+
+### Added
+- Include published singer, DJ, and band profiles in the public catalog API and homepage AJAX search.
+- Add an artist-specific homepage search filter and searchable genre/type metadata.
+- Add a shared responsive UI polish stylesheet for booking states, forms, archives, pagination, focus visibility, and small-screen layouts.
+- Use file modification timestamps for theme asset cache busting.
+
+### Changed
+- Improve mobile drawer dismissal when tapping outside the navigation or selecting a destination.
+- Bump the plugin release version to 0.12.0 and the theme version to 0.3.1.
+
+### Validation notes
+- PHP lint, JavaScript syntax, static contracts, and WordPress integration CI are required before merging.
+- Real-browser responsive checks and provider configuration remain part of the user's staging test.
+
+---
+
 ## 0.11.0 — 2026-10-17
 
 ### Added

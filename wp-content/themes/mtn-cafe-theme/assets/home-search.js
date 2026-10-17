@@ -17,12 +17,12 @@ function addResult(item,type){
 function render(){
  const q=normalize(query.value),selected=kind.value;
  const filtered=items.filter(item=>(selected==='all'||item.type===selected)&&(!q||normalize([item.name,item.cafe_name,item.description,item.location_path,item.event_date].join(' ')).includes(q)));
- results.replaceChildren();filtered.slice(0,12).forEach(item=>addResult(item,item.type==='event'?'برنامه زنده':'کافه'));
+ results.replaceChildren();filtered.slice(0,12).forEach(item=>addResult(item,item.type==='event'?'برنامه زنده':(item.type==='artist'?'هنرمند':'کافه')));
  status.dataset.state='';status.textContent=filtered.length?('نمایش '+Math.min(filtered.length,12)+' نتیجه از '+filtered.length+' مورد'):'نتیجه‌ای پیدا نشد؛ نام کافه، هنرمند یا شهر دیگری را امتحان کن.';
 }
 status.textContent='در حال دریافت کافه‌ها و برنامه‌ها…';
 fetch(MTNHomeSearch.catalogUrl,{headers:{Accept:'application/json'},credentials:'same-origin'}).then(response=>{if(!response.ok)throw new Error('catalog');return response.json();}).then(data=>{
- items=[...(data.cafes||[]).map(item=>({...item,type:'cafe'})),...(data.events||[]).map(item=>({...item,type:'event'}))];
+ items=[...(data.cafes||[]).map(item=>({...item,type:'cafe'})),...(data.events||[]).map(item=>({...item,type:'event'})),...(data.artists||[]).map(item=>({...item,type:'artist'}))];
  status.textContent=items.length?'نام کافه، هنرمند، برنامه یا شهر را جست‌وجو کن.':'هنوز کافه یا برنامه‌ای برای نمایش ثبت نشده است.';render();
 }).catch(()=>{status.dataset.state='error';status.textContent='بارگذاری جست‌وجو ناموفق بود. از آرشیو کافه‌ها یا برنامه‌ها استفاده کن.';});
 form.addEventListener('submit',event=>{event.preventDefault();render();});
