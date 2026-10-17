@@ -5,6 +5,8 @@
 		<p><?php esc_html_e( 'در نسخه اول پرداخت اینترنتی در سایت انجام نمی‌شود؛ هزینه‌های احتمالی طبق سیاست کافه تسویه می‌شوند.', 'mtn-cafe-theme' ); ?></p>
 	</div>
 </footer>
+  </div><!-- .mtn-app-main -->
+</div><!-- .mtn-app-shell -->
 <?php wp_footer(); ?>
 </body>
 </html>
