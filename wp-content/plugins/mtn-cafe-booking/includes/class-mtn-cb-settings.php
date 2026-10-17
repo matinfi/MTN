@@ -81,12 +81,27 @@ final class MTN_CB_Settings {
 
 	public static function sanitize_theme_accent( $value ) {
 		$color = sanitize_hex_color( $value );
-		return $color ? $color : '#e7a94b';
+		// Buttons use dark text; reject accents too dark for readable contrast.
+		return $color && self::color_luminance( $color ) >= 0.45 ? $color : '#e7a94b';
 	}
 
 	public static function sanitize_theme_background( $value ) {
 		$color = sanitize_hex_color( $value );
-		return $color ? $color : '#101014';
+		// Main text is light; keep the background dark enough to preserve contrast.
+		return $color && self::color_luminance( $color ) <= 0.20 ? $color : '#101014';
+	}
+
+	private static function color_luminance( $hex ) {
+		$hex = ltrim( $hex, '#' );
+		if ( 3 === strlen( $hex ) ) $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+		if ( 6 !== strlen( $hex ) ) return 0;
+		$rgb = array( hexdec( substr( $hex, 0, 2 ) ), hexdec( substr( $hex, 2, 2 ) ), hexdec( substr( $hex, 4, 2 ) ) );
+		foreach ( $rgb as &$component ) {
+			$component = $component / 255;
+			$component = $component <= 0.04045 ? $component / 12.92 : pow( ( $component + 0.055 ) / 1.055, 2.4 );
+		}
+		unset( $component );
+		return 0.2126 * $rgb[0] + 0.7152 * $rgb[1] + 0.0722 * $rgb[2];
 	}
 
 	public static function sanitize_theme_font( $value ) {
