@@ -56,3 +56,5 @@ This checklist is the release gate. An unchecked item must not be described as i
 - [x] CI package/extraction smoke tests passed: plugin/theme ZIPs were installed into clean WordPress test core, schema activation completed, and the theme was discoverable.
 - [ ] Accessibility, responsive, security and performance review on supported devices and hosting.
 - [ ] Staging sign-off before production release.
+
+The remaining live-environment review and sign-off must use [STAGING-RELEASE-GATE.md](STAGING-RELEASE-GATE.md) and include evidence from the actual hosting stack; source review and CI do not satisfy this gate.
