@@ -81,7 +81,7 @@ final class MTN_CB_Admin {
 				</main>
 			</div>
 			<script>
-				(function(){var shell=document.querySelector('.mtn-admin-shell');if(!shell)return;var side=shell.querySelector('.mtn-admin-side');var toggle=shell.querySelector('.mtn-admin-toggle');if(!toggle)return;toggle.addEventListener('click',function(){if(window.matchMedia('(max-width: 782px)').matches){var open=side.getAttribute('data-mobile-open')==='true';side.setAttribute('data-mobile-open',open?'false':'true');toggle.setAttribute('aria-expanded',open?'false':'true');}else{var collapsed=side.getAttribute('data-collapsed')==='true';side.setAttribute('data-collapsed',collapsed?'false':'true');toggle.setAttribute('aria-expanded',collapsed?'true':'false');}});})();
+				(function(){var shell=document.querySelector('.mtn-admin-shell');if(!shell)return;var side=shell.querySelector('.mtn-admin-side');var toggle=shell.querySelector('.mtn-admin-toggle');if(!toggle)return;toggle.addEventListener('click',function(){if(window.matchMedia('(max-width: 782px)').matches){var open=side.getAttribute('data-mobile-open')==='true';side.setAttribute('data-mobile-open',open?'false':'true');shell.style.gridTemplateColumns='';toggle.setAttribute('aria-expanded',open?'false':'true');}else{var collapsed=side.getAttribute('data-collapsed')==='true';side.setAttribute('data-collapsed',collapsed?'false':'true');shell.style.gridTemplateColumns=collapsed?'230px minmax(0,1fr)':'72px minmax(0,1fr)';toggle.setAttribute('aria-expanded',collapsed?'true':'false');}});})();
 			</script>
 		</div>
 		<?php
