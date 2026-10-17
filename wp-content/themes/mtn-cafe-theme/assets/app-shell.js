@@ -22,7 +22,8 @@ if(sideToggle){
  if(initialLabel)initialLabel.textContent=initiallyCollapsed?'باز کردن منو':'جمع کردن منو';
  sideToggle.addEventListener('click',function(){
   const collapsed=shell.classList.toggle('is-sidebar-collapsed');
-  sideToggle.setAttribute('aria-expanded',collapsed?'false':'true');\n  sideToggle.setAttribute('aria-label',collapsed?'باز کردن منو':'جمع کردن منو');
+  sideToggle.setAttribute('aria-expanded',collapsed?'false':'true');
+  sideToggle.setAttribute('aria-label',collapsed?'باز کردن منو':'جمع کردن منو');
   const label=sideToggle.querySelector('.mtn-nav-text');
   if(label)label.textContent=collapsed?'باز کردن منو':'جمع کردن منو';
   try{localStorage.setItem(storageKey,collapsed?'1':'0');}catch(e){}
