@@ -9,6 +9,7 @@
     let page = 1;
     let busy = false;
     let filters = {};
+    const favoriteIds = new Set();
     function node(tag, cls, value) {
       const el = document.createElement(tag);
       if (cls) el.className = cls;
@@ -33,6 +34,32 @@
         const map = node('a', 'button', 'نمایش روی نقشه');
         map.href = 'https://www.openstreetmap.org/?mlat=' + encodeURIComponent(item.latitude) + '&mlon=' + encodeURIComponent(item.longitude) + '#map=16/' + encodeURIComponent(item.latitude) + '/' + encodeURIComponent(item.longitude);
         map.target = '_blank'; map.rel = 'noopener noreferrer'; card.append(map);
+      }
+      if (window.MTNCBDiscovery.loggedIn) {
+        const favorite = node('button', 'button mtn-favorite-toggle', favoriteIds.has(Number(item.id)) ? 'حذف از علاقه‌مندی‌ها' : 'ذخیره برنامه');
+        favorite.type = 'button';
+        favorite.addEventListener('click', async () => {
+          favorite.disabled = true;
+          const saved = favoriteIds.has(Number(item.id));
+          try {
+            const response = await fetch(window.MTNCBDiscovery.restUrl + 'my/favorites/' + encodeURIComponent(item.id), {
+              method: saved ? 'DELETE' : 'POST',
+              headers: { 'X-WP-Nonce': window.MTNCBDiscovery.nonce, 'Content-Type': 'application/json' },
+              credentials: 'same-origin'
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'تغییر علاقه‌مندی انجام نشد.');
+            if (result.saved) favoriteIds.add(Number(item.id)); else favoriteIds.delete(Number(item.id));
+            favorite.textContent = result.saved ? 'حذف از علاقه‌مندی‌ها' : 'ذخیره برنامه';
+          } catch (error) {
+            status.textContent = error.message || 'تغییر علاقه‌مندی انجام نشد.';
+          } finally { favorite.disabled = false; }
+        });
+        card.append(favorite);
+      } else {
+        const save = node('a', 'button', 'ورود برای ذخیره برنامه');
+        save.href = window.MTNCBDiscovery.loginUrl;
+        card.append(save);
       }
       const booking = node('a', 'button', 'جزئیات و رزرو'); booking.href = item.url; card.append(booking);
       return card;
@@ -86,6 +113,12 @@
         nearby.disabled = false;
       }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
     });
+    if (window.MTNCBDiscovery.loggedIn) {
+      try {
+        const response = await fetch(window.MTNCBDiscovery.restUrl + 'my/favorites', { headers: { 'X-WP-Nonce': window.MTNCBDiscovery.nonce }, credentials: 'same-origin' });
+        if (response.ok) (await response.json()).forEach((id) => favoriteIds.add(Number(id)));
+      } catch (ignore) { /* discovery remains usable if favorites cannot be loaded */ }
+    }
     load(true);
   });
 })();
