@@ -23,6 +23,10 @@ jobs:
         run: node --check wp-content/plugins/mtn-cafe-booking/assets/booking-wizard.js
       - name: Check SMS OTP JavaScript syntax
         run: node --check wp-content/plugins/mtn-cafe-booking/assets/otp-login.js
+      - name: Check settings wizard JavaScript syntax
+        run: node --check wp-content/plugins/mtn-cafe-booking/assets/settings-wizard.js
+      - name: Check theme shell JavaScript syntax
+        run: node --check wp-content/themes/mtn-cafe-theme/assets/app-shell.js
       - name: Run static source-contract checks
         run: php tests/static-contracts.php
       - name: PHP syntax check
