@@ -13,11 +13,14 @@ final class MTN_CB_Shortcodes {
 		add_shortcode( 'mtn_my_bookings', array( __CLASS__, 'my_bookings' ) );
 		add_shortcode( 'mtn_cafe_dashboard', array( __CLASS__, 'cafe_dashboard' ) );
 		add_shortcode( 'mtn_support_whatsapp', array( __CLASS__, 'support_whatsapp' ) );
+		add_shortcode( 'mtn_event_search', array( __CLASS__, 'event_search' ) );
 		add_shortcode( 'mtn_cafe_invite_accept', array( 'MTN_CB_Team_Invites', 'accept_form' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 	}
 
 	public static function register_assets() {
+		wp_register_script( 'mtn-cb-discovery', MTN_CB_URL . 'assets/event-discovery.js', array(), MTN_CB_VERSION, true );
+		wp_localize_script( 'mtn-cb-discovery', 'MTNCBDiscovery', array( 'restUrl' => esc_url_raw( rest_url( 'mtn/v1/' ) ), 'nonce' => wp_create_nonce( 'wp_rest' ) ) );
 		wp_register_script(
 			'mtn-cb-wizard',
 			MTN_CB_URL . 'assets/booking-wizard.js',
@@ -81,6 +84,31 @@ final class MTN_CB_Shortcodes {
 		</section>
 		<?php
 		return ob_get_clean();
+	}
+
+	public static function event_search() {
+		wp_enqueue_script( 'mtn-cb-discovery' );
+		ob_start(); ?>
+		<section class="section container mtn-event-discovery" data-mtn-event-search>
+			<h2><?php esc_html_e( 'جست‌وجوی برنامه‌ها', 'mtn-cafe-booking' ); ?></h2>
+			<form class="mtn-form-grid">
+				<p><label for="mtn-discovery-q">نام برنامه، مکان یا خواننده</label><input id="mtn-discovery-q" name="q" type="search" maxlength="120"></p>
+				<p><label for="mtn-discovery-city">شهر</label><input id="mtn-discovery-city" name="city" maxlength="100"></p>
+				<p><label for="mtn-discovery-artist">خواننده / هنرمند</label><input id="mtn-discovery-artist" name="artist" maxlength="120"></p>
+				<p><label for="mtn-discovery-genre">سبک موسیقی</label><input id="mtn-discovery-genre" name="genre" maxlength="80"></p>
+				<p><label for="mtn-discovery-type">نوع مکان</label><select id="mtn-discovery-type" name="venue_type"><option value="">همه مکان‌ها</option><option value="cafe">کافه</option><option value="restaurant">رستوران</option></select></p>
+				<p><label for="mtn-discovery-from">از تاریخ</label><input id="mtn-discovery-from" name="date_from" type="date"></p>
+				<p><label for="mtn-discovery-to">تا تاریخ</label><input id="mtn-discovery-to" name="date_to" type="date"></p>
+				<p><label for="mtn-discovery-min">حداقل قیمت (لیر)</label><input id="mtn-discovery-min" name="min_price" type="number" min="0" step="0.01"></p>
+				<p><label for="mtn-discovery-max">حداکثر قیمت (لیر)</label><input id="mtn-discovery-max" name="max_price" type="number" min="0" step="0.01"></p>
+				<p><label for="mtn-discovery-sort">مرتب‌سازی</label><select id="mtn-discovery-sort" name="sort"><option value="">نزدیک‌ترین تاریخ</option><option value="popular">محبوب‌ترین</option></select></p>
+				<p><button type="submit" class="button button-primary">جست‌وجو و فیلتر</button></p>
+			</form>
+			<p role="status" aria-live="polite"></p>
+			<div class="cards mtn-event-results"></div>
+			<button type="button" class="button mtn-event-load-more" hidden>نمایش برنامه‌های بیشتر</button>
+		</section>
+		<?php return ob_get_clean();
 	}
 
 	public static function support_whatsapp() {
