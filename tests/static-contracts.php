@@ -21,6 +21,10 @@ $shortcodes_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-
 $otp_js_path = $root . '/wp-content/plugins/mtn-cafe-booking/assets/otp-login.js';
 $theme_header_path = $root . '/wp-content/themes/mtn-cafe-theme/header.php';
 $theme_style_path = $root . '/wp-content/themes/mtn-cafe-theme/style.css';
+$cafe_actions_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-cafe-actions.php';
+$cooperation_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-cooperation.php';
+$app_shell_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/app-shell.js';
+$home_search_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/home-search.js';
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
 $content = file_get_contents( $content_path );
@@ -36,8 +40,12 @@ $shortcodes = file_get_contents( $shortcodes_path );
 $otp_js = file_get_contents( $otp_js_path );
 $theme_header = file_get_contents( $theme_header_path );
 $theme_style = file_get_contents( $theme_style_path );
+$cafe_actions = file_get_contents( $cafe_actions_path );
+$cooperation = file_get_contents( $cooperation_path );
+$app_shell = file_get_contents( $app_shell_path );
+$home_search = file_get_contents( $home_search_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style, $cafe_actions, $cooperation, $app_shell, $home_search ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -117,6 +125,18 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 
 if ( false === strpos( $theme_header, 'class="skip-link"' ) || false === strpos( $theme_header, 'id="main-content" tabindex="-1"' ) || false === strpos( $theme_style, '.skip-link:focus' ) || false === strpos( $theme_style, 'prefers-reduced-motion:reduce' ) || 1 !== substr_count( $shortcodes, "add_shortcode( 'mtn_cafe_invite_accept'" ) || false === strpos( $otp_js, 'codeField.hidden = false' ) ) {
 	fwrite( STDERR, "Accessibility or front-end registration regression detected.\n" );
+	exit( 1 );
+}
+
+if ( false !== strpos( $shortcodes, "add_shortcode( 'mtn_cafe_dashboard'" ) ||
+	false === strpos( $cafe_actions, 'hash_hmac' ) ||
+	false === strpos( $cafe_actions, 'mtn_cb_booking_created' ) ||
+	false === strpos( $cafe_actions, 'check_admin_referer' ) ||
+	false === strpos( $cooperation, 'mtn_cooperation_submit' ) ||
+	false === strpos( $cooperation, "'mtn_artist'" ) ||
+	false === strpos( $app_shell, 'is-sidebar-collapsed' ) ||
+	false === strpos( $home_search, 'catalogUrl' ) ) {
+	fwrite( STDERR, "Redesign, secure cafe decisions, or cooperation contracts are missing.\\n" );
 	exit( 1 );
 }
 
