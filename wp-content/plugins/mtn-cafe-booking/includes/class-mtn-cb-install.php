@@ -204,6 +204,10 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_bank_iban', '' );
 		add_option( 'mtn_cb_bank_instructions', '' );
 		add_option( 'mtn_cb_support_whatsapp', '' );
+		add_option( 'mtn_cb_theme_accent', '#e7a94b' );
+		add_option( 'mtn_cb_theme_background', '#101014' );
+		add_option( 'mtn_cb_theme_font', 'Tahoma, Arial, sans-serif' );
+		add_option( 'mtn_cb_theme_density', 'comfortable' );
 		add_option( 'mtn_cb_statement_due_days', 7 );
 		add_option( 'mtn_cb_booking_mode', 'cafe_assigns_table' );
 	}
