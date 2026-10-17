@@ -35,6 +35,7 @@
       <button class="mtn-mobile-menu" type="button" data-mtn-mobile-toggle aria-controls="mtn-sidebar" aria-expanded="false" aria-label="<?php esc_attr_e( 'باز کردن منو', 'mtn-cafe-theme' ); ?>">☰</button>
       <div class="mtn-header-title"><span class="mtn-header-kicker">کشف تجربه‌های شبانه</span><strong><?php echo esc_html( is_front_page() ? 'شب بعدی‌ات را پیدا کن' : wp_get_document_title() ); ?></strong></div>
       <div class="mtn-header-actions">
+        <button class="mtn-theme-toggle" type="button" data-mtn-theme-toggle aria-label="فعال‌سازی پوسته روشن" title="تغییر پوسته"><span aria-hidden="true">◐</span><span class="mtn-theme-toggle-label">پوسته روشن</span></button>
         <a class="mtn-header-account" href="<?php echo esc_url( is_user_logged_in() ? home_url( '/my-account/' ) : wp_login_url() ); ?>"><?php echo is_user_logged_in() ? 'حساب کاربری' : 'ورود / ثبت‌نام'; ?></a>
       </div>
     </header>
