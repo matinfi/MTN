@@ -60,7 +60,8 @@ if ( false !== strpos( $rest, $overescaped_pattern ) ) {
 
 if ( false === strpos( $bookings, '$created_timestamp + 3 * HOUR_IN_SECONDS' ) ||
 	false === strpos( $bookings, "'cancelled_by_customer' === " . '$next_status' ) ||
-	false === strpos( $bookings, "'verified' !== $booking->deposit_status" ) ) {
+	false === strpos( $bookings, "'verified' !== $booking->deposit_status" ) ||
+	false === strpos( $bookings, 'mtn_deposit_unconfigured' ) ) {
 	fwrite( STDERR, "Customer cancellation cutoff enforcement is missing.\n" );
 	exit( 1 );
 }
