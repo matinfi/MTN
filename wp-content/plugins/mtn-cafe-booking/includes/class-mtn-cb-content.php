@@ -152,7 +152,7 @@ final class MTN_CB_Content {
 		self::field( $post->ID, 'mtn_cafe_email', __( 'ایمیل دریافت صورت‌حساب', 'mtn-cafe-booking' ), 'email' );
 		self::field( $post->ID, 'mtn_cafe_whatsapp', __( 'شماره واتساپ با کد کشور', 'mtn-cafe-booking' ), 'tel' );
 		self::field( $post->ID, 'mtn_cafe_music_genre', __( 'سبک موسیقی', 'mtn-cafe-booking' ) );
-		self::field( $post->ID, 'mtn_cafe_type', __( 'نوع مکان (کافه/رستوران)', 'mtn-cafe-booking' ) );
+		self::field( $post->ID, 'mtn_cafe_type', __( 'نوع مکان (کافه/رستوران)', 'mtn-cafe-booking' ), 'text', 'برای فیلتر دقیق، مقدار را دقیقاً cafe یا restaurant وارد کنید.' );
 		self::field( $post->ID, 'mtn_cafe_latitude', __( 'عرض جغرافیایی (Latitude)', 'mtn-cafe-booking' ), 'text', 'برای نمایش فاصله و نقشه، مقدار اعشاری معتبر وارد کنید.' );
 		self::field( $post->ID, 'mtn_cafe_longitude', __( 'طول جغرافیایی (Longitude)', 'mtn-cafe-booking' ), 'text', 'برای نمایش فاصله و نقشه، مقدار اعشاری معتبر وارد کنید.' );
 	}
