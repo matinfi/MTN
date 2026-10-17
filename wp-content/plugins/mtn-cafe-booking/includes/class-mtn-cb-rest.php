@@ -341,7 +341,25 @@ final class MTN_CB_Rest {
 				'event_end_time' => sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_end_time', true ) ),
 			);
 		}
-		return rest_ensure_response( array( 'cafes' => $cafes, 'events' => $events, 'timezone' => wp_timezone_string(), 'booking_mode' => get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) );
+		$artist_posts = get_posts( array(
+			'post_type' => 'mtn_artist',
+			'post_status' => 'publish',
+			'posts_per_page' => 100,
+			'orderby' => 'title',
+			'order' => 'ASC',
+		) );
+		$artists = array();
+		foreach ( $artist_posts as $artist ) {
+			$artists[] = array(
+				'id' => (int) $artist->ID,
+				'name' => get_the_title( $artist ),
+				'url' => get_permalink( $artist ),
+				'description' => wp_strip_all_tags( get_the_excerpt( $artist ) ),
+				'kind' => sanitize_key( get_post_meta( $artist->ID, 'mtn_artist_kind', true ) ),
+				'genre' => sanitize_text_field( get_post_meta( $artist->ID, 'mtn_artist_genre', true ) ),
+			);
+		}
+		return rest_ensure_response( array( 'cafes' => $cafes, 'events' => $events, 'artists' => $artists, 'timezone' => wp_timezone_string(), 'booking_mode' => get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) );
 	}
 
 	public static function availability( WP_REST_Request $request ) {
