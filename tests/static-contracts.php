@@ -125,7 +125,7 @@ if ( false === strpos( $theme_header, 'class="skip-link"' ) || false === strpos(
 	exit( 1 );
 }
 
-if ( false === strpos( $rest, "'/events'" ) || false === strpos( $rest, "'/my/favorites'" ) || false === strpos( $rest, 'public static function events_search' ) || false === strpos( $content, "'mtn_artist'" ) || false === strpos( $deposit_source, 'deposit_reference_submitted' ) || false === strpos( file_get_contents( $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-applications.php' ), 'mtn_partner_application' ) ) {
+if ( false === strpos( $rest, "'/events'" ) || false === strpos( $rest, "'/my/favorites'" ) || false === strpos( $rest, 'public static function events_search' ) || false === strpos( $content, "'mtn_artist'" ) || false === strpos( $deposit_source, 'deposit_reference_submitted' ) || false === strpos( file_get_contents( $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-applications.php' ), 'mtn_application' ) ) {
 	fwrite( STDERR, "Final v1 scope contract is missing.\n" );
 	exit( 1 );
 }
