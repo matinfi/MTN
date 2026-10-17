@@ -21,6 +21,9 @@ $shortcodes_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-
 $otp_js_path = $root . '/wp-content/plugins/mtn-cafe-booking/assets/otp-login.js';
 $theme_header_path = $root . '/wp-content/themes/mtn-cafe-theme/header.php';
 $theme_style_path = $root . '/wp-content/themes/mtn-cafe-theme/style.css';
+$theme_polish_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/ui-polish.css';
+$theme_functions_path = $root . '/wp-content/themes/mtn-cafe-theme/functions.php';
+$theme_home_path = $root . '/wp-content/themes/mtn-cafe-theme/front-page.php';
 $cafe_actions_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-cafe-actions.php';
 $cooperation_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-cooperation.php';
 $app_shell_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/app-shell.js';
@@ -40,12 +43,15 @@ $shortcodes = file_get_contents( $shortcodes_path );
 $otp_js = file_get_contents( $otp_js_path );
 $theme_header = file_get_contents( $theme_header_path );
 $theme_style = file_get_contents( $theme_style_path );
+$theme_polish = file_get_contents( $theme_polish_path );
+$theme_functions = file_get_contents( $theme_functions_path );
+$theme_home = file_get_contents( $theme_home_path );
 $cafe_actions = file_get_contents( $cafe_actions_path );
 $cooperation = file_get_contents( $cooperation_path );
 $app_shell = file_get_contents( $app_shell_path );
 $home_search = file_get_contents( $home_search_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style, $cafe_actions, $cooperation, $app_shell, $home_search ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style, $cafe_actions, $cooperation, $app_shell, $home_search, $theme_polish, $theme_functions, $theme_home ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -128,7 +134,12 @@ if ( false === strpos( $theme_header, 'class="skip-link"' ) || false === strpos(
 	exit( 1 );
 }
 
-if ( false !== strpos( $shortcodes, "add_shortcode( 'mtn_cafe_dashboard'" ) ||
+if ( false === strpos( $rest, "'artists' => $artists" ) ||
+	false === strpos( $home_search, "data.artists" ) ||
+	false === strpos( $theme_home, 'option value="artist"' ) ||
+	false === strpos( $theme_functions, 'filemtime( $polish_file )' ) ||
+	false === strpos( $theme_polish, '.mtn-booking-status[data-state="success"]' ) ||
+	false !== strpos( $shortcodes, "add_shortcode( 'mtn_cafe_dashboard'" ) ||
 	false === strpos( $cafe_actions, 'hash_hmac' ) ||
 	false === strpos( $cafe_actions, 'mtn_cb_booking_created' ) ||
 	false === strpos( $cafe_actions, 'check_admin_referer' ) ||
