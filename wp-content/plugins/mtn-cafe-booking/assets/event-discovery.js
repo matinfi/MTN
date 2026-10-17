@@ -31,7 +31,17 @@
       card.append(node('p', 'muted', item.price > 0 ? 'قیمت ورودی: ' + item.price + ' لیر' : 'قیمت ورودی: رایگان / اعلام‌نشده'));
       if (item.distance_km !== null && item.distance_km !== undefined) card.append(node('p', 'muted', 'فاصله تقریبی: ' + item.distance_km + ' کیلومتر'));
       if (item.latitude !== null && item.longitude !== null) {
-        const map = node('a', 'button', 'نمایش روی نقشه');
+        const mapDetails = node('details', 'mtn-map-preview');
+        mapDetails.append(node('summary', '', 'نمایش نقشه و موقعیت'));
+        const mapUrl = new URL('https://www.openstreetmap.org/export/embed.html');
+        mapUrl.searchParams.set('bbox', [item.longitude - 0.012, item.latitude - 0.008, item.longitude + 0.012, item.latitude + 0.008].join(','));
+        mapUrl.searchParams.set('layer', 'mapnik');
+        mapUrl.searchParams.set('marker', item.latitude + ',' + item.longitude);
+        const mapFrame = node('iframe', 'mtn-map-frame');
+        mapFrame.src = mapUrl.toString(); mapFrame.loading = 'lazy'; mapFrame.title = 'نقشه موقعیت ' + item.cafe_name;
+        mapFrame.referrerPolicy = 'no-referrer'; mapFrame.setAttribute('allowfullscreen', '');
+        mapDetails.append(mapFrame); card.append(mapDetails);
+        const map = node('a', 'button', 'بازکردن نقشه بزرگ');
         map.href = 'https://www.openstreetmap.org/?mlat=' + encodeURIComponent(item.latitude) + '&mlon=' + encodeURIComponent(item.longitude) + '#map=16/' + encodeURIComponent(item.latitude) + '/' + encodeURIComponent(item.longitude);
         map.target = '_blank'; map.rel = 'noopener noreferrer'; card.append(map);
       }
