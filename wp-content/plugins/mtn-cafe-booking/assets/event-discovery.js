@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   if (!window.MTNCBDiscovery) return;
-  document.querySelectorAll('[data-mtn-event-search]').forEach((root) => {
+  document.querySelectorAll('[data-mtn-event-search]').forEach(async (root) => {
     const form = root.querySelector('form');
     const results = root.querySelector('.mtn-event-results');
     const loadMore = root.querySelector('.mtn-event-load-more');
