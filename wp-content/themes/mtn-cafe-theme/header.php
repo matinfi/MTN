@@ -21,6 +21,7 @@
       <a class="mtn-nav-link" href="<?php echo esc_url( home_url( '/book/' ) ); ?>" aria-label="<?php esc_attr_e( 'رزرو میز', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">▦</span><span class="mtn-nav-text">رزرو میز</span></a>
       <a class="mtn-nav-link <?php echo is_page( 'my-account' ) ? 'is-active' : ''; ?>" href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>" aria-label="<?php esc_attr_e( 'رزروهای من', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">◎</span><span class="mtn-nav-text">رزروهای من</span></a>
       <a class="mtn-nav-link" href="<?php echo esc_url( home_url( '/cooperation/' ) ); ?>" aria-label="<?php esc_attr_e( 'درخواست همکاری', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">＋</span><span class="mtn-nav-text">درخواست همکاری</span></a>
+      <a class="mtn-nav-link" href="<?php echo esc_url( home_url( '/artists/' ) ); ?>" aria-label="خواننده‌ها و دی‌جی‌ها"><span class="mtn-nav-icon" aria-hidden="true">♫</span><span class="mtn-nav-text">خواننده‌ها و دی‌جی‌ها</span></a>
       <?php if ( current_user_can( 'manage_options' ) ) : ?><a class="mtn-nav-link" href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>" aria-label="<?php esc_attr_e( 'مدیریت مرکزی', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">▤</span><span class="mtn-nav-text">مدیریت مرکزی</span></a><?php endif; ?>
     </nav>
     <div class="mtn-sidebar-bottom">
