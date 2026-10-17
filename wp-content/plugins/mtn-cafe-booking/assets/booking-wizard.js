@@ -25,6 +25,60 @@
   function localDateValue(input) {
     return input.value ? input.value.replace('T', ' ') + (input.value.length === 16 ? ':00' : '') : '';
   }
+  function renderDepositInstructions(booking, parent) {
+    const statusLabels = { awaiting_transfer: 'در انتظار انتقال وجه', under_review: 'در انتظار تطبیق بانکی', verified: 'پیش‌پرداخت تأیید شده', rejected: 'شماره پیگیری/واریز تأیید نشد' };
+    const box = el('section', 'mtn-deposit-instructions');
+    box.append(el('h3', '', 'پیش‌پرداخت رزرو: ۱۰۰ لیر ترکیه (TRY)'));
+    box.append(el('p', '', 'باقی مبلغ را هنگام حضور مستقیماً در کافه پرداخت می‌کنید. پیش‌پرداخت ۱۰۰ لیر در صورت لغو مشتری مسترد نمی‌شود.'));
+    const transfer = booking.bank_transfer || {};
+    if (transfer.account_name || transfer.iban) {
+      if (transfer.account_name) box.append(el('p', '', 'صاحب حساب: ' + transfer.account_name));
+      if (transfer.iban) {
+        const iban = el('code', 'mtn-bank-iban', transfer.iban);
+        iban.setAttribute('dir', 'ltr');
+        box.append(el('p', '', 'IBAN: '), iban);
+      }
+      if (transfer.instructions) box.append(el('p', '', transfer.instructions));
+    } else {
+      box.append(el('p', '', 'اطلاعات حساب مقصد هنوز توسط مدیر سایت ثبت نشده است؛ تا دریافت اطلاعات معتبر، وجهی انتقال ندهید.'));
+    }
+    const state = el('p', 'mtn-deposit-status', 'وضعیت پیش‌پرداخت: ' + (statusLabels[booking.deposit_status] || 'در انتظار انتقال وجه'));
+    box.append(state);
+    if (booking.deposit_reference) box.append(el('p', '', 'شماره پیگیری ثبت‌شده: ' + booking.deposit_reference));
+    if (['awaiting_transfer', 'rejected'].includes(booking.deposit_status)) {
+      const form = el('form', 'mtn-deposit-reference-form');
+      const label = el('label', '', 'شماره پیگیری حواله/کارت‌به‌کارت');
+      const input = el('input');
+      input.name = 'reference';
+      input.required = true;
+      input.minLength = 4;
+      input.maxLength = 100;
+      input.autocomplete = 'off';
+      input.placeholder = 'شماره مرجع بانکی';
+      const button = el('button', 'button', 'ثبت برای بررسی مدیر');
+      button.type = 'submit';
+      form.append(label, input, button);
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        button.disabled = true;
+        try {
+          const result = await request(api + 'bookings/' + encodeURIComponent(booking.id) + '/deposit-reference', {
+            method: 'POST', headers, credentials: 'same-origin', body: JSON.stringify({ reference: input.value.trim() })
+          });
+          booking.deposit_status = result.deposit_status;
+          booking.deposit_reference = input.value.trim();
+          state.textContent = 'وضعیت پیش‌پرداخت: در انتظار تطبیق بانکی. ' + result.message;
+          form.remove();
+        } catch (error) {
+          setStatus(parent.closest('[data-mtn-my-bookings]') || parent.closest('[data-mtn-booking]') || parent, error.message, 'error');
+          button.disabled = false;
+        }
+      });
+      box.append(form);
+    }
+    parent.append(box);
+  }
   document.querySelectorAll('[data-mtn-booking]').forEach(async (root) => {
     const form = root.querySelector('form');
     const cafe = form.elements.cafe_id;
@@ -150,17 +204,15 @@
         updateEvents();
         resetAvailability();
         setStatus(root, 'درخواست رزرو ثبت شد. کد پیگیری: ' + booking.booking_code + ' — وضعیت: در انتظار تأیید کافه.', 'success');
+        loginNote.hidden = false;
+        loginNote.replaceChildren();
+        renderDepositInstructions(booking, loginNote);
         if (booking.whatsapp_url) {
-          loginNote.hidden = false;
-          loginNote.replaceChildren(document.createTextNode('برای باز کردن پیام آماده و ارسال دستی به کافه: '));
-          const whatsappLink = el('a', '', 'باز کردن واتساپ');
+          const whatsappLink = el('a', 'button', 'پیام دستی به کافه در واتساپ');
           whatsappLink.href = booking.whatsapp_url;
           whatsappLink.target = '_blank';
           whatsappLink.rel = 'noopener noreferrer';
           loginNote.append(whatsappLink);
-        } else {
-          loginNote.hidden = true;
-          loginNote.replaceChildren();
         }
       } catch (error) {
         setStatus(root, error.message, 'error');
@@ -193,6 +245,11 @@
         const row = el('tr');
         [booking.booking_code, booking.booking_at, text(booking.party_size), statusLabels[booking.status] || booking.status].forEach((value) => row.append(el('td', '', text(value))));
         const actionCell = el('td');
+        const paymentCell = row.cells[3];
+        paymentCell.textContent = (statusLabels[booking.status] || booking.status) + ' — پیش‌پرداخت: ' + ({ awaiting_transfer: 'در انتظار انتقال وجه', under_review: 'در انتظار بررسی', verified: 'تأیید شده', rejected: 'رد شده' }[booking.deposit_status] || 'در انتظار انتقال وجه');
+        if (['pending_cafe', 'confirmed'].includes(booking.status) && booking.deposit_status !== 'verified') {
+          renderDepositInstructions(booking, actionCell);
+        }
         if (['pending_cafe', 'confirmed'].includes(booking.status)) {
           const cancel = el('button', 'button', 'لغو رزرو');
           cancel.type = 'button';
