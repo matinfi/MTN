@@ -9,7 +9,7 @@
 - [x] New installations no longer create an operational cafe dashboard page, and cafe operations REST endpoints require site administrator capability.
 - [ ] Test deposit reference submission, admin verify/reject/retry, non-admin denial, idempotency, and confirmation guard in the WordPress integration suite.
 - [x] Favorites/saved events and dedicated artist archive/profile templates are implemented; end-to-end verification remains part of staging.
-- [ ] Validate IBAN/account ownership, mobile responsive behavior, screen-reader/accessibility, security and performance on staging.
+- [ ] Validate IBAN/account ownership, theme color contrast, mobile responsive behavior, screen-reader/accessibility, security and performance on staging.
 - [ ] Confirm actual email/notification delivery and direct WhatsApp support contact; automated WhatsApp bot is not in v1.
 - [ ] Staging acceptance, target-host backup/restore rehearsal and production approval.
 
