@@ -1,5 +1,29 @@
 # Delivery roadmap
 
+## Product decision baseline — 2026-10-17
+
+Source of truth: [V1-SCOPE.md](V1-SCOPE.md). Version 1 prioritizes simple reservations, mobile-first RTL UX, centralized administrator control and manually reconciled deposits.
+
+### V1 scope being delivered
+- [x] AJAX discovery API and UI: program/place/city/artist search; date, price, genre, city and venue-type filters; progressive loading; popularity sort; opt-in browser location and distance display when coordinates exist.
+- [x] No oversized hero slider; homepage opens with a compact hero and discovery controls.
+- [x] Event entry-price and artist metadata; cafe venue type and coordinates for discovery/map links.
+- [x] Partner application form for cafes, restaurants and artists, centrally reviewed and status-tracked in the user account.
+- [x] Cafe-owner operational dashboard removed from v1 setup and its operational REST permissions restricted to site administrators.
+- [x] Manual 100 TRY bank-transfer/card-to-card deposit: customer reference submission, administrator verification after bank reconciliation, and booking confirmation blocked until deposit verification.
+- [x] Three-hour customer cancellation window measured from booking creation; customer-cancelled deposit is non-refundable.
+- [x] Configurable direct WhatsApp support link; this is click-to-chat, not an automated chatbot.
+- [ ] Dedicated artist profile pages and user favorites/saved events.
+- [ ] Fully reviewed, mobile/accessibility tested theme settings for colors, logo, typography and layout.
+- [ ] Full end-to-end testing of deposit transfer/reference/rejection/retry/verification and customer notification flows.
+
+### Explicitly deferred or removed
+- Removed: large multi-image hero slider, social profiles/following, independent cafe-owner operations panel, automatic event publication without administrator approval.
+- Phase next: ratings/reviews, internal wallet/credits, customer-selected exact tables and interactive seating maps, complex analytics, multi-currency and multilingual support.
+- Future integration: online gateway and automated refunds, official WhatsApp Business API/webhooks and real chatbot require separate approval, credentials and test evidence.
+
+
+
 ## Phase 0 — foundation (completed)
 - [x] Repository and WordPress plugin/theme separation
 - [x] Plugin activation schema and REST route foundation
