@@ -62,7 +62,6 @@ final class MTN_CB_Content {
 				'capability_type' => array( 'mtn_event', 'mtn_events' ),
 				'map_meta_cap' => true,
 				'capabilities' => array(
-					'edit_post' => 'manage_options', 'read_post' => 'read', 'delete_post' => 'manage_options',
 					'edit_posts' => 'manage_options', 'edit_others_posts' => 'manage_options', 'publish_posts' => 'manage_options',
 					'read_private_posts' => 'manage_options', 'delete_posts' => 'manage_options', 'delete_private_posts' => 'manage_options',
 					'delete_published_posts' => 'manage_options', 'delete_others_posts' => 'manage_options',
@@ -81,7 +80,6 @@ final class MTN_CB_Content {
 				'capability_type' => array( 'mtn_artist', 'mtn_artists' ),
 				'map_meta_cap' => true,
 				'capabilities' => array(
-					'edit_post' => 'manage_options', 'read_post' => 'read', 'delete_post' => 'manage_options',
 					'edit_posts' => 'manage_options', 'edit_others_posts' => 'manage_options', 'publish_posts' => 'manage_options',
 					'read_private_posts' => 'manage_options', 'delete_posts' => 'manage_options', 'delete_private_posts' => 'manage_options',
 					'delete_published_posts' => 'manage_options', 'delete_others_posts' => 'manage_options',
