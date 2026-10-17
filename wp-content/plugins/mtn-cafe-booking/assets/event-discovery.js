@@ -66,6 +66,26 @@
       load(true);
     });
     loadMore.addEventListener('click', () => load(false));
+    const nearby = root.querySelector('.mtn-nearby');
+    if (nearby) nearby.addEventListener('click', () => {
+      if (!navigator.geolocation) { status.textContent = 'مرورگر شما مکان‌یابی را پشتیبانی نمی‌کند.'; return; }
+      nearby.disabled = true;
+      status.textContent = 'برای یافتن برنامه‌های نزدیک، موقعیت دستگاه را تأیید کنید…';
+      navigator.geolocation.getCurrentPosition((position) => {
+        filters = {};
+        new FormData(form).forEach((value, key) => { if (String(value).trim()) filters[key] = String(value).trim(); });
+        filters.lat = String(position.coords.latitude);
+        filters.lng = String(position.coords.longitude);
+        filters.sort = 'distance';
+        const sort = form.elements.sort;
+        if (sort) sort.value = 'distance';
+        nearby.disabled = false;
+        load(true);
+      }, () => {
+        status.textContent = 'مکان‌یابی انجام نشد. اجازه دسترسی به موقعیت را بررسی کنید یا از فیلتر شهر استفاده کنید.';
+        nearby.disabled = false;
+      }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+    });
     load(true);
   });
 })();
