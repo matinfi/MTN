@@ -107,6 +107,17 @@ final class MTN_CB_Cooperation {
 			self::redirect( 'invalid' );
 		}
 		set_transient( $rate_key, 1, 5 * MINUTE_IN_SECONDS );
+		$admin_email = sanitize_email( get_option( 'admin_email' ) );
+		if ( is_email( $admin_email ) ) {
+			$type_labels = array( 'cafe' => 'کافه', 'restaurant' => 'رستوران', 'singer' => 'خواننده', 'dj' => 'دی‌جی', 'band' => 'گروه موسیقی' );
+			$subject = sprintf( 'درخواست همکاری جدید MTN: %s', $name );
+			$message = "یک درخواست همکاری جدید در سایت ثبت شده است.\n\n" .
+				'نوع همکاری: ' . ( isset( $type_labels[ $type ] ) ? $type_labels[ $type ] : $type ) . "\n" .
+				'نام: ' . $name . "\n" . 'تلفن: ' . $phone . "\n" . 'ایمیل: ' . ( $email ? $email : 'ثبت نشده' ) . "\n\n" .
+				"توضیحات:\n" . $details . "\n\n" .
+				'بررسی درخواست‌ها در پیشخوان وردپرس: ' . admin_url( 'edit.php?post_type=mtn_cooperation_request' );
+			wp_mail( $admin_email, $subject, $message );
+		}
 		self::redirect( 'received' );
 	}
 
