@@ -10,7 +10,7 @@
         <div class="mtn-listing-meta">
           <?php if ( $cafe_id && get_post( $cafe_id ) ) : ?><span><?php echo esc_html( get_the_title( $cafe_id ) ); ?></span><?php endif; ?>
           <?php $event_date = get_post_meta( get_the_ID(), 'mtn_event_date', true ); if ( $event_date ) : ?><span><?php echo esc_html( $event_date ); ?></span><?php endif; ?>
-          <?php if ( $city ) : ?><span><?php echo esc_html( $city ); ?></span><?php endif; ?>
+          <?php if ( $city ) : ?><span><?php echo esc_html( $city ); ?></span><?php endif; ?><?php $artist = get_post_meta( get_the_ID(), 'mtn_event_artist', true ); if ( $artist ) : ?><span><?php echo esc_html( 'هنرمند: ' . $artist ); ?></span><?php endif; ?><?php $price = get_post_meta( get_the_ID(), 'mtn_event_price', true ); if ( '' !== $price ) : ?><span><?php echo esc_html( 'ورودی: ' . number_format_i18n( (float) $price, 2 ) . ' لیر' ); ?></span><?php endif; ?>
         </div>
         <p class="muted"><?php echo esc_html( get_the_excerpt() ); ?></p>
         <a class="button" href="<?php the_permalink(); ?>"><?php esc_html_e( 'جزئیات و رزرو', 'mtn-cafe-theme' ); ?></a>
