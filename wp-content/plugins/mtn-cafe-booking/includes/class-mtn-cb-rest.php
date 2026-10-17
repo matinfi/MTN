@@ -236,24 +236,11 @@ final class MTN_CB_Rest {
 	}
 
 	public static function can_access_cafe_dashboard() {
-		if ( current_user_can( 'manage_options' ) ) {
-			return true;
-		}
-		return current_user_can( 'mtn_manage_cafes' ) ? true : new WP_Error( 'mtn_forbidden', __( 'دسترسی مدیر کافه لازم است.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
+		return current_user_can( 'manage_options' ) ? true : new WP_Error( 'mtn_forbidden', __( 'در نسخه اول، مدیریت رزروها فقط از پنل مرکزی مدیر سایت انجام می‌شود.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
 	}
 
 	public static function can_manage_booking_request( $request ) {
-		if ( current_user_can( 'manage_options' ) ) {
-			return true;
-		}
-		if ( ! current_user_can( 'mtn_manage_cafes' ) || ! ( $request instanceof WP_REST_Request ) ) {
-			return new WP_Error( 'mtn_forbidden', __( 'دسترسی مدیر کافه لازم است.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
-		}
-		$booking = MTN_CB_Bookings::get_by_id( $request['id'] );
-		if ( ! $booking || ! MTN_CB_Content::user_can_manage_cafe( $booking->cafe_id, get_current_user_id() ) ) {
-			return new WP_Error( 'mtn_forbidden', __( 'این رزرو متعلق به کافه تحت مدیریت شما نیست.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
-		}
-		return true;
+		return current_user_can( 'manage_options' ) ? true : new WP_Error( 'mtn_forbidden', __( 'در نسخه اول، مدیریت رزروها فقط از پنل مرکزی مدیر سایت انجام می‌شود.', 'mtn-cafe-booking' ), array( 'status' => 403 ) );
 	}
 
 	public static function cafe_bookings() {
@@ -475,6 +462,17 @@ final class MTN_CB_Rest {
 			'party_size'             => (int) $booking->party_size,
 			'booking_at'             => $booking->booking_at,
 			'status'                 => $booking->status,
+			'deposit_amount'         => isset( $booking->deposit_amount ) ? (float) $booking->deposit_amount : 100.00,
+			'deposit_currency'       => isset( $booking->deposit_currency ) ? $booking->deposit_currency : 'TRY',
+			'deposit_status'         => isset( $booking->deposit_status ) ? $booking->deposit_status : 'awaiting_transfer',
+			'deposit_reference'      => isset( $booking->deposit_reference ) ? $booking->deposit_reference : '',
+			'bank_transfer'          => $include_whatsapp ? array(
+				'account_name' => sanitize_text_field( get_option( 'mtn_cb_bank_account_name', '' ) ),
+				'iban' => sanitize_text_field( get_option( 'mtn_cb_bank_iban', '' ) ),
+				'instructions' => sanitize_textarea_field( get_option( 'mtn_cb_bank_instructions', '' ) ),
+				'non_refundable' => true,
+				'cancellation_window_hours' => 3,
+			) : null,
 			'whatsapp_action_status' => $booking->whatsapp_action_status,
 			'whatsapp_url'            => $whatsapp_url,
 			'checkin_status'          => $booking->checkin_status,
