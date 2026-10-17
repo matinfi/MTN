@@ -11,7 +11,6 @@ final class MTN_CB_Shortcodes {
 	public static function init() {
 		add_shortcode( 'mtn_booking_form', array( __CLASS__, 'booking_form' ) );
 		add_shortcode( 'mtn_my_bookings', array( __CLASS__, 'my_bookings' ) );
-		add_shortcode( 'mtn_cooperation_form', array( 'MTN_CB_Cooperation', 'form' ) );
 		add_shortcode( 'mtn_cafe_invite_accept', array( 'MTN_CB_Team_Invites', 'accept_form' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 	}
