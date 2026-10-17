@@ -63,6 +63,16 @@ final class MTN_CB_Content {
 			)
 		);
 		register_post_type(
+			'mtn_artist',
+			array(
+				'labels' => array( 'name' => __( 'هنرمندان', 'mtn-cafe-booking' ), 'singular_name' => __( 'هنرمند', 'mtn-cafe-booking' ), 'add_new_item' => __( 'افزودن هنرمند', 'mtn-cafe-booking' ) ),
+				'public' => true, 'has_archive' => true, 'show_in_rest' => true,
+				'menu_icon' => 'dashicons-microphone',
+				'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
+				'rewrite' => array( 'slug' => 'artists' ),
+			)
+		);
+		register_post_type(
 			'mtn_table',
 			array(
 				'labels' => array( 'name' => __( 'میزها', 'mtn-cafe-booking' ), 'singular_name' => __( 'میز', 'mtn-cafe-booking' ) ),
