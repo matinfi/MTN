@@ -2,7 +2,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Applications {
-	const TYPE = 'mtn_partner_application';
+	const TYPE = 'mtn_application';
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register_type' ) );
 		add_shortcode( 'mtn_partner_application', array( __CLASS__, 'form' ) );
