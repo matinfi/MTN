@@ -226,9 +226,8 @@ final class MTN_CB_Rest {
 			'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای مشاهده علاقه‌مندی‌ها وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); },
 		) );
 		register_rest_route( self::NS, '/my/favorites/(?P<event_id>\\d+)', array(
-			array( 'methods' => WP_REST_Server::CREATABLE, 'callback' => array( __CLASS__, 'add_favorite' ), 'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای ذخیره برنامه وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); } ),
-			array( 'methods' => WP_REST_Server::DELETABLE, 'callback' => array( __CLASS__, 'remove_favorite' ), 'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای ویرایش علاقه‌مندی‌ها وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); } ),
-			'args' => array( 'event_id' => array( 'sanitize_callback' => 'absint' ) ),
+			array( 'methods' => WP_REST_Server::CREATABLE, 'callback' => array( __CLASS__, 'add_favorite' ), 'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای ذخیره برنامه وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); }, 'args' => array( 'event_id' => array( 'sanitize_callback' => 'absint' ) ) ),
+			array( 'methods' => WP_REST_Server::DELETABLE, 'callback' => array( __CLASS__, 'remove_favorite' ), 'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای ویرایش علاقه‌مندی‌ها وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); }, 'args' => array( 'event_id' => array( 'sanitize_callback' => 'absint' ) ) ),
 		) );
 
 		register_rest_route(
