@@ -49,7 +49,7 @@ final class MTN_CB_Admin {
 				.mtn-admin-card{background:#1b1b22;border:1px solid #302e38;border-radius:14px;padding:18px;min-width:0}
 				.mtn-admin-card strong{display:block;font-size:1.8rem;line-height:1.3;margin:.4rem 0;color:#f4bb5e}
 				.mtn-admin-notice{padding:12px 14px;border-radius:10px;background:#33271a;border:1px solid #7b5c2d;margin:14px 0}
-				.mtn-admin-toggle{display:none;margin-bottom:12px}
+				.mtn-admin-toggle{display:inline-flex;margin-bottom:12px}
 				.mtn-admin-side[data-collapsed="true"]{width:72px;padding:10px}.mtn-admin-side[data-collapsed="true"] .mtn-admin-nav-label{display:none}
 				@media(max-width:782px){.mtn-admin-shell{grid-template-columns:1fr}.mtn-admin-toggle{display:inline-flex}.mtn-admin-side[data-mobile-open="false"]{display:none}.mtn-admin-side[data-mobile-open="true"]{display:block}.mtn-admin-side[data-collapsed="true"]{width:auto}.mtn-admin-side[data-collapsed="true"] .mtn-admin-nav-label{display:inline}}
 			</style>
