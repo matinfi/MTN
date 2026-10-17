@@ -389,11 +389,14 @@ final class MTN_CB_Rest {
 			if ( ! $cafe || 'mtn_cafe' !== $cafe->post_type || 'publish' !== $cafe->post_status ) continue;
 			$artist = sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_artist', true ) );
 			$city = sanitize_text_field( get_post_meta( $cafe_id, 'mtn_cafe_city', true ) );
+			$address = sanitize_text_field( get_post_meta( $cafe_id, 'mtn_cafe_address', true ) );
+			$location_terms = self::cafe_location_path( $cafe_id );
+			$location_search = is_array( $location_terms ) ? implode( ' ', $location_terms ) : (string) $location_terms;
 			$genre = sanitize_text_field( get_post_meta( $cafe_id, 'mtn_cafe_music_genre', true ) );
 			$venue_type = sanitize_text_field( get_post_meta( $cafe_id, 'mtn_cafe_type', true ) );
 			$price = (float) get_post_meta( $event->ID, 'mtn_event_price', true );
 			$date = sanitize_text_field( get_post_meta( $event->ID, 'mtn_event_date', true ) );
-			if ( $search && false === stripos( get_the_title( $event ) . ' ' . get_the_title( $cafe ) . ' ' . $artist . ' ' . $city, $search ) ) continue;
+			if ( $search && false === stripos( get_the_title( $event ) . ' ' . get_the_title( $cafe ) . ' ' . $artist . ' ' . $city . ' ' . $address . ' ' . $location_search, $search ) ) continue;
 			if ( $city_filter && false === stripos( $city, $city_filter ) ) continue;
 			if ( $genre_filter && false === stripos( $genre, $genre_filter ) ) continue;
 			if ( $type_filter && $venue_type !== $type_filter ) continue;
@@ -414,7 +417,7 @@ final class MTN_CB_Rest {
 			$items[] = array(
 				'id' => (int) $event->ID, 'name' => get_the_title( $event ), 'url' => get_permalink( $event ),
 				'description' => wp_strip_all_tags( get_the_excerpt( $event ) ), 'cafe_id' => $cafe_id, 'cafe_name' => get_the_title( $cafe ),
-				'city' => $city, 'genre' => $genre, 'venue_type' => $venue_type, 'artist' => $artist, 'price' => $price,
+				'city' => $city, 'address' => $address, 'location_path' => $location_terms, 'genre' => $genre, 'venue_type' => $venue_type, 'artist' => $artist, 'price' => $price,
 				'event_date' => $date, 'event_start_time' => get_post_meta( $event->ID, 'mtn_event_start_time', true ),
 				'image' => get_the_post_thumbnail_url( $event, 'large' ) ?: '', 'latitude' => is_numeric( $clat ) ? (float) $clat : null,
 				'longitude' => is_numeric( $clng ) ? (float) $clng : null, 'distance_km' => null === $distance ? null : round( $distance, 1 ),
