@@ -50,7 +50,7 @@ final class MTN_CB_Admin {
 				.mtn-admin-card strong{display:block;font-size:1.8rem;line-height:1.3;margin:.4rem 0;color:#f4bb5e}
 				.mtn-admin-notice{padding:12px 14px;border-radius:10px;background:#33271a;border:1px solid #7b5c2d;margin:14px 0}
 				.mtn-admin-toggle{display:inline-flex;margin-bottom:12px}
-				.mtn-admin-side[data-collapsed="true"]{width:72px;padding:10px}.mtn-admin-side[data-collapsed="true"] .mtn-admin-nav-label{display:none}
+				.mtn-admin-side[data-collapsed="true"]{width:72px;padding:10px}.mtn-admin-side[data-collapsed="true"] .mtn-admin-nav-label{display:none}.mtn-admin-side[data-collapsed="true"] a{text-align:center;font-size:1.15rem;padding:10px 6px}
 				@media(max-width:782px){.mtn-admin-shell{grid-template-columns:1fr}.mtn-admin-toggle{display:inline-flex}.mtn-admin-side[data-mobile-open="false"]{display:none}.mtn-admin-side[data-mobile-open="true"]{display:block}.mtn-admin-side[data-collapsed="true"]{width:auto}.mtn-admin-side[data-collapsed="true"] .mtn-admin-nav-label{display:inline}}
 			</style>
 			<h1><?php esc_html_e( 'داشبورد مدیریت MTN', 'mtn-cafe-booking' ); ?></h1>
@@ -59,13 +59,13 @@ final class MTN_CB_Admin {
 				<aside class="mtn-admin-side" data-collapsed="false" data-mobile-open="true">
 					<button type="button" class="button mtn-admin-toggle" aria-expanded="true" aria-controls="mtn-admin-nav">نمایش/بستن منو</button>
 					<nav id="mtn-admin-nav" aria-label="ناوبری داشبورد MTN">
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-dashboard' ) ); ?>"><span class="mtn-admin-nav-label">نمای کلی</span></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>"><span class="mtn-admin-nav-label">رزروها و پیش‌پرداخت</span></a>
-						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_cafe' ) ); ?>"><span class="mtn-admin-nav-label">کافه‌ها و رستوران‌ها</span></a>
-						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_event' ) ); ?>"><span class="mtn-admin-nav-label">برنامه‌ها و تأیید انتشار</span></a>
-						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_artist' ) ); ?>"><span class="mtn-admin-nav-label">هنرمندان</span></a>
-						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_partner_application' ) ); ?>"><span class="mtn-admin-nav-label">درخواست‌های همکاری</span></a>
-						<a href="<?php echo esc_url( admin_url( 'options-general.php?page=mtn-cafe-booking' ) ); ?>"><span class="mtn-admin-nav-label">تنظیمات و بانک</span></a>
+						<a title="نمای کلی" aria-label="نمای کلی" href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-dashboard' ) ); ?>"><span aria-hidden="true">⌂</span> <span class="mtn-admin-nav-label">نمای کلی</span></a>
+						<a title="رزروها و پیش‌پرداخت" aria-label="رزروها و پیش‌پرداخت" href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>"><span aria-hidden="true">▣</span> <span class="mtn-admin-nav-label">رزروها و پیش‌پرداخت</span></a>
+						<a title="کافه‌ها و رستوران‌ها" aria-label="کافه‌ها و رستوران‌ها" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_cafe' ) ); ?>"><span aria-hidden="true">☕</span> <span class="mtn-admin-nav-label">کافه‌ها و رستوران‌ها</span></a>
+						<a title="برنامه‌ها و تأیید انتشار" aria-label="برنامه‌ها و تأیید انتشار" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_event' ) ); ?>"><span aria-hidden="true">♫</span> <span class="mtn-admin-nav-label">برنامه‌ها و تأیید انتشار</span></a>
+						<a title="هنرمندان" aria-label="هنرمندان" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_artist' ) ); ?>"><span aria-hidden="true">♪</span> <span class="mtn-admin-nav-label">هنرمندان</span></a>
+						<a title="درخواست‌های همکاری" aria-label="درخواست‌های همکاری" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_partner_application' ) ); ?>"><span aria-hidden="true">✉</span> <span class="mtn-admin-nav-label">درخواست‌های همکاری</span></a>
+						<a title="تنظیمات و بانک" aria-label="تنظیمات و بانک" href="<?php echo esc_url( admin_url( 'options-general.php?page=mtn-cafe-booking' ) ); ?>"><span aria-hidden="true">⚙</span> <span class="mtn-admin-nav-label">تنظیمات و بانک</span></a>
 					</nav>
 				</aside>
 				<main class="mtn-admin-main">
