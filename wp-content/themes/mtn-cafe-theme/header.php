@@ -1,9 +1,9 @@
 <!doctype html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?> data-mtn-default-theme="<?php echo esc_attr( get_option( 'mtn_cafe_theme_default_mode', 'dark' ) ); ?>">
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>(function(){try{var t=localStorage.getItem("mtn-color-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-mtn-theme",t);}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem("mtn-color-theme");if(t!=="light"&&t!=="dark"){t="<?php echo esc_js( get_option( 'mtn_cafe_theme_default_mode', 'dark' ) ); ?>";}if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-mtn-theme",t);}}catch(e){}})();</script>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>

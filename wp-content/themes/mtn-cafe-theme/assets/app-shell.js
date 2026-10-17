@@ -15,9 +15,15 @@ function setMobile(open){
 }
 if(sideToggle){
  try{if(!mobile()&&localStorage.getItem(storageKey)==='1')shell.classList.add('is-sidebar-collapsed');}catch(e){}
+ const initiallyCollapsed=shell.classList.contains('is-sidebar-collapsed');
+ sideToggle.setAttribute('aria-expanded',initiallyCollapsed?'false':'true');
+ sideToggle.setAttribute('aria-label',initiallyCollapsed?'باز کردن منو':'جمع کردن منو');
+ const initialLabel=sideToggle.querySelector('.mtn-nav-text');
+ if(initialLabel)initialLabel.textContent=initiallyCollapsed?'باز کردن منو':'جمع کردن منو';
  sideToggle.addEventListener('click',function(){
   const collapsed=shell.classList.toggle('is-sidebar-collapsed');
   sideToggle.setAttribute('aria-expanded',collapsed?'false':'true');
+  sideToggle.setAttribute('aria-label',collapsed?'باز کردن منو':'جمع کردن منو');
   const label=sideToggle.querySelector('.mtn-nav-text');
   if(label)label.textContent=collapsed?'باز کردن منو':'جمع کردن منو';
   try{localStorage.setItem(storageKey,collapsed?'1':'0');}catch(e){}
@@ -42,7 +48,7 @@ function setTheme(theme){
   if(label)label.textContent=light?'پوسته تاریک':'پوسته روشن';
  }
 }
-let initialTheme='dark';
+let initialTheme=document.documentElement.getAttribute('data-mtn-default-theme')==='light'?'light':'dark';
 try{const savedTheme=localStorage.getItem(themeKey);if(savedTheme==='light'||savedTheme==='dark')initialTheme=savedTheme;}catch(e){}
 setTheme(initialTheme);
 if(themeToggle)themeToggle.addEventListener('click',function(){

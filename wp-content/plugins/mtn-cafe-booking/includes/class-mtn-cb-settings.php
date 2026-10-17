@@ -96,7 +96,7 @@ final class MTN_CB_Settings {
 		<div class="wrap">
 			<h1><?php esc_html_e( 'تنظیمات رزرو کافه MTN', 'mtn-cafe-booking' ); ?></h1>
 			<p><?php esc_html_e( 'پرداخت آنلاین مشتری در نسخه اول غیرفعال است. کارمزد ثبت‌شده به معنی وجه وصول‌شده نیست.', 'mtn-cafe-booking' ); ?></p>
-			<form method="post" action="options.php">
+			<form method="post" action="options.php" data-mtn-settings-wizard>
 				<?php settings_fields( 'mtn_cb_settings' ); ?>
 				<table class="form-table" role="presentation">
 					<tr><th><label for="mtn_cb_brand_name"><?php esc_html_e( 'نام برند', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_brand_name" name="mtn_cb_brand_name" value="<?php echo esc_attr( get_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) ) ); ?>"></td></tr>
