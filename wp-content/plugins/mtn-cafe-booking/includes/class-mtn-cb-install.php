@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '13';
+	const DB_VERSION = '14';
 
 	public static function activate() {
 		global $wpdb;
@@ -27,6 +27,11 @@ final class MTN_CB_Install {
 			table_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			party_size smallint(5) unsigned NOT NULL DEFAULT 1,
 			booking_at datetime NOT NULL,
+			deposit_amount decimal(12,2) NOT NULL DEFAULT 100.00,
+			deposit_currency varchar(8) NOT NULL DEFAULT 'TRY',
+			deposit_status varchar(20) NOT NULL DEFAULT 'awaiting_transfer',
+			deposit_reference varchar(100) NOT NULL DEFAULT '',
+			deposit_verified_at datetime NULL,
 			status varchar(32) NOT NULL DEFAULT 'pending_cafe',
 			cafe_note text NULL,
 			customer_note text NULL,
@@ -169,6 +174,10 @@ final class MTN_CB_Install {
 			KEY status_expiry (status,expires_at)
 		) {$collate};";
 		dbDelta( $otp_sql );
+		$previous_db_version = absint( get_option( 'mtn_cb_db_version', 0 ) );
+		if ( $previous_db_version < 14 && 'customer_selects_table' === get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) {
+			update_option( 'mtn_cb_booking_mode', 'cafe_assigns_table' );
+		}
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
 		if ( ! wp_next_scheduled( 'mtn_cb_expire_pending_bookings' ) ) {
 			wp_schedule_event( time() + 60, 'mtn_cb_five_minutes', 'mtn_cb_expire_pending_bookings' );
@@ -190,8 +199,13 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_checkin_token_minutes', 15 );
 		add_option( 'mtn_cb_booking_duration_minutes', 120 );
 		add_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 );
+		add_option( 'mtn_cb_deposit_amount', '100.00' );
+		add_option( 'mtn_cb_bank_account_name', '' );
+		add_option( 'mtn_cb_bank_iban', '' );
+		add_option( 'mtn_cb_bank_instructions', '' );
+		add_option( 'mtn_cb_support_whatsapp', '' );
 		add_option( 'mtn_cb_statement_due_days', 7 );
-		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
+		add_option( 'mtn_cb_booking_mode', 'cafe_assigns_table' );
 	}
 
 	public static function ensure_roles() {
@@ -211,13 +225,14 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( '4' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
+		if ( '8' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
 			'book' => array( 'title' => 'رزرو کافه', 'content' => '[mtn_booking_form]' ),
-			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]' ),
-			'cafe-dashboard' => array( 'title' => 'مدیریت کافه', 'content' => '[mtn_cafe_dashboard]' ),
+			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]\n\n[mtn_my_favorites]\n\n[mtn_my_applications]\n\n[mtn_support_whatsapp]' ),
+			'cooperation' => array( 'title' => 'درخواست همکاری', 'content' => '[mtn_partner_application]' ),
+			'booking-policy' => array( 'title' => 'قوانین رزرو و پیش‌پرداخت', 'content' => '<h2>پیش‌پرداخت رزرو</h2><p>برای هر رزرو مبلغ ثابت ۱۰۰ لیر ترکیه (TRY) به حساب رسمی سایت از طریق انتقال بانکی/حواله یا روش بانکی مجاز پرداخت می‌شود. پرداخت آنلاین درگاه در نسخه اول فعال نیست.</p><p>مشتری باید شماره پیگیری بانکی را در حساب خود ثبت کند. ثبت شماره پیگیری به‌تنهایی اثبات پرداخت نیست؛ مدیر سایت پس از تطبیق با گردش حساب واقعی آن را تأیید می‌کند. تا تأیید پیش‌پرداخت و تأیید نهایی رزرو توسط مدیر، رزرو قطعی نیست.</p><h2>لغو رزرو</h2><p>لغو توسط مشتری فقط تا سه ساعت پس از ایجاد رزرو و پیش از زمان شروع برنامه امکان‌پذیر است. پس از پایان این مهلت، لغو از حساب مشتری مجاز نیست و باید با پشتیبانی تماس گرفته شود.</p><p>پیش‌پرداخت ۱۰۰ لیر در صورت لغو توسط مشتری قابل استرداد نیست. هرگونه رسیدگی استثنایی در صورت لغو برنامه توسط برگزارکننده/مدیر، دستی و مستند انجام می‌شود؛ سیستم بازپرداخت خودکار ندارد.</p><h2>باقی مبلغ</h2><p>باقی مبلغ ورودی یا هزینه‌های کافه/رستوران مستقیماً هنگام حضور در محل و طبق اطلاعات برنامه پرداخت می‌شود. این پلتفرم در نسخه اول کیف پول یا درگاه پرداخت آنلاین ندارد.</p>' ),
 		);
 		foreach ( $pages as $slug => $page ) {
 			if ( ! get_page_by_path( $slug, OBJECT, 'page' ) ) {
@@ -235,7 +250,7 @@ final class MTN_CB_Install {
 		$account_page = get_page_by_path( 'my-account', OBJECT, 'page' );
 		if ( $account_page ) {
 			$account_content = $account_page->post_content;
-			foreach ( array( '[mtn_cafe_invite_accept]', '[mtn_sms_login]' ) as $shortcode ) {
+			foreach ( array( '[mtn_sms_login]', '[mtn_my_favorites]', '[mtn_my_applications]', '[mtn_support_whatsapp]' ) as $shortcode ) {
 				if ( false === strpos( $account_content, $shortcode ) ) {
 					$account_content .= "\n\n" . $shortcode;
 				}
@@ -244,7 +259,7 @@ final class MTN_CB_Install {
 				wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_content ) );
 			}
 		}
-		update_option( 'mtn_cb_default_pages_version', '4' );
+		update_option( 'mtn_cb_default_pages_version', '8' );
 	}
 
 	public static function maybe_upgrade() {
