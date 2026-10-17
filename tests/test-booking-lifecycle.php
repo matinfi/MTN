@@ -53,4 +53,41 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 		$this->assertWPError( $invalid );
 		$this->assertSame( 'mtn_transition_not_allowed', $invalid->get_error_code() );
 	}
+
+	public function test_idempotency_replays_matching_payload_and_is_scoped_to_customer() {
+		$cafe_id = self::factory()->post->create( array( 'post_type' => 'mtn_cafe', 'post_status' => 'publish' ) );
+		$event_id = self::factory()->post->create( array( 'post_type' => 'mtn_event', 'post_status' => 'publish' ) );
+		$event_date = new DateTimeImmutable( 'tomorrow', wp_timezone() );
+		update_post_meta( $event_id, 'mtn_cafe_id', $cafe_id );
+		update_post_meta( $event_id, 'mtn_event_date', $event_date->format( 'Y-m-d' ) );
+		update_post_meta( $event_id, 'mtn_event_start_time', '18:00' );
+		update_post_meta( $event_id, 'mtn_event_end_time', '23:00' );
+		update_post_meta( $event_id, 'mtn_event_capacity', 20 );
+		update_post_meta( $event_id, 'mtn_max_party_size', 10 );
+		$booking_at = $event_date->setTime( 20, 0 )->format( 'Y-m-d H:i:s' );
+		$first_user = self::factory()->user->create();
+		$second_user = self::factory()->user->create();
+		$args = array(
+			'cafe_id' => $cafe_id,
+			'event_id' => $event_id,
+			'party_size' => 2,
+			'booking_at' => $booking_at,
+			'idempotency_key' => 'lifecycle-key-001',
+		);
+		wp_set_current_user( $first_user );
+		$first = MTN_CB_Bookings::create( $args );
+		$this->assertNotWPError( $first );
+		$replay = MTN_CB_Bookings::create( $args );
+		$this->assertNotWPError( $replay );
+		$this->assertSame( (int) $first->id, (int) $replay->id, 'A matching replay must return the original booking.' );
+		$mismatched = $args;
+		$mismatched['party_size'] = 3;
+		$conflict = MTN_CB_Bookings::create( $mismatched );
+		$this->assertWPError( $conflict );
+		$this->assertSame( 'mtn_idempotency_conflict', $conflict->get_error_code() );
+		wp_set_current_user( $second_user );
+		$other_customer = MTN_CB_Bookings::create( $args );
+		$this->assertNotWPError( $other_customer );
+		$this->assertNotSame( (int) $first->id, (int) $other_customer->id, 'Idempotency keys must not collide across customers.' );
+	}
 }
