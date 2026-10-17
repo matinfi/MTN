@@ -36,7 +36,12 @@ final class MTN_CB_Settings {
 		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_duration_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_duration' ), 'default' => 120 ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_customer_cancel_cutoff_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_cancel_cutoff' ), 'default' => 0 ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_statement_due_days', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_statement_due_days' ), 'default' => 7 ) );
-		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_mode', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_mode' ), 'default' => 'customer_selects_table' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_mode', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_mode' ), 'default' => 'cafe_assigns_table' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_deposit_amount', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_deposit_amount' ), 'default' => '100.00' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_bank_account_name', array( 'sanitize_callback' => 'sanitize_text_field', 'default' => '' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_bank_iban', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_iban' ), 'default' => '' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_bank_instructions', array( 'sanitize_callback' => 'sanitize_textarea_field', 'default' => '' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_support_whatsapp', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_whatsapp' ), 'default' => '' ) );
 	}
 
 	public static function sanitize_currency( $value ) {
@@ -54,6 +59,20 @@ final class MTN_CB_Settings {
 			}
 		}
 		return $value;
+	}
+
+	public static function sanitize_deposit_amount( $value ) {
+		// V1 policy is a fixed 100 TRY deposit; do not allow a currency mismatch.
+		return '100.00';
+	}
+
+	public static function sanitize_iban( $value ) {
+		$value = strtoupper( preg_replace( '/\\s+/', '', sanitize_text_field( $value ) ) );
+		return preg_match( '/^[A-Z]{2}[0-9A-Z]{13,32}$/', $value ) ? $value : '';
+	}
+
+	public static function sanitize_whatsapp( $value ) {
+		return preg_replace( '/[^0-9]/', '', (string) $value );
 	}
 
 	public static function sanitize_amount( $value ) {
@@ -95,7 +114,7 @@ final class MTN_CB_Settings {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'تنظیمات رزرو کافه MTN', 'mtn-cafe-booking' ); ?></h1>
-			<p><?php esc_html_e( 'پرداخت آنلاین مشتری در نسخه اول غیرفعال است. کارمزد ثبت‌شده به معنی وجه وصول‌شده نیست.', 'mtn-cafe-booking' ); ?></p>
+			<p><?php esc_html_e( 'در نسخه اول پرداخت اینترنتی نداریم. مشتری ۱۰۰ لیر را با حواله بانکی/کارت‌به‌کارت واریز می‌کند؛ مدیر سایت پس از تطبیق واقعی گردش حساب، پرداخت را دستی تأیید می‌کند. این پیش‌پرداخت در صورت لغو مشتری مسترد نمی‌شود. تا ثبت حساب مقصد، رزروها نباید منتشر شوند.', 'mtn-cafe-booking' ); ?></p>
 			<form method="post" action="options.php">
 				<?php settings_fields( 'mtn_cb_settings' ); ?>
 				<table class="form-table" role="presentation">
@@ -109,8 +128,13 @@ final class MTN_CB_Settings {
 					<tr><th><label for="mtn_cb_booking_expiry_minutes"><?php esc_html_e( 'مهلت تأیید رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="5" max="1440" id="mtn_cb_booking_expiry_minutes" name="mtn_cb_booking_expiry_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_expiry_minutes', 30 ) ); ?>"></td></tr>
 					<tr><th><label for="mtn_cb_checkin_token_minutes"><?php esc_html_e( 'اعتبار کد اعلام حضور (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="5" max="60" id="mtn_cb_checkin_token_minutes" name="mtn_cb_checkin_token_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_checkin_token_minutes', 15 ) ); ?>"><p class="description"><?php esc_html_e( 'کد اعلام حضور یک‌بارمصرف است و پس از این مدت منقضی می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_booking_duration_minutes"><?php esc_html_e( 'مدت اشغال میز برای هر رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="30" max="720" id="mtn_cb_booking_duration_minutes" name="mtn_cb_booking_duration_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_duration_minutes', 120 ) ); ?>"><p class="description"><?php esc_html_e( 'برای بررسی هم‌پوشانی رزروهای میز استفاده می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
-					<tr><th><label for="mtn_cb_customer_cancel_cutoff_minutes"><?php esc_html_e( 'حداقل فاصله لغو توسط مشتری تا شروع رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="0" max="10080" id="mtn_cb_customer_cancel_cutoff_minutes" name="mtn_cb_customer_cancel_cutoff_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 ) ); ?>"><p class="description"><?php esc_html_e( 'صفر یعنی لغو تا پیش از زمان شروع رزرو مجاز است؛ حداکثر مقدار قابل تنظیم ۷ روز است.', 'mtn-cafe-booking' ); ?></p></td></tr>
+					<tr><th><label for="mtn_cb_customer_cancel_cutoff_minutes"><?php esc_html_e( 'قانون لغو رزرو', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" id="mtn_cb_customer_cancel_cutoff_minutes" value="180" disabled><p class="description"><?php esc_html_e( 'لغو فقط تا ۳ ساعت پس از ایجاد رزرو مجاز است. پس از آن لغو از حساب مشتری مسدود می‌شود. پیش‌پرداخت ۱۰۰ لیر در هیچ لغو مشتری مسترد نمی‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_statement_due_days"><?php esc_html_e( 'مهلت پرداخت کارمزد (روز پس از پایان ماه ثبت)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="1" max="90" id="mtn_cb_statement_due_days" name="mtn_cb_statement_due_days" value="<?php echo esc_attr( get_option( 'mtn_cb_statement_due_days', 7 ) ); ?>"></td></tr>
+					<tr><th><?php esc_html_e( 'پیش‌پرداخت رزرو', 'mtn-cafe-booking' ); ?></th><td><strong>۱۰۰ لیر ترکیه (TRY)</strong><input type="hidden" name="mtn_cb_deposit_amount" value="100.00"><p class="description"><?php esc_html_e( 'مبلغ نسخه اول ثابت است. پرداخت آنلاین درگاه ندارد و تنها پس از بررسی گردش حساب توسط مدیر ثبت می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
+					<tr><th><label for="mtn_cb_bank_account_name"><?php esc_html_e( 'نام صاحب حساب مقصد', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_bank_account_name" name="mtn_cb_bank_account_name" value="<?php echo esc_attr( get_option( 'mtn_cb_bank_account_name', '' ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_bank_iban"><?php esc_html_e( 'شماره IBAN حساب مقصد', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" dir="ltr" id="mtn_cb_bank_iban" name="mtn_cb_bank_iban" value="<?php echo esc_attr( get_option( 'mtn_cb_bank_iban', '' ) ); ?>" maxlength="34"><p class="description"><?php esc_html_e( 'حساب بانکی تأییدشده سایت را وارد کنید. برای انتشار عمومی، صحت مالکیت حساب را بررسی کنید.', 'mtn-cafe-booking' ); ?></p></td></tr>
+					<tr><th><label for="mtn_cb_bank_instructions"><?php esc_html_e( 'راهنمای انتقال وجه', 'mtn-cafe-booking' ); ?></label></th><td><textarea class="large-text" rows="3" id="mtn_cb_bank_instructions" name="mtn_cb_bank_instructions"><?php echo esc_textarea( get_option( 'mtn_cb_bank_instructions', '' ) ); ?></textarea></td></tr>
+					<tr><th><label for="mtn_cb_support_whatsapp"><?php esc_html_e( 'واتساپ پشتیبانی', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" dir="ltr" id="mtn_cb_support_whatsapp" name="mtn_cb_support_whatsapp" value="<?php echo esc_attr( get_option( 'mtn_cb_support_whatsapp', '' ) ); ?>"><p class="description"><?php esc_html_e( 'شماره بین‌المللی فقط با ارقام؛ لینک چت دستی ساخته می‌شود و ربات یا ارسال خودکار پیام بدون اتصال رسمی فعال نیست.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_booking_mode"><?php esc_html_e( 'روش انتخاب میز', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_booking_mode" name="mtn_cb_booking_mode"><option value="customer_selects_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'customer_selects_table' ); ?>><?php esc_html_e( 'انتخاب توسط مشتری', 'mtn-cafe-booking' ); ?></option><option value="cafe_assigns_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'cafe_assigns_table' ); ?>><?php esc_html_e( 'تخصیص توسط کافه', 'mtn-cafe-booking' ); ?></option></select></td></tr>
 				</table>
 				<?php submit_button(); ?>
