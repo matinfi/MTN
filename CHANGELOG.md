@@ -1,3 +1,26 @@
+## 0.11.0 — 2026-10-17
+
+### Added
+- Responsive Persian RTL application shell with a collapsible right sidebar on desktop and slide-in navigation on mobile.
+- AJAX homepage discovery search for published cafes and upcoming events, backed by the public catalog endpoint.
+- Moderated cooperation request form for cafes, restaurants, singers, DJs, and music groups.
+- Independent public artist directory and profile templates with artist type and music genre metadata.
+- Signed, expiring cafe approval/rejection links with explicit POST confirmation and optional table assignment for cafe-assignment mode.
+- CI syntax checks for the newly added theme JavaScript.
+
+### Changed
+- Removed the full cafe dashboard shortcode from the public front-end.
+- Stopped provisioning the `/cafe-dashboard/` page. On upgrade, the legacy page is moved to draft only if it contains the old dashboard shortcode.
+- Bumped the plugin release version to 0.11.0.
+
+### Safety and release notes
+- Cafe decision links expire after 48 hours and only operate on bookings that remain `pending_cafe`.
+- Cafe decision email requires a valid cafe contact email and a functioning configured mail transport.
+- Online customer payments and automatic WhatsApp delivery remain out of scope for v1.
+- Passing lint/static checks does not replace staging verification, multi-process concurrency tests, email-delivery testing, or production sign-off.
+
+---
+
 # Changelog
 
 ## [0.10.1] - 2026-10-16
