@@ -14,7 +14,7 @@ Source of truth: [V1-SCOPE.md](V1-SCOPE.md). Version 1 prioritizes simple reserv
 - [x] Three-hour customer cancellation window measured from booking creation; customer-cancelled deposit is non-refundable.
 - [x] Configurable direct WhatsApp support link; this is click-to-chat, not an automated chatbot.
 - [ ] Dedicated artist profile pages and user favorites/saved events.
-- [ ] Fully reviewed, mobile/accessibility tested theme settings for colors, logo, typography and layout.
+- [x] Central admin dashboard with responsive collapsible navigation; admin settings for accent/background colors, font and layout density; logo uses WordPress site identity settings. Accessibility/contrast validation remains a staging gate.
 - [ ] Full end-to-end testing of deposit transfer/reference/rejection/retry/verification and customer notification flows.
 
 ### Explicitly deferred or removed
