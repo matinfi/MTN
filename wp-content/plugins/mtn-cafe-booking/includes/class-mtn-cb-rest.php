@@ -354,8 +354,10 @@ final class MTN_CB_Rest {
 		$date_to = sanitize_text_field( (string) $request->get_param( 'date_to' ) );
 		$min_price = null !== $request->get_param( 'min_price' ) && '' !== $request->get_param( 'min_price' ) ? max( 0, (float) $request->get_param( 'min_price' ) ) : null;
 		$max_price = null !== $request->get_param( 'max_price' ) && '' !== $request->get_param( 'max_price' ) ? max( 0, (float) $request->get_param( 'max_price' ) ) : null;
-		$lat = is_numeric( $request->get_param( 'lat' ) ) ? (float) $request->get_param( 'lat' ) : null;
-		$lng = is_numeric( $request->get_param( 'lng' ) ) ? (float) $request->get_param( 'lng' ) : null;
+		$lat_raw = $request->get_param( 'lat' );
+		$lng_raw = $request->get_param( 'lng' );
+		$lat = is_numeric( $lat_raw ) && (float) $lat_raw >= -90 && (float) $lat_raw <= 90 ? (float) $lat_raw : null;
+		$lng = is_numeric( $lng_raw ) && (float) $lng_raw >= -180 && (float) $lng_raw <= 180 ? (float) $lng_raw : null;
 		$sort = sanitize_key( (string) $request->get_param( 'sort' ) );
 		$posts = get_posts( array(
 			'post_type' => 'mtn_event', 'post_status' => 'publish', 'posts_per_page' => 500,
@@ -393,7 +395,10 @@ final class MTN_CB_Rest {
 				$a = sin( ( ( (float) $clat - $lat ) * $rad ) / 2 ) ** 2 + cos( $lat * $rad ) * cos( (float) $clat * $rad ) * sin( ( ( (float) $clng - $lng ) * $rad ) / 2 ) ** 2;
 				$distance = 6371 * 2 * atan2( sqrt( $a ), sqrt( max( 0, 1 - $a ) ) );
 			}
-			$booking_count = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . MTN_CB_Bookings::table_name() . ' WHERE event_id = %d AND status IN (%s,%s,%s,%s)', $event->ID, 'pending_cafe', 'confirmed', 'completed', 'no_show' ) );
+			$booking_count = 0;
+			if ( 'popular' === $sort ) {
+				$booking_count = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . MTN_CB_Bookings::table_name() . ' WHERE event_id = %d AND status IN (%s,%s,%s,%s)', $event->ID, 'pending_cafe', 'confirmed', 'completed', 'no_show' ) );
+			}
 			$items[] = array(
 				'id' => (int) $event->ID, 'name' => get_the_title( $event ), 'url' => get_permalink( $event ),
 				'description' => wp_strip_all_tags( get_the_excerpt( $event ) ), 'cafe_id' => $cafe_id, 'cafe_name' => get_the_title( $cafe ),
