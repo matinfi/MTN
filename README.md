@@ -35,4 +35,4 @@ find wp-content tests -name '*.php' -print0 | xargs -0 -n1 php -l
 node --check wp-content/plugins/mtn-cafe-booking/assets/booking-wizard.js
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/FINANCE.md](docs/FINANCE.md), [docs/TESTING.md](docs/TESTING.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/ROADMAP.md](docs/ROADMAP.md), and [CHANGELOG.md](CHANGELOG.md).
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/FINANCE.md](docs/FINANCE.md), [docs/TESTING.md](docs/TESTING.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/STAGING-RELEASE-GATE.md](docs/STAGING-RELEASE-GATE.md), [docs/ROADMAP.md](docs/ROADMAP.md), and [CHANGELOG.md](CHANGELOG.md).
