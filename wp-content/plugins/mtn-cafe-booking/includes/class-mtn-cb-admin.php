@@ -15,14 +15,76 @@ final class MTN_CB_Admin {
 
 	public static function menu() {
 		add_menu_page(
-			__( 'مدیریت رزروها', 'mtn-cafe-booking' ),
-			__( 'رزروهای MTN', 'mtn-cafe-booking' ),
+			__( 'داشبورد MTN', 'mtn-cafe-booking' ),
+			__( 'MTN', 'mtn-cafe-booking' ),
 			'manage_options',
-			'mtn-cb-bookings',
-			array( __CLASS__, 'render_bookings' ),
+			'mtn-cb-dashboard',
+			array( __CLASS__, 'render_dashboard' ),
 			'dashicons-calendar-alt',
 			26
 		);
+		add_submenu_page( 'mtn-cb-dashboard', __( 'داشبورد', 'mtn-cafe-booking' ), __( 'داشبورد', 'mtn-cafe-booking' ), 'manage_options', 'mtn-cb-dashboard', array( __CLASS__, 'render_dashboard' ) );
+		add_submenu_page( 'mtn-cb-dashboard', __( 'مدیریت رزروها', 'mtn-cafe-booking' ), __( 'رزروها', 'mtn-cafe-booking' ), 'manage_options', 'mtn-cb-bookings', array( __CLASS__, 'render_bookings' ) );
+	}
+
+	public static function render_dashboard() {
+		if ( ! current_user_can( 'manage_options' ) ) return;
+		global $wpdb;
+		$bookings_table = MTN_CB_Bookings::table_name();
+		$total_bookings = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$bookings_table}" );
+		$pending_bookings = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$bookings_table} WHERE status = %s", 'pending_cafe' ) );
+		$pending_deposits = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$bookings_table} WHERE deposit_status = %s", 'under_review' ) );
+		$published_cafes = (int) wp_count_posts( 'mtn_cafe' )->publish;
+		$published_events = (int) wp_count_posts( 'mtn_event' )->publish;
+		$pending_applications = (int) wp_count_posts( 'mtn_partner_application' )->pending;
+		$bank_configured = '' !== trim( (string) get_option( 'mtn_cb_bank_account_name', '' ) ) && '' !== trim( (string) get_option( 'mtn_cb_bank_iban', '' ) );
+		?>
+		<div class="wrap mtn-admin-dashboard">
+			<style>
+				.mtn-admin-shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;margin-top:18px;color:#f7f4ef}
+				.mtn-admin-side{background:#17171e;border:1px solid #302e38;border-radius:14px;padding:18px;min-width:0}
+				.mtn-admin-side nav{display:grid;gap:8px}.mtn-admin-side a{display:block;padding:10px 12px;border-radius:8px;color:#f7f4ef;text-decoration:none}.mtn-admin-side a:hover,.mtn-admin-side a:focus{background:#302e38;color:#f4bb5e}
+				.mtn-admin-main{min-width:0;background:#101014;border-radius:14px;padding:clamp(14px,2vw,24px)}
+				.mtn-admin-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+				.mtn-admin-card{background:#1b1b22;border:1px solid #302e38;border-radius:14px;padding:18px;min-width:0}
+				.mtn-admin-card strong{display:block;font-size:1.8rem;line-height:1.3;margin:.4rem 0;color:#f4bb5e}
+				.mtn-admin-notice{padding:12px 14px;border-radius:10px;background:#33271a;border:1px solid #7b5c2d;margin:14px 0}
+				.mtn-admin-toggle{display:none;margin-bottom:12px}
+				.mtn-admin-side[data-collapsed="true"]{width:72px;padding:10px}.mtn-admin-side[data-collapsed="true"] .mtn-admin-nav-label{display:none}
+				@media(max-width:782px){.mtn-admin-shell{grid-template-columns:1fr}.mtn-admin-toggle{display:inline-flex}.mtn-admin-side[data-mobile-open="false"]{display:none}.mtn-admin-side[data-mobile-open="true"]{display:block}.mtn-admin-side[data-collapsed="true"]{width:auto}.mtn-admin-side[data-collapsed="true"] .mtn-admin-nav-label{display:inline}}
+			</style>
+			<h1><?php esc_html_e( 'داشبورد مدیریت MTN', 'mtn-cafe-booking' ); ?></h1>
+			<p><?php esc_html_e( 'مدیریت متمرکز برنامه‌ها، رزروها، درخواست‌های همکاری و پیش‌پرداخت‌ها.', 'mtn-cafe-booking' ); ?></p>
+			<div class="mtn-admin-shell">
+				<aside class="mtn-admin-side" data-collapsed="false" data-mobile-open="true">
+					<button type="button" class="button mtn-admin-toggle" aria-expanded="true" aria-controls="mtn-admin-nav">نمایش/بستن منو</button>
+					<nav id="mtn-admin-nav" aria-label="ناوبری داشبورد MTN">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-dashboard' ) ); ?>"><span class="mtn-admin-nav-label">نمای کلی</span></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>"><span class="mtn-admin-nav-label">رزروها و پیش‌پرداخت</span></a>
+						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_cafe' ) ); ?>"><span class="mtn-admin-nav-label">کافه‌ها و رستوران‌ها</span></a>
+						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_event' ) ); ?>"><span class="mtn-admin-nav-label">برنامه‌ها و تأیید انتشار</span></a>
+						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_artist' ) ); ?>"><span class="mtn-admin-nav-label">هنرمندان</span></a>
+						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_partner_application' ) ); ?>"><span class="mtn-admin-nav-label">درخواست‌های همکاری</span></a>
+						<a href="<?php echo esc_url( admin_url( 'options-general.php?page=mtn-cafe-booking' ) ); ?>"><span class="mtn-admin-nav-label">تنظیمات و بانک</span></a>
+					</nav>
+				</aside>
+				<main class="mtn-admin-main">
+					<?php if ( ! $bank_configured ) : ?><div class="mtn-admin-notice" role="alert"><strong><?php esc_html_e( 'دریافت رزرو مسدود است.', 'mtn-cafe-booking' ); ?></strong> <?php esc_html_e( 'نام صاحب حساب و IBAN معتبر را در تنظیمات وارد کنید؛ بدون حساب مقصد، ثبت رزرو از سمت سرور رد می‌شود.', 'mtn-cafe-booking' ); ?> <a href="<?php echo esc_url( admin_url( 'options-general.php?page=mtn-cafe-booking' ) ); ?>"><?php esc_html_e( 'رفتن به تنظیمات', 'mtn-cafe-booking' ); ?></a></div><?php endif; ?>
+					<div class="mtn-admin-cards">
+						<div class="mtn-admin-card"><span><?php esc_html_e( 'کل رزروها', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $total_bookings; ?></strong><a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>"><?php esc_html_e( 'مشاهده رزروها', 'mtn-cafe-booking' ); ?></a></div>
+						<div class="mtn-admin-card"><span><?php esc_html_e( 'در انتظار تصمیم مدیر', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $pending_bookings; ?></strong><a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings&status=pending_cafe' ) ); ?>"><?php esc_html_e( 'بررسی درخواست‌ها', 'mtn-cafe-booking' ); ?></a></div>
+						<div class="mtn-admin-card"><span><?php esc_html_e( 'انتقال‌های در انتظار تطبیق', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $pending_deposits; ?></strong><a href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>"><?php esc_html_e( 'تطبیق رسیدها', 'mtn-cafe-booking' ); ?></a></div>
+						<div class="mtn-admin-card"><span><?php esc_html_e( 'کافه/رستوران منتشرشده', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $published_cafes; ?></strong><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_cafe' ) ); ?>"><?php esc_html_e( 'مدیریت مکان‌ها', 'mtn-cafe-booking' ); ?></a></div>
+						<div class="mtn-admin-card"><span><?php esc_html_e( 'برنامه منتشرشده', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $published_events; ?></strong><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_event' ) ); ?>"><?php esc_html_e( 'مدیریت برنامه‌ها', 'mtn-cafe-booking' ); ?></a></div>
+						<div class="mtn-admin-card"><span><?php esc_html_e( 'درخواست همکاری در صف', 'mtn-cafe-booking' ); ?></span><strong><?php echo (int) $pending_applications; ?></strong><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_partner_application' ) ); ?>"><?php esc_html_e( 'بررسی همکاری‌ها', 'mtn-cafe-booking' ); ?></a></div>
+					</div>
+				</main>
+			</div>
+			<script>
+				(function(){var shell=document.querySelector('.mtn-admin-shell');if(!shell)return;var side=shell.querySelector('.mtn-admin-side');var toggle=shell.querySelector('.mtn-admin-toggle');if(!toggle)return;toggle.addEventListener('click',function(){if(window.matchMedia('(max-width: 782px)').matches){var open=side.getAttribute('data-mobile-open')==='true';side.setAttribute('data-mobile-open',open?'false':'true');toggle.setAttribute('aria-expanded',open?'false':'true');}else{var collapsed=side.getAttribute('data-collapsed')==='true';side.setAttribute('data-collapsed',collapsed?'false':'true');toggle.setAttribute('aria-expanded',collapsed?'true':'false');}});})();
+			</script>
+		</div>
+		<?php
 	}
 
 	public static function handle_booking_action() {
