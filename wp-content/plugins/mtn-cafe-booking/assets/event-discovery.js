@@ -25,7 +25,7 @@
       }
       const titleLink = node('a'); titleLink.href = item.url; titleLink.textContent = item.name;
       card.append(node('h2', '', '').appendChild(titleLink).parentNode);
-      card.append(node('p', 'mtn-listing-meta', [item.cafe_name, item.city, item.event_date, item.event_start_time].filter(Boolean).join(' · ')));
+      card.append(node('p', 'mtn-listing-meta', [item.cafe_name, item.city, item.location_path && Array.isArray(item.location_path) ? item.location_path.join(' / ') : '', item.address, item.event_date, item.event_start_time].filter(Boolean).join(' · ')));
       if (item.artist) card.append(node('p', 'muted', 'هنرمند: ' + item.artist));
       if (item.genre) card.append(node('p', 'muted', 'سبک موسیقی: ' + item.genre));
       card.append(node('p', 'muted', item.price > 0 ? 'قیمت ورودی: ' + item.price + ' لیر' : 'قیمت ورودی: رایگان / اعلام‌نشده'));
