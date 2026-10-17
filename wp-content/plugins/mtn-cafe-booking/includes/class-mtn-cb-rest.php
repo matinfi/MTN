@@ -489,8 +489,7 @@ final class MTN_CB_Rest {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
 		$is_customer = (int) $booking->user_id === get_current_user_id();
-		$is_cafe_owner = current_user_can( 'mtn_manage_cafes' ) && MTN_CB_Content::user_can_manage_cafe( $booking->cafe_id, get_current_user_id() );
-		if ( ! $is_customer && ! $is_cafe_owner && ! current_user_can( 'manage_options' ) ) {
+		if ( ! $is_customer && ! current_user_can( 'manage_options' ) ) {
 			return new WP_Error( 'mtn_booking_not_found', __( 'رزرو پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
 		}
 		$events = MTN_CB_Bookings::get_history( $booking->id );
