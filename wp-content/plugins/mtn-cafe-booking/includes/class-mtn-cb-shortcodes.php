@@ -101,7 +101,7 @@ final class MTN_CB_Shortcodes {
 				<p><label for="mtn-discovery-to">تا تاریخ</label><input id="mtn-discovery-to" name="date_to" type="date"></p>
 				<p><label for="mtn-discovery-min">حداقل قیمت (لیر)</label><input id="mtn-discovery-min" name="min_price" type="number" min="0" step="0.01"></p>
 				<p><label for="mtn-discovery-max">حداکثر قیمت (لیر)</label><input id="mtn-discovery-max" name="max_price" type="number" min="0" step="0.01"></p>
-				<p><label for="mtn-discovery-sort">مرتب‌سازی</label><select id="mtn-discovery-sort" name="sort"><option value="">نزدیک‌ترین تاریخ</option><option value="popular">محبوب‌ترین</option></select></p>
+				<p><label for="mtn-discovery-sort">مرتب‌سازی</label><select id="mtn-discovery-sort" name="sort"><option value="">نزدیک‌ترین تاریخ</option><option value="popular">محبوب‌ترین</option><option value="distance">نزدیک‌ترین به من</option></select></p><p><button type="button" class="button mtn-nearby">پیدا کردن برنامه‌های نزدیک من</button></p>
 				<p><button type="submit" class="button button-primary">جست‌وجو و فیلتر</button></p>
 			</form>
 			<p role="status" aria-live="polite"></p>
