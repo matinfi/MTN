@@ -8,7 +8,7 @@ All booking mutations require an authenticated WordPress session and a valid RES
 
 `GET /catalog`
 
-Returns published cafes and events whose cafe relationship points to a published cafe, plus the configured WordPress timezone and current table-selection mode. Cafe objects include `location_path`, an ordered array of assigned hierarchical location term names from root to leaf (empty when no location is assigned). It does not expose cafe owner identifiers.
+Returns published cafes and upcoming published events whose cafe relationship points to a published cafe, plus the configured WordPress timezone and table-selection mode. Cafe objects include `location_path`, an ordered array of assigned hierarchical location term names from root to leaf. It does not expose cafe owner identifiers.
 
 ## Availability preview
 
@@ -73,19 +73,19 @@ A customer may read only their own booking. Administrators may read any booking.
 
 `POST /bookings/{id}/cancel`
 
-A customer may request cancellation only for their own booking. Cancellation follows the server-side state machine; only pending or confirmed bookings can transition to customer-cancelled. The administrator-configured `mtn_cb_customer_cancel_cutoff_minutes` setting controls the cutoff: `0` permits cancellation until the booking start, while a positive value blocks cancellation inside that many minutes before start. Late or past-start requests return HTTP 409.
+A customer may request cancellation only for their own booking. Only pending or confirmed bookings can transition to customer-cancelled. The server permits cancellation only within three hours after `created_at` and before the event start; the 100 TRY deposit is non-refundable on customer cancellation. Late or past-start requests return HTTP 409. See `/booking-policy/` for the customer-facing policy.
 
 ## Confirm a booking
 
 `POST /cafe/bookings/{id}/confirm`
 
-The assigned cafe owner or a WordPress administrator can confirm a booking. The permission callback verifies ownership against the cafe's private `mtn_cafe_owner_id` metadata.
+V1 central administration only: the route is restricted to WordPress administrators. A booking cannot be confirmed until its 100 TRY deposit has been manually verified by an administrator.
 
 ## Cafe operations
 
 `GET /cafe/bookings`
 
-Administrators can see all bookings; a user with the `mtn_cafe_manager` role sees only bookings for cafes where they are the configured owner or are listed in the private `mtn_cafe_manager_ids` team metadata. The owner ID is never exposed through public cafe metadata.
+V1 central administration only: this route and all cafe operational action routes require the WordPress administrator capability. The independent cafe-owner operations panel is retired from v1. The owner ID is never exposed through public cafe metadata.
 
 `POST /cafe/bookings/{id}/assign-table`
 
@@ -113,7 +113,7 @@ The authenticated customer who owns a confirmed booking can issue a one-time, ra
 
 `POST /cafe/check-in`
 
-Requires an authenticated cafe manager who is the configured owner or an assigned team member for the booking's cafe, or a WordPress administrator. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Team members can be assigned directly by an administrator or added through the expiring invitation workflow. Check-in token delivery is not automated.
+Requires a WordPress administrator in v1. JSON body: `{"token":"<64-character-hex-token>"}`. A valid unexpired token for a confirmed booking is consumed atomically, the booking's check-in status changes to `checked_in`, and a booking audit event is appended. Reuse, expiry or an invalid token is rejected. Token hashes and plaintext tokens are never included in public booking responses or audit details. Team members can be assigned directly by an administrator or added through the expiring invitation workflow. Check-in token delivery is not automated.
 
 ## Cafe team invitations
 
@@ -133,7 +133,7 @@ Requires the same phone number and the six-digit code. A valid code is single-us
 
 ## Finance behavior
 
-The fixed commission amount, currency, trigger status and cancellation/no-show reversal policies are snapshotted when a booking is created. The central setting defaults to accruing commission on `confirmed`, with `completed` available as an alternative; later setting changes affect only new bookings. When the booking-time reversal option is enabled, a later cancellation or no-show appends a negative reversal entry if commission was already accrued. No payment refund is initiated or verified. When the booking-time event-cancellation policy is enabled, moving a published event to draft, private or trash appends an idempotent reversal for accrued commissions. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
+The fixed 100 TRY reservation deposit is separate from the cafe commission ledger. The customer submits a bank-transfer reference through `POST /bookings/{id}/deposit-reference`; this moves the deposit to `under_review` and is not proof of payment. An administrator reconciles the actual bank statement using the admin booking console and marks the deposit verified or rejected. Booking confirmation is blocked until verified. Configure the account owner, IBAN and transfer instructions in central settings before opening booking to the public. No online gateway or automatic refund is available. The fixed commission amount, currency, trigger status and cancellation/no-show reversal policies are snapshotted when a booking is created. The central setting defaults to accruing commission on `confirmed`, with `completed` available as an alternative; later setting changes affect only new bookings. When the booking-time reversal option is enabled, a later cancellation or no-show appends a negative reversal entry if commission was already accrued. No payment refund is initiated or verified. When the booking-time event-cancellation policy is enabled, moving a published event to draft, private or trash appends an idempotent reversal for accrued commissions. The admin finance screen records received settlements as negative ledger entries and supports signed manual adjustments with a required reason. These records track accounting state only; they do not initiate or verify a real payment.
 
 ## Current contract limitations
 
@@ -141,4 +141,27 @@ The fixed commission amount, currency, trigger status and cancellation/no-show r
 - Cafe-assigned-table mode does not yet allocate a table automatically. Team invitations require the recipient to have a WordPress account whose email matches the invitation.
 - Event capacity counts active bookings attached to each event post. Weekly/monthly recurrence generates draft occurrences for administrator review; each occurrence has its own capacity pool.
 - Locking relies on MySQL/MariaDB `GET_LOCK()`. Validate behavior on the production database and test concurrent requests before launch.
-- Online payments and automatic WhatsApp delivery are not implemented. Optional Twilio SMS OTP requires provider constants in `wp-config.php`; it must not be advertised as live until credentials and delivery are verified.
+- Online payments, automated WhatsApp delivery/chatbot, multi-currency and automatic refunds are not implemented. Optional Twilio SMS OTP requires provider constants in `wp-config.php`; it must not be advertised as live until credentials and delivery are verified.
+
+
+## AJAX event discovery
+
+`GET /events?q={term}&city={city}&artist={name}&genre={genre}&venue_type={cafe|restaurant}&date_from=YYYY-MM-DD&date_to=YYYY-MM-DD&min_price={amount}&max_price={amount}&sort={popular|distance}&lat={latitude}&lng={longitude}&page={n}&per_page={n}`
+
+Returns paginated published future events with artist, price, city, genre, venue type, optional coordinates and computed distance. The public discovery UI loads more results without a page reload. Distance sorting requires the customer to explicitly grant browser location access and requires valid coordinates entered by an administrator. The map action opens OpenStreetMap; it does not imply geocoding or live traffic data.
+
+## Saved events
+
+- `GET /my/favorites` — authenticated customer's saved event IDs.
+- `POST /my/favorites/{event_id}` — save a published event.
+- `DELETE /my/favorites/{event_id}` — remove a saved event.
+
+## Manual bank-transfer deposit
+
+`POST /bookings/{id}/deposit-reference`
+
+Authenticated owner only. JSON: `{"reference":"bank-transfer-reference"}`. A 4–100 character bank reference changes the status to `under_review`; it does not confirm payment. Administrators reconcile the real account statement in **MTN Bookings** and can set `verified` or `rejected`. Booking confirmation returns HTTP 409 until the deposit status is verified. The deposit is fixed at 100 TRY, separate from the remaining amount payable at the venue, and non-refundable when the customer cancels.
+
+## Partner applications
+
+The `[mtn_partner_application]` shortcode accepts cafe, restaurant and artist applications. Applicants must be logged in to submit so they can track status with `[mtn_my_applications]` on `/my-account/`. Administrators review submissions under **درخواست‌های همکاری**; a submission never publishes an event automatically. `[mtn_support_whatsapp]` opens a direct WhatsApp support chat only; no bot or delivery webhook is claimed.
