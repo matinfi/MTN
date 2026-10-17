@@ -220,6 +220,17 @@ final class MTN_CB_Rest {
 			)
 		);
 
+		register_rest_route( self::NS, '/my/favorites', array(
+			'methods' => WP_REST_Server::READABLE,
+			'callback' => array( __CLASS__, 'my_favorites' ),
+			'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای مشاهده علاقه‌مندی‌ها وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); },
+		) );
+		register_rest_route( self::NS, '/my/favorites/(?P<event_id>\\d+)', array(
+			array( 'methods' => WP_REST_Server::CREATABLE, 'callback' => array( __CLASS__, 'add_favorite' ), 'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای ذخیره برنامه وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); } ),
+			array( 'methods' => WP_REST_Server::DELETABLE, 'callback' => array( __CLASS__, 'remove_favorite' ), 'permission_callback' => static function () { return is_user_logged_in() ? true : new WP_Error( 'mtn_auth_required', __( 'برای ویرایش علاقه‌مندی‌ها وارد حساب شوید.', 'mtn-cafe-booking' ), array( 'status' => 401 ) ); } ),
+			'args' => array( 'event_id' => array( 'sanitize_callback' => 'absint' ) ),
+		) );
+
 		register_rest_route(
 			self::NS,
 			'/my/bookings',
@@ -419,6 +430,30 @@ final class MTN_CB_Rest {
 	public static function availability( WP_REST_Request $request ) {
 		$result = MTN_CB_Bookings::get_availability( $request->get_params() );
 		return is_wp_error( $result ) ? $result : rest_ensure_response( $result );
+	}
+
+	public static function my_favorites() {
+		$ids = get_user_meta( get_current_user_id(), 'mtn_cb_favorite_event_ids', true );
+		return rest_ensure_response( is_array( $ids ) ? array_values( array_filter( array_map( 'absint', $ids ) ) ) : array() );
+	}
+
+	public static function add_favorite( WP_REST_Request $request ) {
+		$event_id = absint( $request['event_id'] );
+		$event = get_post( $event_id );
+		if ( ! $event || 'mtn_event' !== $event->post_type || 'publish' !== $event->post_status ) return new WP_Error( 'mtn_event_not_found', __( 'برنامه پیدا نشد.', 'mtn-cafe-booking' ), array( 'status' => 404 ) );
+		$ids = get_user_meta( get_current_user_id(), 'mtn_cb_favorite_event_ids', true );
+		$ids = is_array( $ids ) ? array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) ) : array();
+		if ( ! in_array( $event_id, $ids, true ) ) { $ids[] = $event_id; update_user_meta( get_current_user_id(), 'mtn_cb_favorite_event_ids', $ids ); }
+		return rest_ensure_response( array( 'event_id' => $event_id, 'saved' => true ) );
+	}
+
+	public static function remove_favorite( WP_REST_Request $request ) {
+		$event_id = absint( $request['event_id'] );
+		$ids = get_user_meta( get_current_user_id(), 'mtn_cb_favorite_event_ids', true );
+		$ids = is_array( $ids ) ? array_values( array_filter( array_map( 'absint', $ids ) ) ) : array();
+		$ids = array_values( array_diff( $ids, array( $event_id ) ) );
+		update_user_meta( get_current_user_id(), 'mtn_cb_favorite_event_ids', $ids );
+		return rest_ensure_response( array( 'event_id' => $event_id, 'saved' => false ) );
 	}
 
 	public static function my_bookings() {
