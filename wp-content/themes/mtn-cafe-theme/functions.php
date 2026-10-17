@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+require_once get_template_directory() . '/inc/theme-settings.php';
+
 function mtn_cafe_theme_setup() {
 	load_theme_textdomain( 'mtn-cafe-theme', get_template_directory() . '/languages' );
 	add_theme_support( 'title-tag' );
