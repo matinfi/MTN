@@ -69,6 +69,11 @@ final class MTN_CB_Bookings {
 		if ( ! $user_id || $party < 1 || $party > 100 || ! $event_id || ! $cafe_id ) {
 			return new WP_Error( 'mtn_invalid_booking', __( 'اطلاعات رزرو معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
 		}
+		$deposit_account_name = trim( (string) get_option( 'mtn_cb_bank_account_name', '' ) );
+		$deposit_iban = strtoupper( preg_replace( '/\\s+/', '', (string) get_option( 'mtn_cb_bank_iban', '' ) ) );
+		if ( '' === $deposit_account_name || ! preg_match( '/^[A-Z]{2}[0-9A-Z]{13,32}$/', $deposit_iban ) ) {
+			return new WP_Error( 'mtn_deposit_unconfigured', __( 'ثبت رزرو موقتاً غیرفعال است؛ مدیر سایت هنوز حساب معتبر دریافت پیش‌پرداخت را تنظیم نکرده است.', 'mtn-cafe-booking' ), array( 'status' => 503 ) );
+		}
 
 		if ( null !== $idempotency_key && ! preg_match( '/^[A-Za-z0-9._:-]{8,64}$/', $idempotency_key ) ) {
 			return new WP_Error( 'mtn_invalid_idempotency_key', __( 'کلید جلوگیری از ثبت تکراری معتبر نیست.', 'mtn-cafe-booking' ), array( 'status' => 400 ) );
