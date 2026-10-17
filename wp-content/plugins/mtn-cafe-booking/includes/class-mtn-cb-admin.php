@@ -81,7 +81,7 @@ final class MTN_CB_Admin {
 			<?php if ( isset( $_GET['mtn_notice'] ) ) : ?>
 				<div class="notice <?php echo 'updated' === sanitize_key( wp_unslash( $_GET['mtn_notice'] ) ) ? 'notice-success' : 'notice-warning'; ?> is-dismissible"><p><?php
 					$notice = sanitize_key( wp_unslash( $_GET['mtn_notice'] ) );
-					echo esc_html( 'updated' === $notice ? 'وضعیت رزرو به‌روزرسانی شد.' : ( 'invalid' === $notice ? 'درخواست معتبر نیست.' : 'تغییر وضعیت انجام نشد؛ وضعیت فعلی رزرو را بررسی کنید.' ) );
+					echo esc_html( 'updated' === $notice ? 'وضعیت رزرو به‌روزرسانی شد.' : ( 0 === strpos( $notice, 'deposit_' ) ? ( 'deposit_updated' === $notice ? 'وضعیت پیش‌پرداخت به‌روزرسانی شد.' : 'تأیید پیش‌پرداخت انجام نشد؛ وضعیت را بررسی کنید.' ) : ( 'invalid' === $notice ? 'درخواست معتبر نیست.' : 'تغییر وضعیت انجام نشد؛ وضعیت فعلی رزرو را بررسی کنید.' ) ) );
 				?></p></div>
 			<?php endif; ?>
 			<form method="get" style="margin:1rem 0">
@@ -93,7 +93,7 @@ final class MTN_CB_Admin {
 				<?php submit_button( __( 'اعمال فیلتر', 'mtn-cafe-booking' ), 'secondary', '', false ); ?>
 			</form>
 			<table class="widefat striped">
-				<thead><tr><th><?php esc_html_e( 'کد پیگیری', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'کافه / برنامه', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'زمان (UTC)', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'نفرات', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'وضعیت', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'عملیات', 'mtn-cafe-booking' ); ?></th></tr></thead>
+				<thead><tr><th><?php esc_html_e( 'کد پیگیری', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'کافه / برنامه', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'زمان (UTC)', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'نفرات', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'وضعیت', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'پیش‌پرداخت ۱۰۰ لیر', 'mtn-cafe-booking' ); ?></th><th><?php esc_html_e( 'عملیات', 'mtn-cafe-booking' ); ?></th></tr></thead>
 				<tbody>
 				<?php if ( $bookings ) : foreach ( $bookings as $booking ) : ?>
 					<tr>
@@ -102,6 +102,7 @@ final class MTN_CB_Admin {
 						<td><?php echo esc_html( $booking->booking_at ); ?></td>
 						<td><?php echo (int) $booking->party_size; ?></td>
 						<td><?php echo esc_html( isset( $labels[ $booking->status ] ) ? $labels[ $booking->status ] : $booking->status ); ?></td>
+						<td><?php $deposit_labels = array( 'awaiting_transfer' => 'در انتظار انتقال وجه', 'under_review' => 'در انتظار تطبیق بانکی', 'verified' => 'واریز تأیید شد', 'rejected' => 'واریز تأیید نشد' ); echo esc_html( isset( $deposit_labels[ $booking->deposit_status ] ) ? $deposit_labels[ $booking->deposit_status ] : $booking->deposit_status ); ?><br><small><?php echo esc_html( number_format_i18n( (float) $booking->deposit_amount, 2 ) . ' ' . $booking->deposit_currency ); ?><?php if ( $booking->deposit_reference ) : ?><br><?php echo esc_html( 'پیگیری: ' . $booking->deposit_reference ); ?><?php endif; ?></small><?php if ( 'under_review' === $booking->deposit_status ) : ?><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.4rem"><input type="hidden" name="action" value="mtn_cb_deposit_action"><input type="hidden" name="booking_id" value="<?php echo (int) $booking->id; ?>"><?php wp_nonce_field( 'mtn_cb_deposit_' . (int) $booking->id ); ?><button class="button button-primary" name="deposit_decision" value="verified"><?php esc_html_e( 'تطبیق شد', 'mtn-cafe-booking' ); ?></button><button class="button" name="deposit_decision" value="rejected"><?php esc_html_e( 'رد رسید', 'mtn-cafe-booking' ); ?></button></form><?php endif; ?></td>
 						<td>
 							<?php if ( in_array( $booking->status, array( 'pending_cafe', 'confirmed' ), true ) ) : ?>
 								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap">
@@ -116,7 +117,7 @@ final class MTN_CB_Admin {
 							<?php else : ?>—<?php endif; ?>
 						</td>
 					</tr>
-				<?php endforeach; else : ?><tr><td colspan="6"><?php esc_html_e( 'رزروی برای نمایش وجود ندارد.', 'mtn-cafe-booking' ); ?></td></tr><?php endif; ?>
+				<?php endforeach; else : ?><tr><td colspan="7"><?php esc_html_e( 'رزروی برای نمایش وجود ندارد.', 'mtn-cafe-booking' ); ?></td></tr><?php endif; ?>
 				</tbody>
 			</table>
 		</div>
