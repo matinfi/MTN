@@ -55,6 +55,7 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 	}
 
 	public function test_idempotency_replays_matching_payload_and_is_scoped_to_customer() {
+		update_option( 'mtn_cb_booking_mode', 'cafe_assigns_table' );
 		$cafe_id = self::factory()->post->create( array( 'post_type' => 'mtn_cafe', 'post_status' => 'publish' ) );
 		$event_id = self::factory()->post->create( array( 'post_type' => 'mtn_event', 'post_status' => 'publish' ) );
 		$event_date = new DateTimeImmutable( 'tomorrow', wp_timezone() );
