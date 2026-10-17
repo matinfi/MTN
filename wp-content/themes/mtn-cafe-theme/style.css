@@ -69,3 +69,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .mtn-support-widget{margin:1rem 0;padding:1rem;border:1px solid #383640;border-radius:12px;background:var(--mtn-surface)}
 .mtn-support-widget summary{cursor:pointer;font-weight:800;color:var(--mtn-accent)}
 .mtn-support-faq{padding-top:.75rem}.mtn-support-faq p{margin:.75rem 0}
+
+.mtn-map-preview{margin:.5rem 0;border:1px solid #383640;border-radius:10px;overflow:hidden}
+.mtn-map-preview summary{cursor:pointer;padding:.6rem .75rem;font-weight:700;color:var(--mtn-accent)}
+.mtn-map-frame{display:block;width:100%;height:220px;border:0;background:#ddd}
