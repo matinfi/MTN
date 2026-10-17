@@ -63,6 +63,13 @@ final class MTN_CB_Admin {
 		}
 		$sql .= ' ORDER BY b.created_at DESC LIMIT 200';
 		$bookings = $wpdb->get_results( $sql );
+		$summary_rows = $wpdb->get_results( 'SELECT status, COUNT(*) AS total FROM ' . $table . ' GROUP BY status' );
+		$summary = array( 'all' => 0, 'pending_cafe' => 0, 'confirmed' => 0, 'completed' => 0 );
+		foreach ( $summary_rows as $summary_row ) {
+			$summary['all'] += (int) $summary_row->total;
+			if ( isset( $summary[ $summary_row->status ] ) ) { $summary[ $summary_row->status ] = (int) $summary_row->total; }
+		}
+		$cooperation_count = (int) wp_count_posts( 'mtn_cooperation_request' )->private;
 		$labels = array(
 			'pending_cafe' => 'در انتظار تأیید',
 			'confirmed' => 'تأیید شده',
@@ -75,9 +82,15 @@ final class MTN_CB_Admin {
 			'no_show' => 'عدم مراجعه',
 		);
 		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'مدیریت رزروها', 'mtn-cafe-booking' ); ?></h1>
-			<p><?php esc_html_e( 'این صفحه فعلاً مخصوص مدیران وردپرس است؛ دسترسی مدیران کافه تا تکمیل مجوزهای مالکیت فعال نیست.', 'mtn-cafe-booking' ); ?></p>
+		<div class="wrap mtn-admin-dashboard">
+			<div class="mtn-admin-heading"><div><p class="mtn-admin-kicker">MTN · CONTROL CENTER</p><h1><?php esc_html_e( 'مدیریت رزروها', 'mtn-cafe-booking' ); ?></h1><p><?php esc_html_e( 'نمای کلی فعالیت‌ها و دسترسی سریع به درخواست‌های مهم پلتفرم.', 'mtn-cafe-booking' ); ?></p></div><a class="button button-primary mtn-admin-inbox-link" href="<?php echo esc_url( admin_url( 'edit.php?post_type=mtn_cooperation_request' ) ); ?>"><span class="dashicons dashicons-email-alt" aria-hidden="true"></span><?php echo esc_html( sprintf( 'درخواست‌های همکاری (%d)', $cooperation_count ) ); ?></a></div>
+			<div class="mtn-admin-metrics" aria-label="خلاصه رزروها">
+				<div class="mtn-admin-metric"><span>کل رزروها</span><strong><?php echo (int) $summary['all']; ?></strong><small>تمام وضعیت‌ها</small></div>
+				<div class="mtn-admin-metric is-pending"><span>در انتظار تأیید</span><strong><?php echo (int) $summary['pending_cafe']; ?></strong><small>نیازمند پیگیری</small></div>
+				<div class="mtn-admin-metric is-confirmed"><span>تأیید شده</span><strong><?php echo (int) $summary['confirmed']; ?></strong><small>رزروهای فعال</small></div>
+				<div class="mtn-admin-metric is-complete"><span>تکمیل شده</span><strong><?php echo (int) $summary['completed']; ?></strong><small>رزروهای پایان‌یافته</small></div>
+			</div>
+			<p class="mtn-admin-notice-line"><?php esc_html_e( 'این صفحه فعلاً مخصوص مدیران وردپرس است؛ دسترسی مدیران کافه تا تکمیل مجوزهای مالکیت فعال نیست.', 'mtn-cafe-booking' ); ?></p>
 			<?php if ( isset( $_GET['mtn_notice'] ) ) : ?>
 				<div class="notice <?php echo 'updated' === sanitize_key( wp_unslash( $_GET['mtn_notice'] ) ) ? 'notice-success' : 'notice-warning'; ?> is-dismissible"><p><?php
 					$notice = sanitize_key( wp_unslash( $_GET['mtn_notice'] ) );
