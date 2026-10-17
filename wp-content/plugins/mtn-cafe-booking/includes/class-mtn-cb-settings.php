@@ -42,6 +42,10 @@ final class MTN_CB_Settings {
 		register_setting( 'mtn_cb_settings', 'mtn_cb_bank_iban', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_iban' ), 'default' => '' ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_bank_instructions', array( 'sanitize_callback' => 'sanitize_textarea_field', 'default' => '' ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_support_whatsapp', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_whatsapp' ), 'default' => '' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_theme_accent', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_theme_accent' ), 'default' => '#e7a94b' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_theme_background', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_theme_background' ), 'default' => '#101014' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_theme_font', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_theme_font' ), 'default' => 'Tahoma, Arial, sans-serif' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_theme_density', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_theme_density' ), 'default' => 'comfortable' ) );
 	}
 
 	public static function sanitize_currency( $value ) {
@@ -73,6 +77,25 @@ final class MTN_CB_Settings {
 
 	public static function sanitize_whatsapp( $value ) {
 		return preg_replace( '/[^0-9]/', '', (string) $value );
+	}
+
+	public static function sanitize_theme_accent( $value ) {
+		$color = sanitize_hex_color( $value );
+		return $color ? $color : '#e7a94b';
+	}
+
+	public static function sanitize_theme_background( $value ) {
+		$color = sanitize_hex_color( $value );
+		return $color ? $color : '#101014';
+	}
+
+	public static function sanitize_theme_font( $value ) {
+		$allowed = array( 'Tahoma, Arial, sans-serif', 'Arial, sans-serif', 'system-ui, sans-serif' );
+		return in_array( $value, $allowed, true ) ? $value : 'Tahoma, Arial, sans-serif';
+	}
+
+	public static function sanitize_theme_density( $value ) {
+		return in_array( $value, array( 'comfortable', 'compact' ), true ) ? $value : 'comfortable';
 	}
 
 	public static function sanitize_amount( $value ) {
@@ -119,6 +142,10 @@ final class MTN_CB_Settings {
 				<?php settings_fields( 'mtn_cb_settings' ); ?>
 				<table class="form-table" role="presentation">
 					<tr><th><label for="mtn_cb_brand_name"><?php esc_html_e( 'نام برند', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_brand_name" name="mtn_cb_brand_name" value="<?php echo esc_attr( get_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_theme_accent"><?php esc_html_e( 'رنگ تأکیدی قالب', 'mtn-cafe-booking' ); ?></label></th><td><input type="color" id="mtn_cb_theme_accent" name="mtn_cb_theme_accent" value="<?php echo esc_attr( get_option( 'mtn_cb_theme_accent', '#e7a94b' ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_theme_background"><?php esc_html_e( 'رنگ پس‌زمینه قالب', 'mtn-cafe-booking' ); ?></label></th><td><input type="color" id="mtn_cb_theme_background" name="mtn_cb_theme_background" value="<?php echo esc_attr( get_option( 'mtn_cb_theme_background', '#101014' ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_theme_font"><?php esc_html_e( 'تایپوگرافی', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_theme_font" name="mtn_cb_theme_font"><?php foreach ( array( 'Tahoma, Arial, sans-serif' => 'Tahoma', 'Arial, sans-serif' => 'Arial', 'system-ui, sans-serif' => 'System UI' ) as $font_value => $font_label ) : ?><option value="<?php echo esc_attr( $font_value ); ?>" <?php selected( get_option( 'mtn_cb_theme_font', 'Tahoma, Arial, sans-serif' ), $font_value ); ?>><?php echo esc_html( $font_label ); ?></option><?php endforeach; ?></select></td></tr>
+					<tr><th><label for="mtn_cb_theme_density"><?php esc_html_e( 'تراکم چیدمان', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_theme_density" name="mtn_cb_theme_density"><option value="comfortable" <?php selected( get_option( 'mtn_cb_theme_density', 'comfortable' ), 'comfortable' ); ?>><?php esc_html_e( 'راحت', 'mtn-cafe-booking' ); ?></option><option value="compact" <?php selected( get_option( 'mtn_cb_theme_density', 'comfortable' ), 'compact' ); ?>><?php esc_html_e( 'فشرده', 'mtn-cafe-booking' ); ?></option></select><p class="description"><?php esc_html_e( 'لوگو از مسیر نمایش ← سفارشی‌سازی ← هویت سایت قابل تغییر است.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_currency"><?php esc_html_e( 'واحد پول', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" id="mtn_cb_currency" name="mtn_cb_currency" value="<?php echo esc_attr( get_option( 'mtn_cb_currency', 'TRY' ) ); ?>" maxlength="8"><p class="description"><?php esc_html_e( 'برای جلوگیری از ترکیب ارزها در دفتر مالی، پس از ایجاد اولین رزرو تغییر ارز قفل می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_commission_trigger_status"><?php esc_html_e( 'زمان ایجاد کارمزد', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_commission_trigger_status" name="mtn_cb_commission_trigger_status"><option value="confirmed" <?php selected( get_option( 'mtn_cb_commission_trigger_status', 'confirmed' ), 'confirmed' ); ?>><?php esc_html_e( 'پس از تأیید کافه (پیش‌فرض)', 'mtn-cafe-booking' ); ?></option><option value="completed" <?php selected( get_option( 'mtn_cb_commission_trigger_status', 'confirmed' ), 'completed' ); ?>><?php esc_html_e( 'پس از تکمیل رزرو', 'mtn-cafe-booking' ); ?></option></select><p class="description"><?php esc_html_e( 'این سیاست هنگام ایجاد هر رزرو ثبت می‌شود و تغییر بعدی فقط روی رزروهای جدید اثر دارد.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_default_commission"><?php esc_html_e( 'کارمزد ثابت هر رزرو واجد شرایط', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="0" step="0.01" id="mtn_cb_default_commission" name="mtn_cb_default_commission" value="<?php echo esc_attr( get_option( 'mtn_cb_default_commission', '0' ) ); ?>"></td></tr>
