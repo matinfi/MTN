@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 final class MTN_CB_Install {
-	const DB_VERSION = '13';
+	const DB_VERSION = '14';
 
 	public static function activate() {
 		global $wpdb;
@@ -27,6 +27,11 @@ final class MTN_CB_Install {
 			table_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			party_size smallint(5) unsigned NOT NULL DEFAULT 1,
 			booking_at datetime NOT NULL,
+			deposit_amount decimal(12,2) NOT NULL DEFAULT 100.00,
+			deposit_currency varchar(8) NOT NULL DEFAULT 'TRY',
+			deposit_status varchar(20) NOT NULL DEFAULT 'awaiting_transfer',
+			deposit_reference varchar(100) NOT NULL DEFAULT '',
+			deposit_verified_at datetime NULL,
 			status varchar(32) NOT NULL DEFAULT 'pending_cafe',
 			cafe_note text NULL,
 			customer_note text NULL,
@@ -190,6 +195,11 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_checkin_token_minutes', 15 );
 		add_option( 'mtn_cb_booking_duration_minutes', 120 );
 		add_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 );
+		add_option( 'mtn_cb_deposit_amount', '100.00' );
+		add_option( 'mtn_cb_bank_account_name', '' );
+		add_option( 'mtn_cb_bank_iban', '' );
+		add_option( 'mtn_cb_bank_instructions', '' );
+		add_option( 'mtn_cb_support_whatsapp', '' );
 		add_option( 'mtn_cb_statement_due_days', 7 );
 		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
 	}
@@ -211,13 +221,12 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( '4' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
+		if ( '5' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
 			'book' => array( 'title' => 'رزرو کافه', 'content' => '[mtn_booking_form]' ),
 			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]' ),
-			'cafe-dashboard' => array( 'title' => 'مدیریت کافه', 'content' => '[mtn_cafe_dashboard]' ),
 		);
 		foreach ( $pages as $slug => $page ) {
 			if ( ! get_page_by_path( $slug, OBJECT, 'page' ) ) {
@@ -244,7 +253,7 @@ final class MTN_CB_Install {
 				wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_content ) );
 			}
 		}
-		update_option( 'mtn_cb_default_pages_version', '4' );
+		update_option( 'mtn_cb_default_pages_version', '5' );
 	}
 
 	public static function maybe_upgrade() {
