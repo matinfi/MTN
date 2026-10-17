@@ -20,7 +20,7 @@ Returns whether event headcount capacity and selected-table availability appear 
 
 `GET /bookings/{id}/history`
 
-The customer who owns the booking, its assigned cafe owner, or an administrator can read the append-only event timeline. Actor user IDs are not returned. Events include creation, status transitions and table assignments; the timeline is operational audit evidence, not a substitute for a database backup.
+Only the customer who owns the booking or a site administrator can read the append-only event timeline in v1. Actor user IDs are not returned. Events include creation, status transitions and table assignments; the timeline is operational audit evidence, not a substitute for a database backup.
 
 ## Customer booking history
 
