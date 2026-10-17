@@ -3,7 +3,7 @@ Theme Name: MTN Cafe
 Theme URI: https://github.com/matinfi/MTN
 Author: MTN Project
 Description: Lightweight Persian RTL theme for cafe discovery and live music reservations.
-Version: 0.2.1
+Version: 0.3.0
 Requires at least: 6.4
 Requires PHP: 8.1
 Text Domain: mtn-cafe-theme
@@ -55,3 +55,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .mtn-checkin-token code{overflow-wrap:anywhere;user-select:all}
 
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* V1 discovery, bank-transfer instructions and saved-event actions */
+.mtn-event-discovery{background:var(--mtn-surface);border:1px solid #302e38;border-radius:var(--mtn-radius);padding:clamp(1rem,3vw,2rem)}
+.mtn-event-discovery input,.mtn-event-discovery select,.mtn-deposit-reference-form input{width:100%;min-height:46px;padding:.7rem .8rem;border:1px solid #77717f;border-radius:10px;background:#111116;color:var(--mtn-text);font:inherit}
+.mtn-event-discovery label,.mtn-deposit-reference-form label{display:block;font-weight:700;margin-bottom:.3rem}
+.mtn-event-load-more{margin-top:1rem}.mtn-deposit-instructions{display:grid;gap:.5rem;margin-top:1rem;padding:1rem;border:1px solid #7b5c2d;border-radius:12px;background:#211d18;white-space:normal;max-width:100%}
+.mtn-deposit-instructions p{margin:.2rem 0;overflow-wrap:anywhere}.mtn-bank-iban{display:inline-block;direction:ltr;overflow-wrap:anywhere;user-select:all}
+.mtn-deposit-reference-form{display:grid;gap:.5rem;max-width:100%}.mtn-favorite-toggle{margin-inline-end:.4rem}
+.mtn-support-whatsapp{margin-block:.5rem}
+@media(max-width:640px){.mtn-event-discovery .mtn-form-grid{grid-template-columns:1fr}.mtn-event-discovery .button{width:100%}}
