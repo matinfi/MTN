@@ -225,13 +225,14 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( '7' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
+		if ( '8' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
 			'book' => array( 'title' => 'رزرو کافه', 'content' => '[mtn_booking_form]' ),
 			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]\n\n[mtn_my_favorites]\n\n[mtn_my_applications]\n\n[mtn_support_whatsapp]' ),
 			'cooperation' => array( 'title' => 'درخواست همکاری', 'content' => '[mtn_partner_application]' ),
+			'booking-policy' => array( 'title' => 'قوانین رزرو و پیش‌پرداخت', 'content' => '<h2>پیش‌پرداخت رزرو</h2><p>برای هر رزرو مبلغ ثابت ۱۰۰ لیر ترکیه (TRY) به حساب رسمی سایت از طریق انتقال بانکی/حواله یا روش بانکی مجاز پرداخت می‌شود. پرداخت آنلاین درگاه در نسخه اول فعال نیست.</p><p>مشتری باید شماره پیگیری بانکی را در حساب خود ثبت کند. ثبت شماره پیگیری به‌تنهایی اثبات پرداخت نیست؛ مدیر سایت پس از تطبیق با گردش حساب واقعی آن را تأیید می‌کند. تا تأیید پیش‌پرداخت و تأیید نهایی رزرو توسط مدیر، رزرو قطعی نیست.</p><h2>لغو رزرو</h2><p>لغو توسط مشتری فقط تا سه ساعت پس از ایجاد رزرو و پیش از زمان شروع برنامه امکان‌پذیر است. پس از پایان این مهلت، لغو از حساب مشتری مجاز نیست و باید با پشتیبانی تماس گرفته شود.</p><p>پیش‌پرداخت ۱۰۰ لیر در صورت لغو توسط مشتری قابل استرداد نیست. هرگونه رسیدگی استثنایی در صورت لغو برنامه توسط برگزارکننده/مدیر، دستی و مستند انجام می‌شود؛ سیستم بازپرداخت خودکار ندارد.</p><h2>باقی مبلغ</h2><p>باقی مبلغ ورودی یا هزینه‌های کافه/رستوران مستقیماً هنگام حضور در محل و طبق اطلاعات برنامه پرداخت می‌شود. این پلتفرم در نسخه اول کیف پول یا درگاه پرداخت آنلاین ندارد.</p>' ),
 		);
 		foreach ( $pages as $slug => $page ) {
 			if ( ! get_page_by_path( $slug, OBJECT, 'page' ) ) {
@@ -258,7 +259,7 @@ final class MTN_CB_Install {
 				wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_content ) );
 			}
 		}
-		update_option( 'mtn_cb_default_pages_version', '7' );
+		update_option( 'mtn_cb_default_pages_version', '8' );
 	}
 
 	public static function maybe_upgrade() {
