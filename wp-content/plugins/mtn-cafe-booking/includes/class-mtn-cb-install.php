@@ -201,7 +201,7 @@ final class MTN_CB_Install {
 		add_option( 'mtn_cb_bank_instructions', '' );
 		add_option( 'mtn_cb_support_whatsapp', '' );
 		add_option( 'mtn_cb_statement_due_days', 7 );
-		add_option( 'mtn_cb_booking_mode', 'customer_selects_table' );
+		add_option( 'mtn_cb_booking_mode', 'cafe_assigns_table' );
 	}
 
 	public static function ensure_roles() {
@@ -221,12 +221,13 @@ final class MTN_CB_Install {
 	}
 
 	public static function ensure_default_pages() {
-		if ( '5' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
+		if ( '6' === (string) get_option( 'mtn_cb_default_pages_version', '0' ) ) {
 			return;
 		}
 		$pages = array(
 			'book' => array( 'title' => 'رزرو کافه', 'content' => '[mtn_booking_form]' ),
-			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]' ),
+			'my-account' => array( 'title' => 'رزروهای من', 'content' => '[mtn_my_bookings]\n\n[mtn_my_applications]\n\n[mtn_support_whatsapp]' ),
+			'cooperation' => array( 'title' => 'درخواست همکاری', 'content' => '[mtn_partner_application]' ),
 		);
 		foreach ( $pages as $slug => $page ) {
 			if ( ! get_page_by_path( $slug, OBJECT, 'page' ) ) {
@@ -244,7 +245,7 @@ final class MTN_CB_Install {
 		$account_page = get_page_by_path( 'my-account', OBJECT, 'page' );
 		if ( $account_page ) {
 			$account_content = $account_page->post_content;
-			foreach ( array( '[mtn_cafe_invite_accept]', '[mtn_sms_login]' ) as $shortcode ) {
+			foreach ( array( '[mtn_sms_login]', '[mtn_my_applications]', '[mtn_support_whatsapp]' ) as $shortcode ) {
 				if ( false === strpos( $account_content, $shortcode ) ) {
 					$account_content .= "\n\n" . $shortcode;
 				}
@@ -253,7 +254,7 @@ final class MTN_CB_Install {
 				wp_update_post( array( 'ID' => $account_page->ID, 'post_content' => $account_content ) );
 			}
 		}
-		update_option( 'mtn_cb_default_pages_version', '5' );
+		update_option( 'mtn_cb_default_pages_version', '6' );
 	}
 
 	public static function maybe_upgrade() {
