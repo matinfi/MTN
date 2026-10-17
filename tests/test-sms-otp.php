@@ -91,4 +91,45 @@ class MTN_Cafe_Booking_SMS_OTP_Test extends WP_UnitTestCase {
 		$this->assertSame( 'mtn_otp_invalid', $result->get_error_code() );
 	}
 
+
+	public function test_valid_code_authenticates_registered_phone_once_and_replay_fails() {
+		global $wpdb;
+		$phone = '+905551234570';
+		$user_id = self::factory()->user->create();
+		update_user_meta( $user_id, 'mtn_cb_phone', $phone );
+		$captured_code = '';
+		$mock_twilio = static function ( $preempt, $args ) use ( &$captured_code ) {
+			if ( isset( $args['body']['Body'] ) && preg_match( '/([0-9]{6})/', $args['body']['Body'], $matches ) ) {
+				$captured_code = $matches[1];
+			}
+			return array(
+				'headers' => array(),
+				'body' => '{}',
+				'response' => array( 'code' => 201, 'message' => 'Created' ),
+				'cookies' => array(),
+				'filename' => null,
+			);
+		};
+		add_filter( 'pre_http_request', $mock_twilio, 10, 3 );
+		try {
+			$request = new WP_REST_Request( 'POST', '/mtn/v1/auth/otp/request' );
+			$request->set_param( 'phone', $phone );
+			$requested = MTN_CB_SMS_OTP::request_code( $request );
+			$this->assertNotWPError( $requested );
+			$this->assertSame( 6, strlen( $captured_code ), 'The mocked provider should capture the generated OTP without exposing it in the API response.' );
+		} finally {
+			remove_filter( 'pre_http_request', $mock_twilio, 10 );
+		}
+		wp_set_current_user( 0 );
+		$verify = MTN_CB_SMS_OTP::verify_code( $this->make_request( $phone, $captured_code ) );
+		$this->assertNotWPError( $verify );
+		$this->assertSame( $user_id, get_current_user_id() );
+		$status = $wpdb->get_var( $wpdb->prepare( 'SELECT status FROM ' . MTN_CB_SMS_OTP::table_name() . ' WHERE phone = %s ORDER BY id DESC LIMIT 1', $phone ) );
+		$this->assertSame( 'consumed', $status );
+		wp_set_current_user( 0 );
+		$replay = MTN_CB_SMS_OTP::verify_code( $this->make_request( $phone, $captured_code ) );
+		$this->assertWPError( $replay );
+		$this->assertSame( 'mtn_otp_expired', $replay->get_error_code() );
+		$this->assertSame( 0, get_current_user_id(), 'Replaying a consumed code must not authenticate the user.' );
+	}
 }
