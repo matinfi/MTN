@@ -20,3 +20,7 @@ tests_add_filter( 'muplugins_loaded', static function () use ( $plugin_path ) {
 	require $plugin_path;
 } );
 require $wp_tests_dir . '/includes/bootstrap.php';
+
+// Test-only bank details allow booking-flow tests to exercise the manual deposit guard.
+update_option( 'mtn_cb_bank_account_name', 'MTN Test Account' );
+update_option( 'mtn_cb_bank_iban', 'TR330006100519786457841326' );
