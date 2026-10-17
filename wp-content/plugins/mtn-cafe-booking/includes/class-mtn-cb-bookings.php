@@ -197,6 +197,10 @@ final class MTN_CB_Bookings {
 				'table_id'               => $table_id,
 				'party_size'             => $party,
 				'booking_at'             => $booking_at_utc,
+				'deposit_amount'         => '100.00',
+				'deposit_currency'       => 'TRY',
+				'deposit_status'         => 'awaiting_transfer',
+				'deposit_reference'      => '',
 				'status'                 => 'pending_cafe',
 				'customer_note'          => isset( $args['customer_note'] ) ? sanitize_textarea_field( $args['customer_note'] ) : '',
 				'whatsapp_action_status' => 'manual_required',
@@ -210,7 +214,7 @@ final class MTN_CB_Bookings {
 				'created_at'             => $now,
 				'updated_at'             => $now,
 			),
-			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+			array( '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%s', '%s', '%d', '%d', '%d', '%s', '%s' )
 		);
 
 		if ( false === $inserted ) {
@@ -608,11 +612,15 @@ final class MTN_CB_Bookings {
 			return new WP_Error( 'mtn_transition_not_allowed', __( 'این تغییر وضعیت مجاز نیست.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 		}
 		if ( 'cancelled_by_customer' === $next_status ) {
-			$cutoff_minutes = min( 10080, max( 0, absint( get_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 ) ) ) );
 			$booking_timestamp = strtotime( $booking->booking_at . ' UTC' );
-			if ( ! $booking_timestamp || $booking_timestamp <= time() || ( $cutoff_minutes > 0 && $booking_timestamp - time() < $cutoff_minutes * MINUTE_IN_SECONDS ) ) {
-				return new WP_Error( 'mtn_cancellation_cutoff', __( 'مهلت لغو این رزرو به پایان رسیده است؛ برای پیگیری با کافه تماس بگیرید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
+			$created_timestamp = strtotime( $booking->created_at . ' UTC' );
+			$within_three_hours = $created_timestamp && time() <= ( $created_timestamp + 3 * HOUR_IN_SECONDS );
+			if ( ! $booking_timestamp || $booking_timestamp <= time() || ! $within_three_hours ) {
+				return new WP_Error( 'mtn_cancellation_cutoff', __( 'لغو فقط تا سه ساعت پس از ثبت رزرو مجاز است. پس از پایان این مهلت، پیش‌پرداخت ۱۰۰ لیر مسترد نمی‌شود.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 			}
+		}
+		if ( 'confirmed' === $next_status && isset( $booking->deposit_status ) && 'verified' !== $booking->deposit_status ) {
+			return new WP_Error( 'mtn_deposit_unverified', __( 'تا زمانی که مدیر سایت واریز پیش‌پرداخت ۱۰۰ لیر را تأیید نکرده باشد، رزرو قابل تأیید نیست.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
 		}
 		if ( in_array( $next_status, array( 'confirmed', 'completed' ), true ) && 'cafe_assigns_table' === get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) && ! absint( $booking->table_id ) ) {
 			return new WP_Error( 'mtn_table_not_assigned', __( 'پیش از تأیید یا تکمیل رزرو، میز را تخصیص دهید.', 'mtn-cafe-booking' ), array( 'status' => 409 ) );
