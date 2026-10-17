@@ -9,6 +9,7 @@ final class MTN_CB_Applications {
 		add_shortcode( 'mtn_my_applications', array( __CLASS__, 'my_applications' ) );
 		add_action( 'admin_post_mtn_cb_submit_application', array( __CLASS__, 'submit' ) );
 		add_action( 'admin_post_nopriv_mtn_cb_submit_application', array( __CLASS__, 'submit' ) );
+		add_action( 'save_post_' . self::TYPE, array( __CLASS__, 'sync_review_status' ), 20, 3 );
 		add_filter( 'manage_' . self::TYPE . '_posts_columns', array( __CLASS__, 'columns' ) );
 		add_action( 'manage_' . self::TYPE . '_posts_custom_column', array( __CLASS__, 'column_value' ), 10, 2 );
 	}
@@ -23,7 +24,8 @@ final class MTN_CB_Applications {
 		$notice = isset( $_GET['mtn_application'] ) ? sanitize_key( wp_unslash( $_GET['mtn_application'] ) ) : '';
 		ob_start(); ?>
 		<section class="mtn-booking-panel"><h2>درخواست همکاری با MTN</h2>
-		<p>درخواست‌های کافه، رستوران و هنرمند توسط مدیر سایت بررسی می‌شوند. ارسال فرم به معنی تأیید یا انتشار برنامه نیست.</p>
+		<p>درخواست‌های کافه، رستوران و هنرمند توسط مدیر سایت بررسی می‌شوند. ارسال فرم به معنی تأیید یا انتشار برنامه نیست. برای پیگیری در حساب کاربری، پیش از ثبت درخواست وارد شوید.</p>
+		<?php if ( ! is_user_logged_in() ) : ?><p><a class="button" href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>">ورود برای ثبت و پیگیری درخواست</a></p><?php endif; ?>
 		<?php if ( 'sent' === $notice ) : ?><p role="status">درخواست ثبت شد؛ وضعیت را در پنل کاربری پیگیری کنید.</p><?php elseif ( 'error' === $notice ) : ?><p role="alert">ثبت درخواست انجام نشد؛ اطلاعات را بررسی کنید.</p><?php endif; ?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="mtn-form-grid">
 		<input type="hidden" name="action" value="mtn_cb_submit_application"><?php wp_nonce_field( 'mtn_cb_submit_application', 'mtn_application_nonce' ); ?>
@@ -37,6 +39,7 @@ final class MTN_CB_Applications {
 		<?php return ob_get_clean();
 	}
 	public static function submit() {
+		if ( ! is_user_logged_in() ) self::redirect( 'error' );
 		if ( ! isset( $_POST['mtn_application_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_application_nonce'] ) ), 'mtn_cb_submit_application' ) ) wp_die( esc_html__( 'درخواست امنیتی معتبر نیست.', 'mtn-cafe-booking' ), '', array( 'response' => 403 ) );
 		$type = isset( $_POST['application_type'] ) ? sanitize_key( wp_unslash( $_POST['application_type'] ) ) : '';
 		$name = isset( $_POST['applicant_name'] ) ? sanitize_text_field( wp_unslash( $_POST['applicant_name'] ) ) : '';
@@ -66,6 +69,12 @@ final class MTN_CB_Applications {
 		$out .= '<ul>'; foreach ( $items as $item ) $out .= '<li><strong>' . esc_html( get_the_title( $item ) ) . '</strong> — ' . esc_html( isset( $labels[ $item->post_status ] ) ? $labels[ $item->post_status ] : 'در انتظار بررسی مدیر' ) . ' — ' . esc_html( get_the_date( '', $item ) ) . '</li>';
 		return $out . '</ul></section>';
 	}
+	public static function sync_review_status( $post_id, $post, $update ) {
+		if ( wp_is_post_revision( $post_id ) || self::TYPE !== $post->post_type ) return;
+		$statuses = array( 'pending' => 'pending_review', 'draft' => 'needs_information', 'publish' => 'approved', 'private' => 'closed' );
+		update_post_meta( $post_id, '_mtn_application_review_status', isset( $statuses[ $post->post_status ] ) ? $statuses[ $post->post_status ] : 'pending_review' );
+	}
+
 	public static function columns( $columns ) { $columns['mtn_applicant_type'] = 'نوع'; $columns['mtn_applicant_contact'] = 'اطلاعات تماس'; $columns['mtn_application_review'] = 'وضعیت بررسی'; return $columns; }
 	public static function column_value( $column, $post_id ) {
 		if ( 'mtn_applicant_type' === $column ) { $types = array( 'cafe' => 'کافه', 'restaurant' => 'رستوران', 'artist' => 'هنرمند' ); $type = get_post_meta( $post_id, '_mtn_application_type', true ); echo esc_html( isset( $types[ $type ] ) ? $types[ $type ] : '—' ); }
