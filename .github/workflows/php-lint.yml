@@ -20,6 +20,8 @@ jobs:
         run: node --check wp-content/plugins/mtn-cafe-booking/assets/booking-wizard.js
       - name: Check SMS OTP JavaScript syntax
         run: node --check wp-content/plugins/mtn-cafe-booking/assets/otp-login.js
+      - name: Check event discovery JavaScript syntax
+        run: node --check wp-content/plugins/mtn-cafe-booking/assets/event-discovery.js
       - name: Run static source-contract checks
         run: php tests/static-contracts.php
       - name: Lint PHP files

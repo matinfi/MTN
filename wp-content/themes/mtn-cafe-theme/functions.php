@@ -18,7 +18,18 @@ function mtn_cafe_theme_setup() {
 add_action( 'after_setup_theme', 'mtn_cafe_theme_setup' );
 
 function mtn_cafe_enqueue_assets() {
-	wp_enqueue_style( 'mtn-cafe-style', get_stylesheet_uri(), array(), '0.2.1' );
+	wp_enqueue_style( 'mtn-cafe-style', get_stylesheet_uri(), array(), '0.3.0' );
+	$accent = sanitize_hex_color( get_option( 'mtn_cb_theme_accent', '#e7a94b' ) );
+	$background = sanitize_hex_color( get_option( 'mtn_cb_theme_background', '#101014' ) );
+	$font = get_option( 'mtn_cb_theme_font', 'Tahoma, Arial, sans-serif' );
+	$allowed_fonts = array( 'Tahoma, Arial, sans-serif', 'Arial, sans-serif', 'system-ui, sans-serif' );
+	if ( ! in_array( $font, $allowed_fonts, true ) ) $font = 'Tahoma, Arial, sans-serif';
+	$density = 'compact' === get_option( 'mtn_cb_theme_density', 'comfortable' ) ? 'compact' : 'comfortable';
+	$gap = 'compact' === $density ? '.65rem' : '1rem';
+	$card_padding = 'compact' === $density ? '.85rem' : '1.25rem';
+	$section_space = 'compact' === $density ? '2rem' : '3rem';
+	$css = ':root{--mtn-accent:' . ( $accent ? $accent : '#e7a94b' ) . ';--mtn-bg:' . ( $background ? $background : '#101014' ) . ';--mtn-font:' . $font . ';--mtn-card-gap:' . $gap . ';--mtn-card-padding:' . $card_padding . ';--mtn-section-space:' . $section_space . '}body{font-family:var(--mtn-font)}.cards{gap:var(--mtn-card-gap)}.card{padding:var(--mtn-card-padding)}.section{padding:var(--mtn-section-space) 0}';
+	wp_add_inline_style( 'mtn-cafe-style', $css );
 }
 add_action( 'wp_enqueue_scripts', 'mtn_cafe_enqueue_assets' );
 

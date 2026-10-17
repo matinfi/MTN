@@ -1,5 +1,20 @@
 # Acceptance checklist
 
+## Final product scope gates (added 2026-10-17)
+- [x] AJAX event discovery route and homepage filters for name/place/city/artist/date/price/genre/venue type, progressive loading, popularity and opt-in distance sort are implemented in source.
+- [x] Manual 100 TRY bank-transfer deposit fields, customer transfer-reference submission and administrator reconciliation UI are implemented in source; no online gateway is claimed.
+- [x] Booking confirmation is blocked until the deposit is manually verified.
+- [x] Customer cancellation is limited to three hours after booking creation and before event start; the deposit is non-refundable on customer cancellation.
+- [x] Partner applications for cafes, restaurants and artists can be submitted and tracked by logged-in applicants; review remains centralized.
+- [x] New installations no longer create an operational cafe dashboard page, and cafe operations REST endpoints require site administrator capability.
+- [ ] Test deposit reference submission, admin verify/reject/retry, non-admin denial, idempotency, and confirmation guard in the WordPress integration suite.
+- [x] Favorites/saved events and dedicated artist archive/profile templates are implemented; end-to-end verification remains part of staging.
+- [ ] Validate IBAN/account ownership, theme color contrast, mobile responsive behavior, screen-reader/accessibility, security and performance on staging.
+- [ ] Confirm actual email/notification delivery and direct WhatsApp support contact; automated WhatsApp bot is not in v1.
+- [ ] Staging acceptance, target-host backup/restore rehearsal and production approval.
+
+
+
 This checklist is the release gate. An unchecked item must not be described as implemented or production-ready.
 
 ## Booking

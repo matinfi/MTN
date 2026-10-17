@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.11.0] - 2026-10-17
+- Add AJAX event discovery filters, progressive loading, popularity sorting, opt-in distance sorting, event price/artist metadata, venue type and coordinate fields.
+- Add saved events/favorites and dedicated artist archive/profile templates.
+- Add centrally reviewed partner application form and status tracking; retire the cafe-owner operational dashboard from v1.
+- Add manual 100 TRY bank-transfer deposit flow, customer reference submission, administrator reconciliation and confirmation guard; no online payment gateway is represented as active.
+- Enforce customer cancellation only within three hours of booking creation and publish explicit non-refundable deposit terms.
+- Add configurable direct WhatsApp support contact; automated chatbot/WhatsApp API remains out of v1 scope.
+- Update v1 scope, API, finance and acceptance documentation.
+
 ## [0.10.1] - 2026-10-16
 - Serialize OTP requests per phone, supersede older challenges, and atomically enforce failed-attempt lockout.
 - Add per-IP OTP throttling regression coverage and eliminate duplicate-key database noise in idempotent notification enqueue.

@@ -44,9 +44,10 @@ foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications,
 	}
 }
 
-$route_count = substr_count( $rest, '(?P<id>' );
-if ( 10 !== $route_count ) {
-	fwrite( STDERR, "Expected 10 booking routes with an ID pattern; found {$route_count}.\n" );
+$deposit_source = file_get_contents( $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-deposit.php' );
+$route_count = substr_count( $rest, '(?P<id>' ) + substr_count( $deposit_source, '(?P<id>' );
+if ( 11 !== $route_count ) {
+	fwrite( STDERR, "Expected 11 routes with a numeric ID pattern; found {$route_count}.\n" );
 	exit( 1 );
 }
 
@@ -57,8 +58,10 @@ if ( false !== strpos( $rest, $overescaped_pattern ) ) {
 	exit( 1 );
 }
 
-if ( false === strpos( $bookings, "get_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 )" ) ||
-	false === strpos( $bookings, "'cancelled_by_customer' === " . '$next_status' ) ) {
+if ( false === strpos( $bookings, '$created_timestamp + 3 * HOUR_IN_SECONDS' ) ||
+	false === strpos( $bookings, "'cancelled_by_customer' === " . '$next_status' ) ||
+	false === strpos( $bookings, "'verified' !== $booking->deposit_status" ) ||
+	false === strpos( $bookings, 'mtn_deposit_unconfigured' ) ) {
 	fwrite( STDERR, "Customer cancellation cutoff enforcement is missing.\n" );
 	exit( 1 );
 }
@@ -71,7 +74,7 @@ if ( false === strpos( $content, "if ( current_user_can( 'manage_options' ) )" )
 	exit( 1 );
 }
 
-if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
+if ( false === strpos( $install, "const DB_VERSION = '14';" ) ||
 	false === strpos( $install, 'commission_trigger_status varchar(20)' ) ||
 	false === strpos( $install, 'commission_reverse_on_cancellation tinyint(1)' ) ||
 	false === strpos( $install, 'commission_reverse_on_no_show tinyint(1)' ) ||
@@ -79,6 +82,8 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 	false === strpos( $install, 'mtn_cafe_invites' ) ||
 	false === strpos( $install, 'mtn_notifications' ) ||
 	false === strpos( $install, 'mtn_sms_otps' ) ||
+	false === strpos( $install, 'deposit_status varchar(20)' ) ||
+	false === strpos( $install, 'deposit_reference varchar(100)' ) ||
 	false === strpos( $sms, 'MTN_CB_TWILIO_ACCOUNT_SID' ) ||
 	false === strpos( $sms, 'wp_set_auth_cookie' ) ||
 	false === strpos( $sms, 'mtn_sms_login' ) ||
@@ -117,6 +122,11 @@ if ( false === strpos( $install, "const DB_VERSION = '13';" ) ||
 
 if ( false === strpos( $theme_header, 'class="skip-link"' ) || false === strpos( $theme_header, 'id="main-content" tabindex="-1"' ) || false === strpos( $theme_style, '.skip-link:focus' ) || false === strpos( $theme_style, 'prefers-reduced-motion:reduce' ) || 1 !== substr_count( $shortcodes, "add_shortcode( 'mtn_cafe_invite_accept'" ) || false === strpos( $otp_js, 'codeField.hidden = false' ) ) {
 	fwrite( STDERR, "Accessibility or front-end registration regression detected.\n" );
+	exit( 1 );
+}
+
+if ( false === strpos( $rest, "'/events'" ) || false === strpos( $rest, "'/my/favorites'" ) || false === strpos( $rest, 'public static function events_search' ) || false === strpos( $content, "'mtn_artist'" ) || false === strpos( $deposit_source, 'deposit_reference_submitted' ) || false === strpos( file_get_contents( $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-applications.php' ), 'mtn_application' ) ) {
+	fwrite( STDERR, "Final v1 scope contract is missing.\n" );
 	exit( 1 );
 }
 

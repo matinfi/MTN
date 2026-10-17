@@ -59,7 +59,33 @@ final class MTN_CB_Content {
 				'show_in_rest' => true,
 				'menu_icon' => 'dashicons-calendar-alt',
 				'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
+				'capability_type' => array( 'mtn_event', 'mtn_events' ),
+				'map_meta_cap' => true,
+				'capabilities' => array(
+					'edit_posts' => 'manage_options', 'edit_others_posts' => 'manage_options', 'publish_posts' => 'manage_options',
+					'read_private_posts' => 'manage_options', 'delete_posts' => 'manage_options', 'delete_private_posts' => 'manage_options',
+					'delete_published_posts' => 'manage_options', 'delete_others_posts' => 'manage_options',
+					'edit_private_posts' => 'manage_options', 'edit_published_posts' => 'manage_options', 'create_posts' => 'manage_options',
+				),
 				'rewrite' => array( 'slug' => 'events' ),
+			)
+		);
+		register_post_type(
+			'mtn_artist',
+			array(
+				'labels' => array( 'name' => __( 'هنرمندان', 'mtn-cafe-booking' ), 'singular_name' => __( 'هنرمند', 'mtn-cafe-booking' ), 'add_new_item' => __( 'افزودن هنرمند', 'mtn-cafe-booking' ) ),
+				'public' => true, 'has_archive' => true, 'show_in_rest' => true,
+				'menu_icon' => 'dashicons-microphone',
+				'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
+				'capability_type' => array( 'mtn_artist', 'mtn_artists' ),
+				'map_meta_cap' => true,
+				'capabilities' => array(
+					'edit_posts' => 'manage_options', 'edit_others_posts' => 'manage_options', 'publish_posts' => 'manage_options',
+					'read_private_posts' => 'manage_options', 'delete_posts' => 'manage_options', 'delete_private_posts' => 'manage_options',
+					'delete_published_posts' => 'manage_options', 'delete_others_posts' => 'manage_options',
+					'edit_private_posts' => 'manage_options', 'edit_published_posts' => 'manage_options', 'create_posts' => 'manage_options',
+				),
+				'rewrite' => array( 'slug' => 'artists' ),
 			)
 		);
 		register_post_type(
@@ -111,8 +137,9 @@ final class MTN_CB_Content {
 		} elseif ( 'checkbox' === $type ) {
 			echo '<input type="checkbox" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" value="1" ' . checked( (bool) $value, true, false ) . '> ' . esc_html__( 'فعال', 'mtn-cafe-booking' );
 		} else {
-			$input_type = in_array( $type, array( 'number', 'datetime-local', 'date', 'time', 'tel', 'url', 'email' ), true ) ? $type : 'text';
-			$step = 'number' === $input_type ? ' step="1" min="0"' : '';
+			$input_type = in_array( $type, array( 'number', 'decimal', 'datetime-local', 'date', 'time', 'tel', 'url', 'email' ), true ) ? $type : 'text';
+			$step = 'number' === $input_type ? ' step="1" min="0"' : ( 'decimal' === $input_type ? ' step="0.01" min="0"' : '' );
+			if ( 'decimal' === $input_type ) { $input_type = 'number'; }
 			echo '<input class="widefat" type="' . esc_attr( $input_type ) . '" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '"' . $step . '>';
 		}
 		if ( $help ) {
@@ -141,6 +168,9 @@ final class MTN_CB_Content {
 		self::field( $post->ID, 'mtn_cafe_email', __( 'ایمیل دریافت صورت‌حساب', 'mtn-cafe-booking' ), 'email' );
 		self::field( $post->ID, 'mtn_cafe_whatsapp', __( 'شماره واتساپ با کد کشور', 'mtn-cafe-booking' ), 'tel' );
 		self::field( $post->ID, 'mtn_cafe_music_genre', __( 'سبک موسیقی', 'mtn-cafe-booking' ) );
+		self::field( $post->ID, 'mtn_cafe_type', __( 'نوع مکان (کافه/رستوران)', 'mtn-cafe-booking' ), 'text', 'برای فیلتر دقیق، مقدار را دقیقاً cafe یا restaurant وارد کنید.' );
+		self::field( $post->ID, 'mtn_cafe_latitude', __( 'عرض جغرافیایی (Latitude)', 'mtn-cafe-booking' ), 'text', 'برای نمایش فاصله و نقشه، مقدار اعشاری معتبر وارد کنید.' );
+		self::field( $post->ID, 'mtn_cafe_longitude', __( 'طول جغرافیایی (Longitude)', 'mtn-cafe-booking' ), 'text', 'برای نمایش فاصله و نقشه، مقدار اعشاری معتبر وارد کنید.' );
 	}
 
 	public static function render_event_meta_box( $post ) {
@@ -152,6 +182,8 @@ final class MTN_CB_Content {
 		self::field( $post->ID, 'mtn_event_date', __( 'تاریخ برنامه', 'mtn-cafe-booking' ), 'date' );
 		self::field( $post->ID, 'mtn_event_start_time', __( 'ساعت شروع', 'mtn-cafe-booking' ), 'time' );
 		self::field( $post->ID, 'mtn_event_end_time', __( 'ساعت پایان', 'mtn-cafe-booking' ), 'time' );
+		self::field( $post->ID, 'mtn_event_artist', __( 'خواننده / هنرمند', 'mtn-cafe-booking' ) );
+		self::field( $post->ID, 'mtn_event_price', __( 'قیمت ورودی هر نفر (لیر؛ ۰ یعنی رایگان/نامشخص)', 'mtn-cafe-booking' ), 'decimal' );
 		$recurrence = get_post_meta( $post->ID, 'mtn_event_recurrence', true );
 		if ( ! in_array( $recurrence, array( 'weekly', 'monthly' ), true ) ) {
 			$recurrence = 'none';
@@ -201,11 +233,20 @@ final class MTN_CB_Content {
 		}
 		// Only administrators may assign cafe ownership. Editors who can edit
 		// public cafe content must not be able to grant users manager access.
-		$keys = array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_email', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre' );
+		$keys = array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_email', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre', 'mtn_cafe_type' );
 		if ( current_user_can( 'manage_options' ) ) {
 			$keys[] = 'mtn_cafe_owner_id';
 		}
 		self::save_fields( $post_id, $keys, array( 'mtn_cafe_owner_id' ) );
+		if ( isset( $_POST['mtn_cb_listing_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_cb_listing_nonce'] ) ), 'mtn_cb_save_listing' ) && current_user_can( 'edit_post', $post_id ) && ! ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) && ! wp_is_post_revision( $post_id ) ) {
+			foreach ( array( 'mtn_cafe_latitude' => array( -90, 90 ), 'mtn_cafe_longitude' => array( -180, 180 ) ) as $coordinate => $bounds ) {
+				if ( isset( $_POST[ $coordinate ] ) && is_scalar( $_POST[ $coordinate ] ) ) {
+					$value = trim( (string) wp_unslash( $_POST[ $coordinate ] ) );
+					$valid = is_numeric( $value ) && (float) $value >= $bounds[0] && (float) $value <= $bounds[1];
+					update_post_meta( $post_id, $coordinate, $valid ? (string) (float) $value : '' );
+				}
+			}
+		}
 		if ( current_user_can( 'manage_options' ) ) {
 			$raw_manager_ids = isset( $_POST['mtn_cafe_manager_ids'] ) && is_array( $_POST['mtn_cafe_manager_ids'] ) ? wp_unslash( $_POST['mtn_cafe_manager_ids'] ) : array();
 			$manager_ids = array_values( array_unique( array_filter( array_map( 'absint', $raw_manager_ids ) ) ) );
@@ -222,7 +263,11 @@ final class MTN_CB_Content {
 	}
 
 	public static function save_event_meta( $post_id ) {
-		self::save_fields( $post_id, array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size', 'mtn_event_date', 'mtn_event_start_time', 'mtn_event_end_time', 'mtn_event_recurrence_until' ), array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size' ) );
+		self::save_fields( $post_id, array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size', 'mtn_event_date', 'mtn_event_start_time', 'mtn_event_end_time', 'mtn_event_recurrence_until', 'mtn_event_artist' ), array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size' ) );
+		if ( isset( $_POST['mtn_event_price'] ) && is_scalar( $_POST['mtn_event_price'] ) && current_user_can( 'edit_post', $post_id ) && isset( $_POST['mtn_cb_listing_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_cb_listing_nonce'] ) ), 'mtn_cb_save_listing' ) && ! ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) && ! wp_is_post_revision( $post_id ) ) {
+			$price = sanitize_text_field( wp_unslash( $_POST['mtn_event_price'] ) );
+			update_post_meta( $post_id, 'mtn_event_price', is_numeric( $price ) && (float) $price >= 0 ? number_format( min( 999999999.99, (float) $price ), 2, '.', '' ) : '0.00' );
+		}
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) || ! isset( $_POST['mtn_cb_listing_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_cb_listing_nonce'] ) ), 'mtn_cb_save_listing' ) || ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
@@ -265,10 +310,10 @@ final class MTN_CB_Content {
 		register_post_meta( 'mtn_event', 'mtn_event_capacity', $common );
 		register_post_meta( 'mtn_event', 'mtn_min_party_size', $common );
 		register_post_meta( 'mtn_event', 'mtn_max_party_size', $common );
-		foreach ( array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre' ) as $text_meta ) {
+		foreach ( array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre', 'mtn_cafe_type', 'mtn_cafe_latitude', 'mtn_cafe_longitude' ) as $text_meta ) {
 			register_post_meta( 'mtn_cafe', $text_meta, array( 'single' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field', 'show_in_rest' => true, 'auth_callback' => static function () { return current_user_can( 'edit_posts' ); } ) );
 		}
-		foreach ( array( 'mtn_event_date', 'mtn_event_start_time', 'mtn_event_end_time' ) as $text_meta ) {
+		foreach ( array( 'mtn_event_date', 'mtn_event_start_time', 'mtn_event_end_time', 'mtn_event_artist', 'mtn_event_price' ) as $text_meta ) {
 			register_post_meta( 'mtn_event', $text_meta, array( 'single' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field', 'show_in_rest' => true, 'auth_callback' => static function () { return current_user_can( 'edit_posts' ); } ) );
 		}
 		$private_owner_meta = $common;
