@@ -37,6 +37,12 @@ final class MTN_CB_Settings {
 		register_setting( 'mtn_cb_settings', 'mtn_cb_customer_cancel_cutoff_minutes', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_cancel_cutoff' ), 'default' => 0 ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_statement_due_days', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_statement_due_days' ), 'default' => 7 ) );
 		register_setting( 'mtn_cb_settings', 'mtn_cb_booking_mode', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_mode' ), 'default' => 'customer_selects_table' ) );
+		register_setting( 'mtn_cb_settings', 'mtn_cb_whatsapp_number', array( 'sanitize_callback' => array( __CLASS__, 'sanitize_whatsapp_number' ), 'default' => '' ) );
+	}
+
+	public static function sanitize_whatsapp_number( $value ) {
+		$value = preg_replace( '/[^0-9]/', '', (string) $value );
+		return strlen( $value ) >= 8 && strlen( $value ) <= 15 ? $value : '';
 	}
 
 	public static function sanitize_currency( $value ) {
@@ -111,6 +117,7 @@ final class MTN_CB_Settings {
 					<tr><th><label for="mtn_cb_booking_duration_minutes"><?php esc_html_e( 'مدت اشغال میز برای هر رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="30" max="720" id="mtn_cb_booking_duration_minutes" name="mtn_cb_booking_duration_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_booking_duration_minutes', 120 ) ); ?>"><p class="description"><?php esc_html_e( 'برای بررسی هم‌پوشانی رزروهای میز استفاده می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_customer_cancel_cutoff_minutes"><?php esc_html_e( 'حداقل فاصله لغو توسط مشتری تا شروع رزرو (دقیقه)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="0" max="10080" id="mtn_cb_customer_cancel_cutoff_minutes" name="mtn_cb_customer_cancel_cutoff_minutes" value="<?php echo esc_attr( get_option( 'mtn_cb_customer_cancel_cutoff_minutes', 0 ) ); ?>"><p class="description"><?php esc_html_e( 'صفر یعنی لغو تا پیش از زمان شروع رزرو مجاز است؛ حداکثر مقدار قابل تنظیم ۷ روز است.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_statement_due_days"><?php esc_html_e( 'مهلت پرداخت کارمزد (روز پس از پایان ماه ثبت)', 'mtn-cafe-booking' ); ?></label></th><td><input type="number" min="1" max="90" id="mtn_cb_statement_due_days" name="mtn_cb_statement_due_days" value="<?php echo esc_attr( get_option( 'mtn_cb_statement_due_days', 7 ) ); ?>"></td></tr>
+					<tr><th><label for="mtn_cb_whatsapp_number"><?php esc_html_e( 'شماره واتساپ پشتیبانی', 'mtn-cafe-booking' ); ?></label></th><td><input class="regular-text" type="tel" inputmode="numeric" id="mtn_cb_whatsapp_number" name="mtn_cb_whatsapp_number" value="<?php echo esc_attr( get_option( 'mtn_cb_whatsapp_number', '' ) ); ?>" placeholder="905xxxxxxxxx"><p class="description"><?php esc_html_e( 'شماره را با کد کشور و فقط به صورت رقم وارد کنید؛ مثال ترکیه: 905xxxxxxxxx. پس از ذخیره، دکمه گفت‌وگو در سایت نمایش داده می‌شود.', 'mtn-cafe-booking' ); ?></p></td></tr>
 					<tr><th><label for="mtn_cb_booking_mode"><?php esc_html_e( 'روش انتخاب میز', 'mtn-cafe-booking' ); ?></label></th><td><select id="mtn_cb_booking_mode" name="mtn_cb_booking_mode"><option value="customer_selects_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'customer_selects_table' ); ?>><?php esc_html_e( 'انتخاب توسط مشتری', 'mtn-cafe-booking' ); ?></option><option value="cafe_assigns_table" <?php selected( get_option( 'mtn_cb_booking_mode' ), 'cafe_assigns_table' ); ?>><?php esc_html_e( 'تخصیص توسط کافه', 'mtn-cafe-booking' ); ?></option></select></td></tr>
 				</table>
 				<?php submit_button(); ?>

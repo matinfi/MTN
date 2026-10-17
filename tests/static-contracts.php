@@ -30,10 +30,14 @@ $app_shell_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/app-shell.js
 $home_search_path = $root . '/wp-content/themes/mtn-cafe-theme/assets/home-search.js';
 $theme_settings_path = $root . '/wp-content/themes/mtn-cafe-theme/inc/theme-settings.php';
 $settings_wizard_path = $root . '/wp-content/plugins/mtn-cafe-booking/assets/settings-wizard.js';
+$admin_design_path = $root . '/wp-content/plugins/mtn-cafe-booking/assets/admin-design-system.css';
 $plugin_main_path = $root . '/wp-content/plugins/mtn-cafe-booking/mtn-cafe-booking.php';
+$plugin_settings_path = $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-settings.php';
 $theme_settings = file_get_contents( $theme_settings_path );
 $settings_wizard = file_get_contents( $settings_wizard_path );
+$admin_design = file_get_contents( $admin_design_path );
 $plugin_main = file_get_contents( $plugin_main_path );
+$plugin_settings = file_get_contents( $plugin_settings_path );
 $rest = file_get_contents( $rest_path );
 $bookings = file_get_contents( $bookings_path );
 $content = file_get_contents( $content_path );
@@ -57,7 +61,7 @@ $cooperation = file_get_contents( $cooperation_path );
 $app_shell = file_get_contents( $app_shell_path );
 $home_search = file_get_contents( $home_search_path );
 
-foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style, $cafe_actions, $cooperation, $app_shell, $home_search, $theme_polish, $theme_functions, $theme_home, $theme_settings, $settings_wizard, $plugin_main ) as $source ) {
+foreach ( array( $rest, $bookings, $content, $install, $finance, $notifications, $invites, $sms, $recurrence, $event_cancel, $statements, $shortcodes, $otp_js, $theme_header, $theme_style, $cafe_actions, $cooperation, $app_shell, $home_search, $theme_polish, $theme_functions, $theme_home, $theme_settings, $settings_wizard, $plugin_main, $admin_design, $plugin_settings ) as $source ) {
 	if ( false === $source ) {
 		fwrite( STDERR, "Unable to read a required source file.\n" );
 		exit( 1 );
@@ -166,10 +170,19 @@ if ( false === strpos( $theme_settings, "'sanitize_callback' => 'sanitize_hex_co
 	false === strpos( $theme_polish, '.mtn-theme-toggle' ) ||
 	false === strpos( $settings_wizard, 'checkValidity()' ) ||
 	false === strpos( $settings_wizard, 'mtn_cb_booking_duration_minutes' ) ||
-	false === strpos( $plugin_main, "Version: 0.13.0" ) ||
-	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.13.0' )" ) ||
-	false === strpos( $theme_style, 'Version: 0.4.0' ) ) {
+	false === strpos( $plugin_main, "Version: 0.14.0" ) ||
+	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.14.0' )" ) ||
+	false === strpos( $theme_style, 'Version: 0.5.0' ) ) {
 	fwrite( STDERR, "Theme preferences, persistent shell controls, settings wizard, or release versions are missing.\n" );
+	exit( 1 );
+}
+
+if ( false === strpos( $cooperation, 'wp_mail( $admin_email, $subject, $message )' ) ||
+	false === strpos( $cooperation, "admin_url( 'edit.php?post_type=mtn_cooperation_request' )" ) ||
+	false === strpos( $plugin_settings, "'mtn_cb_whatsapp_number'" ) ||
+	false === strpos( $theme_polish, '.mtn-whatsapp-float' ) ||
+	false === strpos( $admin_design, '.mtn-admin-metrics' ) ) {
+	fwrite( STDERR, "Cooperation notification, WhatsApp contact, or admin dashboard UI contract is missing.\n" );
 	exit( 1 );
 }
 
