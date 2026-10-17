@@ -55,7 +55,6 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 	}
 
 	public function test_idempotency_replays_matching_payload_and_is_scoped_to_customer() {
-		update_option( 'mtn_cb_booking_mode', 'cafe_assigns_table' );
 		$cafe_id = self::factory()->post->create( array( 'post_type' => 'mtn_cafe', 'post_status' => 'publish' ) );
 		$event_id = self::factory()->post->create( array( 'post_type' => 'mtn_event', 'post_status' => 'publish' ) );
 		$event_date = new DateTimeImmutable( 'tomorrow', wp_timezone() );
@@ -65,6 +64,13 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 		update_post_meta( $event_id, 'mtn_event_end_time', '23:00' );
 		update_post_meta( $event_id, 'mtn_event_capacity', 20 );
 		update_post_meta( $event_id, 'mtn_max_party_size', 10 );
+		$first_table = self::factory()->post->create( array( 'post_type' => 'mtn_table', 'post_status' => 'publish' ) );
+		$second_table = self::factory()->post->create( array( 'post_type' => 'mtn_table', 'post_status' => 'publish' ) );
+		foreach ( array( $first_table, $second_table ) as $table_id ) {
+			update_post_meta( $table_id, 'mtn_cafe_id', $cafe_id );
+			update_post_meta( $table_id, 'mtn_table_capacity', 4 );
+			update_post_meta( $table_id, 'mtn_table_active', 1 );
+		}
 		$booking_at = $event_date->setTime( 20, 0 )->format( 'Y-m-d H:i:s' );
 		$first_user = self::factory()->user->create();
 		$second_user = self::factory()->user->create();
@@ -73,6 +79,7 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 			'event_id' => $event_id,
 			'party_size' => 2,
 			'booking_at' => $booking_at,
+			'table_id' => $first_table,
 			'idempotency_key' => 'lifecycle-key-001',
 		);
 		wp_set_current_user( $first_user );
@@ -87,7 +94,9 @@ class MTN_Cafe_Booking_Lifecycle_Test extends WP_UnitTestCase {
 		$this->assertWPError( $conflict );
 		$this->assertSame( 'mtn_idempotency_conflict', $conflict->get_error_code() );
 		wp_set_current_user( $second_user );
-		$other_customer = MTN_CB_Bookings::create( $args );
+		$other_args = $args;
+		$other_args['table_id'] = $second_table;
+		$other_customer = MTN_CB_Bookings::create( $other_args );
 		$this->assertNotWPError( $other_customer );
 		$this->assertNotSame( (int) $first->id, (int) $other_customer->id, 'Idempotency keys must not collide across customers.' );
 	}
