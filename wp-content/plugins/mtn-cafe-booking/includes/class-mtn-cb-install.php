@@ -174,6 +174,10 @@ final class MTN_CB_Install {
 			KEY status_expiry (status,expires_at)
 		) {$collate};";
 		dbDelta( $otp_sql );
+		$previous_db_version = absint( get_option( 'mtn_cb_db_version', 0 ) );
+		if ( $previous_db_version < 14 && 'customer_selects_table' === get_option( 'mtn_cb_booking_mode', 'customer_selects_table' ) ) {
+			update_option( 'mtn_cb_booking_mode', 'cafe_assigns_table' );
+		}
 		update_option( 'mtn_cb_db_version', self::DB_VERSION );
 		if ( ! wp_next_scheduled( 'mtn_cb_expire_pending_bookings' ) ) {
 			wp_schedule_event( time() + 60, 'mtn_cb_five_minutes', 'mtn_cb_expire_pending_bookings' );
