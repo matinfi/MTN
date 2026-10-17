@@ -190,3 +190,79 @@ a.page-numbers:hover { border-color: var(--mtn-accent); }
 @media(prefers-reduced-motion:reduce){.hero .button,.mtn-listing-card{transition:none}}
 
 .mtn-whatsapp-float{position:fixed;z-index:100;left:22px;bottom:22px;display:inline-flex;align-items:center;gap:.65rem;min-height:52px;padding:.7rem 1rem;border-radius:999px;background:#168b57;color:#fff;border:1px solid rgba(255,255,255,.18);box-shadow:0 12px 32px rgba(0,0,0,.24);font-weight:800;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease}.mtn-whatsapp-float span:first-child{display:grid;place-items:center;width:28px;height:28px;border:1px solid rgba(255,255,255,.65);border-radius:50%;font-size:1.1rem}.mtn-whatsapp-float:hover{color:#fff;transform:translateY(-3px);box-shadow:0 16px 36px rgba(0,0,0,.3)}.mtn-whatsapp-float:focus-visible{outline:3px solid var(--mtn-accent);outline-offset:4px}@media(max-width:600px){.mtn-whatsapp-float{left:12px;bottom:12px;min-height:48px;padding:.55rem .8rem;font-size:.88rem}}
+
+
+/* MTN experience refresh: immersive discovery, clearer actions and tactile cards. */
+:root {
+  --mtn-border: #34313b;
+  --mtn-surface-raised: #24232b;
+  --mtn-accent-soft: rgb(231 169 75 / 14%);
+}
+body { background-image: radial-gradient(ellipse at 80% -10%, rgb(231 169 75 / 8%), transparent 38%); }
+.site-header {
+  position: sticky; top: 0; z-index: 80; backdrop-filter: blur(18px);
+  background: rgb(21 21 27 / 92%); box-shadow: 0 8px 30px rgb(0 0 0 / 10%);
+}
+.mtn-app-shell { min-height: 100vh; }
+.hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  padding-block: clamp(4rem, 10vw, 8rem);
+  background:
+    radial-gradient(ellipse at 12% 20%, rgb(231 169 75 / 19%), transparent 42%),
+    radial-gradient(ellipse at 90% 80%, rgb(123 77 135 / 13%), transparent 36%),
+    linear-gradient(135deg, #1d1b22 0%, #101014 72%);
+}
+.hero::after {
+  content: ""; position: absolute; z-index: -1; inset: auto -10% -65% 35%;
+  height: 90%; border: 1px solid rgb(231 169 75 / 14%); border-radius: 50%;
+  box-shadow: 0 0 0 36px rgb(231 169 75 / 3%), 0 0 0 72px rgb(231 169 75 / 2%);
+  pointer-events: none;
+}
+.hero .container { position: relative; }
+.hero .eyebrow { display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .8rem; border: 1px solid rgb(231 169 75 / 30%); border-radius: 999px; background: rgb(231 169 75 / 8%); }
+.hero h1 { letter-spacing: -.035em; max-width: 850px; }
+.hero .button { margin-inline-end: .5rem; margin-top: .7rem; box-shadow: 0 8px 22px rgb(231 169 75 / 16%); transition: transform .18s ease, box-shadow .18s ease; }
+.hero .button:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgb(231 169 75 / 24%); }
+.mtn-home-search {
+  position: relative; z-index: 2; width: min(1050px, calc(100% - 2rem)); margin: -2rem auto 1rem;
+  padding: clamp(1rem, 3vw, 2rem); border: 1px solid #38343d; border-radius: 24px;
+  background: color-mix(in srgb, var(--mtn-surface) 94%, transparent); box-shadow: 0 24px 70px rgb(0 0 0 / 26%);
+  backdrop-filter: blur(18px);
+}
+.mtn-home-search-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.mtn-home-search-head h2 { margin-block: .2rem .8rem; }
+.mtn-home-search-form { display:grid; grid-template-columns:minmax(0,1fr) minmax(150px,.35fr) auto; gap:.65rem; }
+.mtn-home-search-form input, .mtn-home-search-form select {
+  width:100%; min-width:0; min-height:50px; padding:.7rem .9rem; border:1px solid var(--mtn-border);
+  border-radius:12px; background:var(--mtn-bg); color:var(--mtn-text);
+}
+.section { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+.section-heading { margin-bottom:1.25rem; }
+.section-heading h2 { margin-block:.15rem .4rem; font-size:clamp(1.5rem,3vw,2.2rem); }
+.cards { gap:1.2rem; }
+.card.mtn-listing-card { padding:0 0 1.15rem; overflow:hidden; transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease; }
+.card.mtn-listing-card > :not(a:first-child) { margin-inline:1.15rem; }
+.mtn-listing-card > a:first-child { display:block; overflow:hidden; background:#25232b; }
+.mtn-listing-card .mtn-card-image { width:100%; aspect-ratio: 16 / 10; object-fit:cover; transition:transform .35s ease,filter .2s ease; }
+.mtn-listing-card:hover { transform:translateY(-4px); border-color:rgb(231 169 75 / 55%); box-shadow:0 18px 40px rgb(0 0 0 / 22%); }
+.mtn-listing-card:hover .mtn-card-image { transform:scale(1.035); }
+.mtn-listing-card h3 { margin-top:1rem; }
+.mtn-listing-card h3 a:hover, .section-heading > a:hover { color:var(--mtn-accent); }
+.mtn-listing-meta span { display:inline-flex; padding:.2rem .55rem; border:1px solid var(--mtn-border); border-radius:999px; font-size:.84rem; }
+.mtn-booking-panel { border-radius:22px; }
+.mtn-booking-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.75rem; margin-top:1.5rem; }
+.mtn-sidebar { border-inline-end:1px solid var(--mtn-border); }
+.mtn-nav-link { border-radius:12px; transition:background .15s ease,color .15s ease,transform .15s ease; }
+.mtn-nav-link:hover { transform:translateX(-2px); background:var(--mtn-surface-raised); }
+.mtn-nav-link.is-active { background:var(--mtn-accent-soft); color:var(--mtn-accent); box-shadow:inset -3px 0 var(--mtn-accent); }
+.site-footer { border-top:1px solid var(--mtn-border); }
+@media(max-width:760px) {
+  .mtn-home-search { margin-top:-1.1rem; border-radius:18px; }
+  .mtn-home-search-form { grid-template-columns:1fr; }
+  .mtn-home-search-form .button { width:100%; }
+  .hero { padding-block:3.5rem 3rem; }
+  .hero::after { display:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .mtn-listing-card, .mtn-listing-card .mtn-card-image, .hero .button { transition:none; }
+}
