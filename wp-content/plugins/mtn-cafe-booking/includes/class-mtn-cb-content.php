@@ -207,11 +207,20 @@ final class MTN_CB_Content {
 		}
 		// Only administrators may assign cafe ownership. Editors who can edit
 		// public cafe content must not be able to grant users manager access.
-		$keys = array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_email', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre', 'mtn_cafe_type', 'mtn_cafe_latitude', 'mtn_cafe_longitude' );
+		$keys = array( 'mtn_cafe_city', 'mtn_cafe_address', 'mtn_cafe_phone', 'mtn_cafe_email', 'mtn_cafe_whatsapp', 'mtn_cafe_music_genre', 'mtn_cafe_type' );
 		if ( current_user_can( 'manage_options' ) ) {
 			$keys[] = 'mtn_cafe_owner_id';
 		}
 		self::save_fields( $post_id, $keys, array( 'mtn_cafe_owner_id' ) );
+		if ( isset( $_POST['mtn_cb_listing_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_cb_listing_nonce'] ) ), 'mtn_cb_save_listing' ) && current_user_can( 'edit_post', $post_id ) && ! ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) && ! wp_is_post_revision( $post_id ) ) {
+			foreach ( array( 'mtn_cafe_latitude' => array( -90, 90 ), 'mtn_cafe_longitude' => array( -180, 180 ) ) as $coordinate => $bounds ) {
+				if ( isset( $_POST[ $coordinate ] ) && is_scalar( $_POST[ $coordinate ] ) ) {
+					$value = trim( (string) wp_unslash( $_POST[ $coordinate ] ) );
+					$valid = is_numeric( $value ) && (float) $value >= $bounds[0] && (float) $value <= $bounds[1];
+					update_post_meta( $post_id, $coordinate, $valid ? (string) (float) $value : '' );
+				}
+			}
+		}
 		if ( current_user_can( 'manage_options' ) ) {
 			$raw_manager_ids = isset( $_POST['mtn_cafe_manager_ids'] ) && is_array( $_POST['mtn_cafe_manager_ids'] ) ? wp_unslash( $_POST['mtn_cafe_manager_ids'] ) : array();
 			$manager_ids = array_values( array_unique( array_filter( array_map( 'absint', $raw_manager_ids ) ) ) );
@@ -229,7 +238,7 @@ final class MTN_CB_Content {
 
 	public static function save_event_meta( $post_id ) {
 		self::save_fields( $post_id, array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size', 'mtn_event_date', 'mtn_event_start_time', 'mtn_event_end_time', 'mtn_event_recurrence_until', 'mtn_event_artist' ), array( 'mtn_cafe_id', 'mtn_event_capacity', 'mtn_min_party_size', 'mtn_max_party_size' ) );
-		if ( isset( $_POST['mtn_event_price'] ) && is_scalar( $_POST['mtn_event_price'] ) && current_user_can( 'edit_post', $post_id ) ) {
+		if ( isset( $_POST['mtn_event_price'] ) && is_scalar( $_POST['mtn_event_price'] ) && current_user_can( 'edit_post', $post_id ) && isset( $_POST['mtn_cb_listing_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mtn_cb_listing_nonce'] ) ), 'mtn_cb_save_listing' ) && ! ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) && ! wp_is_post_revision( $post_id ) ) {
 			$price = sanitize_text_field( wp_unslash( $_POST['mtn_event_price'] ) );
 			update_post_meta( $post_id, 'mtn_event_price', is_numeric( $price ) && (float) $price >= 0 ? number_format( min( 999999999.99, (float) $price ), 2, '.', '' ) : '0.00' );
 		}
