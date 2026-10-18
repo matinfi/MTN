@@ -12,7 +12,7 @@
 <div class="mtn-app-shell" data-mtn-app-shell>
   <aside class="mtn-sidebar" id="mtn-sidebar" aria-label="<?php esc_attr_e( 'ناوبری اصلی', 'mtn-cafe-theme' ); ?>">
     <a class="mtn-sidebar-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'صفحه اصلی MTN کافه', 'mtn-cafe-theme' ); ?>">
-      <?php if ( has_custom_logo() ) { the_custom_logo(); } else { ?><span class="mtn-brand-mark" aria-hidden="true">M</span><span class="mtn-brand-copy"><strong>MTN</strong><small>کافه و موسیقی</small></span><?php } ?>
+      <?php if ( has_custom_logo() ) { the_custom_logo(); } else { ?><span class="mtn-brand-mark" aria-hidden="true">M</span><span class="mtn-brand-copy"><strong>MTN</strong><small><?php echo esc_html( mtn_cafe_theme_option_value("mtn_cafe_theme_brand_subtitle") ); ?></small></span><?php } ?>
     </a>
     <nav class="mtn-side-nav">
       <span class="mtn-nav-label"><?php esc_html_e( 'منوی اصلی', 'mtn-cafe-theme' ); ?></span>

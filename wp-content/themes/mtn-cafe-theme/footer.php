@@ -1,8 +1,8 @@
 </main>
 <footer class="site-footer">
 	<div class="container">
-		<p><?php echo esc_html( get_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) ) ); ?> — <?php esc_html_e( 'کشف کافه‌ها و برنامه‌های شبانه', 'mtn-cafe-theme' ); ?></p>
-		<p><?php esc_html_e( 'در نسخه اول پرداخت اینترنتی در سایت انجام نمی‌شود؛ هزینه‌های احتمالی طبق سیاست کافه تسویه می‌شوند.', 'mtn-cafe-theme' ); ?></p>
+		<p><?php echo esc_html( get_option( 'mtn_cb_brand_name', get_bloginfo( 'name' ) ) ); ?> — <?php echo esc_html( mtn_cafe_theme_option_value('mtn_cafe_theme_footer_description') ); ?></p>
+		<p><?php echo esc_html( mtn_cafe_theme_option_value('mtn_cafe_theme_footer_notice') ); ?></p>
 	</div>
 </footer>
 <?php $mtn_whatsapp_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'mtn_cb_whatsapp_number', '' ) ); ?>
