@@ -29,7 +29,7 @@ if(sideToggle){
   try{localStorage.setItem(storageKey,collapsed?'1':'0');}catch(e){}
  });
 }
-if(mobileToggle)mobileToggle.addEventListener('click',function(){setMobile(!shell.classList.contains('is-mobile-menu-open'));});
+if(mobileToggle)mobileToggle.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();setMobile(!shell.classList.contains('is-mobile-menu-open'));});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&shell.classList.contains('is-mobile-menu-open')){setMobile(false);if(mobileToggle)mobileToggle.focus();}});
 document.addEventListener('pointerdown',function(e){if(!shell.classList.contains('is-mobile-menu-open'))return;if(sidebar&&!sidebar.contains(e.target)&&mobileToggle&&!mobileToggle.contains(e.target)){setMobile(false);}});
 if(sidebar){sidebar.addEventListener('click',function(e){if(mobile()&&e.target.closest('a'))setMobile(false);});}
