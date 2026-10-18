@@ -32,6 +32,7 @@
     if (!field) return;
     input.classList.add('mtn-datetime-source');
     input.setAttribute('aria-hidden', 'true');
+    input.required = false;
     input.tabIndex = -1;
     const wrap = el('div', 'mtn-date-time-picker');
     const dateColumn = el('div', 'mtn-date-column');
@@ -231,7 +232,12 @@
     next.addEventListener('click', () => {
       const required = current === 1 ? [form.elements.cafe_id, form.elements.event_id] : [form.elements.party_size, form.elements.booking_at];
       for (const field of required) {
-        if (!field.reportValidity()) return;
+        if (!field || !field.reportValidity()) return;
+      }
+      if (current === 2 && !date.value) {
+        setStatus(root, 'لطفاً ابتدا تاریخ و ساعت را انتخاب کنید.', 'error');
+        dateButton.focus();
+        return;
       }
       if (current === 2) {
         const status = root.querySelector('.mtn-booking-status');
@@ -325,6 +331,7 @@
     form.elements.customer_note.addEventListener('input', () => { idempotencyKey = ''; });
     checkButton.addEventListener('click', async () => {
       if (!form.reportValidity()) return;
+      if (!date.value) { setStatus(root, 'لطفاً تاریخ و ساعت رزرو را انتخاب کنید.', 'error'); dateButton.focus(); return; }
       const params = new URLSearchParams({
         cafe_id: cafe.value,
         event_id: event.value,
