@@ -69,16 +69,10 @@
     calendarFoot.append(todayBtn);
     popover.append(calendarHead, weekdays, days, calendarFoot);
     dateColumn.append(dateLabel, dateButton, popover);
-    const timeLabel = el('label', 'mtn-picker-label', 'انتخاب ساعت');
-    const timeSelect = el('select', 'mtn-time-select');
-    timeSelect.setAttribute('aria-label', 'انتخاب ساعت رزرو');
-    timeSelect.add(new Option('ساعت را انتخاب کنید', ''));
-    for (let minutes = 9 * 60; minutes <= 23 * 60 + 30; minutes += 30) {
-      const hour = String(Math.floor(minutes / 60)).padStart(2, '0');
-      const minute = String(minutes % 60).padStart(2, '0');
-      timeSelect.add(new Option(hour + ':' + minute, hour + ':' + minute));
-    }
-    timeColumn.append(timeLabel, timeSelect);
+    const timeLabel = el('span', 'mtn-picker-label', 'ساعت برنامه');
+    const timeDisplay = el('div', 'mtn-event-time-display', 'پس از انتخاب برنامه نمایش داده می‌شود');
+    timeDisplay.setAttribute('aria-live', 'polite');
+    timeColumn.append(timeLabel, timeDisplay);
     wrap.append(dateColumn, timeColumn);
     field.append(wrap);
     const persian = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { year: 'numeric', month: 'long' });
@@ -91,7 +85,7 @@
       return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
     }
     function updateValue() {
-      input.value = selectedDate && timeSelect.value ? selectedDate + 'T' + timeSelect.value : '';
+      input.value = selectedDate ? selectedDate + 'T00:00' : '';
       dateText.textContent = selectedDate ? dateFormat.format(new Date(selectedDate + 'T12:00:00')) : 'انتخاب روز';
       dateButton.classList.toggle('has-value', !!selectedDate);
       dateHint.textContent = selectedDate ? 'تاریخ انتخاب‌شده' : 'برای باز کردن تقویم بزنید';
@@ -129,11 +123,7 @@
       if (!value) { selectedDate = ''; return; }
       const parts = value.split('T');
       selectedDate = parts[0] || '';
-      if (parts[1]) {
-        const normalized = parts[1].slice(0,5);
-        if (![...timeSelect.options].some(option => option.value === normalized)) timeSelect.add(new Option(normalized, normalized));
-        timeSelect.value = normalized;
-      }
+      timeDisplay.textContent = parts[1] ? 'ساعت برنامه: ' + parts[1].slice(0,5) : 'پس از انتخاب برنامه نمایش داده می‌شود';
       if (selectedDate) {
         const d = new Date(selectedDate + 'T12:00:00');
         visibleMonth = new Date(d.getFullYear(), d.getMonth(), 1);
@@ -158,7 +148,6 @@
       popover.hidden = true;
       dateButton.setAttribute('aria-expanded', 'false');
     });
-    timeSelect.addEventListener('change', updateValue);
     document.addEventListener('click', event => {
       if (!wrap.contains(event.target)) {
         popover.hidden = true;
@@ -167,7 +156,7 @@
     });
     setFromValue(input.value);
     renderCalendar();
-    return { setFromValue };
+    return { setFromValue, getSelectedDate: () => selectedDate, setEventTime: (value) => { timeDisplay.textContent = value ? 'ساعت برنامه: ' + value.slice(0,5) : 'پس از انتخاب برنامه نمایش داده می‌شود'; input.value = selectedDate && value ? selectedDate + 'T' + value.slice(0,5) : ''; input.dispatchEvent(new Event('change', { bubbles: true })); } };
   }
   function buildBookingSteps(root) {
     const form = root.querySelector('.mtn-booking-form');
@@ -186,16 +175,16 @@
     const stepTwo = el('section', 'mtn-booking-step');
     const stepThree = el('section', 'mtn-booking-step');
     stepOne.dataset.step = '1'; stepTwo.dataset.step = '2'; stepThree.dataset.step = '3';
-    stepOne.append(el('h3', 'mtn-step-title', '۱. انتخاب کافه و برنامه'));
-    stepTwo.append(el('h3', 'mtn-step-title', '۲. زمان و ظرفیت'));
+    stepOne.append(el('h3', 'mtn-step-title', '۱. تاریخ و تعداد نفرات'));
+    stepTwo.append(el('h3', 'mtn-step-title', '۲. انتخاب کافه و برنامه'));
     stepThree.append(el('h3', 'mtn-step-title', '۳. اطلاعات و تأیید'));
-    stepOne.append(cafeField, eventField);
-    stepTwo.append(partyField, dateField);
+    stepOne.append(partyField, dateField);
+    stepTwo.append(cafeField, eventField);
     if (tableField) stepTwo.append(tableField);
     stepThree.append(noteField);
     grid.replaceChildren(stepOne, stepTwo, stepThree);
     const progress = el('ol', 'mtn-booking-progress');
-    ['کافه و برنامه', 'زمان و میز', 'تأیید'].forEach((label, index) => {
+    ['تاریخ و نفرات', 'کافه و برنامه', 'تأیید'].forEach((label, index) => {
       const item = el('li', 'mtn-booking-progress-item', label);
       item.dataset.step = String(index + 1);
       progress.append(item);
@@ -230,13 +219,12 @@
       actions.classList.toggle('is-final-step', current === 3);
     }
     next.addEventListener('click', () => {
-      const required = current === 1 ? [form.elements.cafe_id, form.elements.event_id] : [form.elements.party_size, form.elements.booking_at];
+      const required = current === 1 ? [form.elements.party_size, form.elements.booking_at] : [form.elements.cafe_id, form.elements.event_id];
       for (const field of required) {
         if (!field || !field.reportValidity()) return;
       }
-      if (current === 2 && !date.value) {
-        setStatus(root, 'لطفاً ابتدا تاریخ و ساعت را انتخاب کنید.', 'error');
-        dateButton.focus();
+      if (current === 1 && !date.value) {
+        setStatus(root, 'لطفاً ابتدا تاریخ را انتخاب کنید.', 'error');
         return;
       }
       if (current === 2) {
@@ -289,12 +277,15 @@
       const selected = catalog.events.find((item) => String(item.id) === String(event.value));
       if (selected && selected.event_date && selected.event_start_time) {
         date.value = selected.event_date + 'T' + selected.event_start_time.slice(0, 5);
-        if (datePicker) datePicker.setFromValue(date.value);
+        if (datePicker) datePicker.setEventTime(selected.event_start_time);
+      } else if (datePicker) {
+        datePicker.setEventTime('');
       }
     }
     function updateEvents() {
       const cafeId = Number(cafe.value || 0);
-      const items = catalog.events.filter((item) => Number(item.cafe_id) === cafeId);
+      const chosenDate = datePicker ? datePicker.getSelectedDate() : '';
+      const items = catalog.events.filter((item) => Number(item.cafe_id) === cafeId && (!chosenDate || item.event_date === chosenDate));
       options(event, items, 'انتخاب برنامه', 'id', 'name');
       event.disabled = !items.length;
       if (root.dataset.defaultEvent && items.some((item) => String(item.id) === root.dataset.defaultEvent)) {
@@ -326,12 +317,12 @@
     cafe.addEventListener('change', () => { idempotencyKey = ''; updateEvents(); });
     event.addEventListener('change', () => { idempotencyKey = ''; applyEventSchedule(); resetAvailability(); });
     party.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
-    date.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
+    date.addEventListener('change', () => { idempotencyKey = ''; updateEvents(); resetAvailability(); });
     table.addEventListener('change', () => { idempotencyKey = ''; if (lastAvailability) submitButton.disabled = !lastAvailability.available || (lastAvailability.table_selection_required && !table.value); });
     form.elements.customer_note.addEventListener('input', () => { idempotencyKey = ''; });
     checkButton.addEventListener('click', async () => {
       if (!form.reportValidity()) return;
-      if (!date.value) { setStatus(root, 'لطفاً تاریخ و ساعت رزرو را انتخاب کنید.', 'error'); dateButton.focus(); return; }
+      if (!date.value || !event.value) { setStatus(root, 'تاریخ را انتخاب کنید و سپس برنامه‌ای با ساعت مشخص برگزینید.', 'error'); return; }
       const params = new URLSearchParams({
         cafe_id: cafe.value,
         event_id: event.value,
