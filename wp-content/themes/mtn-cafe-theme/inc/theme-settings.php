@@ -2,7 +2,7 @@
 /** MTN theme appearance settings. @package MTN_Cafe_Theme */
 defined( 'ABSPATH' ) || exit;
 function mtn_cafe_register_theme_settings() {
- register_setting( 'mtn_cafe_theme_settings', 'mtn_cafe_theme_accent', array( 'type'=>'string', 'sanitize_callback'=>'sanitize_hex_color', 'default'=>'#e7a94b' ) );
+ register_setting( 'mtn_cafe_theme_settings', 'mtn_cafe_theme_accent', array( 'type'=>'string', 'sanitize_callback' => 'sanitize_hex_color', 'default'=>'#e7a94b' ) );
  register_setting( 'mtn_cafe_theme_settings', 'mtn_cafe_theme_default_mode', array( 'type'=>'string', 'sanitize_callback'=>static function($v){return in_array($v,array('dark','light'),true)?$v:'dark';}, 'default'=>'dark' ) );
  register_setting( 'mtn_cafe_theme_settings', 'mtn_cafe_theme_sidebar_style', array( 'type'=>'string', 'sanitize_callback'=>static function($v){return in_array($v,array('solid','glass'),true)?$v:'solid';}, 'default'=>'solid' ) );
  register_setting( 'mtn_cafe_theme_settings', 'mtn_cafe_theme_radius', array( 'type'=>'integer', 'sanitize_callback'=>static function($v){return min(28,max(8,absint($v)));}, 'default'=>18 ) );
