@@ -270,3 +270,31 @@ body { background-image: radial-gradient(ellipse at 80% -10%, rgb(231 169 75 / 8
 /* Reliable navigation layers and laptop sidebar controls */
 @media(max-width:700px){.site-header{position:sticky;top:0;z-index:70}.mtn-mobile-menu{position:relative;z-index:72;flex:0 0 44px;pointer-events:auto}.mtn-app-shell.is-mobile-menu-open:after{z-index:40;pointer-events:auto}.mtn-app-shell.is-mobile-menu-open .mtn-sidebar{z-index:60}.mtn-app-shell.is-mobile-menu-open .site-header{z-index:70}}
 @media(min-width:701px){.mtn-sidebar{z-index:50}.mtn-sidebar-toggle{position:relative;z-index:2;pointer-events:auto}.mtn-app-shell.is-sidebar-collapsed .mtn-sidebar{overflow-x:clip}.mtn-app-shell.is-sidebar-collapsed .mtn-sidebar-toggle{cursor:pointer}}
+
+
+/* Desktop sidebar: deterministic icon-only collapsed state and accessible toggle. */
+@media (min-width:701px) {
+ .mtn-app-shell .mtn-sidebar { flex-shrink:0; min-width:0; }
+ .mtn-app-shell.is-sidebar-collapsed .mtn-sidebar { width:var(--mtn-sidebar-mini,82px); flex-basis:var(--mtn-sidebar-mini,82px); }
+ .mtn-app-shell.is-sidebar-collapsed .mtn-nav-text,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-nav-label,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-brand-copy { display:none !important; }
+ .mtn-app-shell.is-sidebar-collapsed .mtn-sidebar-brand,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-nav-link,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-sidebar-toggle { justify-content:center; }
+ .mtn-app-shell.is-sidebar-collapsed .mtn-nav-link,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-sidebar-toggle { position:relative; padding-inline:.35rem; }
+ .mtn-app-shell.is-sidebar-collapsed .mtn-nav-link[aria-label]:hover::after,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-nav-link[aria-label]:focus-visible::after,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-sidebar-toggle[aria-label]:hover::after,
+ .mtn-app-shell.is-sidebar-collapsed .mtn-sidebar-toggle[aria-label]:focus-visible::after {
+  content:attr(aria-label); position:absolute; z-index:999; right:calc(100% + 10px); top:50%;
+  transform:translateY(-50%); padding:.45rem .7rem; border:1px solid var(--mtn-border);
+  border-radius:9px; background:var(--mtn-surface-raised); color:var(--mtn-text);
+  box-shadow:0 8px 24px rgb(0 0 0 / 25%); white-space:nowrap; font-size:.82rem; pointer-events:none;
+ }
+ .mtn-app-shell .mtn-sidebar-toggle { position:relative; z-index:5; cursor:pointer; pointer-events:auto; }
+}
+@media (max-width:700px) {
+ .mtn-app-shell.is-sidebar-collapsed .mtn-sidebar { width:min(84vw,300px); flex-basis:auto; }
+}
