@@ -15,14 +15,20 @@ final class MTN_CB_Admin {
 
 	public static function menu() {
 		add_menu_page(
-			__( 'مدیریت رزروها', 'mtn-cafe-booking' ),
-			__( 'رزروهای MTN', 'mtn-cafe-booking' ),
+			__( 'مرکز مدیریت MTN', 'mtn-cafe-booking' ),
+			__( 'مدیریت MTN', 'mtn-cafe-booking' ),
 			'manage_options',
 			'mtn-cb-bookings',
 			array( __CLASS__, 'render_bookings' ),
-			'dashicons-calendar-alt',
+			'dashicons-layout',
 			26
 		);
+		add_submenu_page( 'mtn-cb-bookings', __( 'رزروها', 'mtn-cafe-booking' ), __( 'رزروها', 'mtn-cafe-booking' ), 'manage_options', 'mtn-cb-bookings', array( __CLASS__, 'render_bookings' ) );
+		add_submenu_page( 'mtn-cb-bookings', __( 'کافه‌ها', 'mtn-cafe-booking' ), __( 'کافه‌ها', 'mtn-cafe-booking' ), 'manage_options', 'edit.php?post_type=mtn_cafe' );
+		add_submenu_page( 'mtn-cb-bookings', __( 'رویدادها و سانس‌ها', 'mtn-cafe-booking' ), __( 'رویدادها و سانس‌ها', 'mtn-cafe-booking' ), 'manage_options', 'edit.php?post_type=mtn_event' );
+		add_submenu_page( 'mtn-cb-bookings', __( 'میزها و ظرفیت', 'mtn-cafe-booking' ), __( 'میزها و ظرفیت', 'mtn-cafe-booking' ), 'manage_options', 'edit.php?post_type=mtn_table' );
+		add_submenu_page( 'mtn-cb-bookings', __( 'درخواست‌های همکاری', 'mtn-cafe-booking' ), __( 'درخواست‌های همکاری', 'mtn-cafe-booking' ), 'manage_options', 'edit.php?post_type=mtn_cooperation_request' );
+		add_submenu_page( 'mtn-cb-bookings', __( 'تنظیمات سایت و رزرو', 'mtn-cafe-booking' ), __( 'تنظیمات سایت و رزرو', 'mtn-cafe-booking' ), 'manage_options', 'options-general.php?page=mtn-cafe-booking' );
 	}
 
 	public static function handle_booking_action() {
