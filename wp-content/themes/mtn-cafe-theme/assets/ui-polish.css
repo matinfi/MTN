@@ -289,3 +289,85 @@ body { background-image: radial-gradient(ellipse at 80% -10%, rgb(231 169 75 / 8
 .mtn-404-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem}
 .mtn-sidebar-brand strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:9rem}
 @media(max-width:700px){.mtn-footer-grid{grid-template-columns:1fr}.mtn-404 form{flex-direction:column}}
+
+/* ==========================================================================
+   Web-app layer (0.10.0): bottom tab bar, install button, toasts, skeletons,
+   how-it-works steps, FAQ, cooperation call to action.
+   ========================================================================== */
+@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}
+html{-webkit-tap-highlight-color:transparent}
+.mtn-card,.card,.mtn-listing-card,.mtn-search-result,.button,.mtn-tab,.mtn-nav-link{-webkit-user-select:none;user-select:none}
+.card,.mtn-listing-card p,.mtn-listing-card h3{-webkit-user-select:text;user-select:text}
+.button:active,.mtn-tab:active,.mtn-nav-link:active,.mtn-search-result:active{transform:scale(.97)}
+
+.mtn-install-button{display:inline-flex;align-items:center;gap:.4rem;min-height:40px;padding:.35rem .9rem;border:1px solid var(--mtn-accent,#e7a94b);border-radius:999px;background:transparent;color:var(--mtn-accent,#e7a94b);font:inherit;font-weight:800;cursor:pointer}
+.mtn-install-button[hidden]{display:none}
+.mtn-install-button:hover{background:var(--mtn-accent,#e7a94b);color:#17120b}
+
+/* Bottom tab bar: phones only. */
+.mtn-bottom-nav{display:none}
+@media(max-width:700px){
+	body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+	.mtn-bottom-nav{position:fixed;inset-inline:0;bottom:0;z-index:60;display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:.35rem .5rem calc(.35rem + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--mtn-surface,#1b1b22) 92%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--mtn-border,rgb(255 255 255 / 12%));box-shadow:0 -10px 30px rgb(0 0 0 / 18%)}
+	.mtn-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;min-height:56px;padding:.25rem .15rem;border-radius:14px;color:var(--mtn-muted,#b8b4bf);text-decoration:none;font-size:.72rem;font-weight:700;transition:color .15s ease,transform .12s ease,background .15s ease}
+	.mtn-tab-icon{font-size:1.35rem;line-height:1}
+	.mtn-tab.is-active{color:var(--mtn-accent,#e7a94b)}
+	.mtn-tab.is-active .mtn-tab-icon{transform:translateY(-1px)}
+	.mtn-tab.is-primary{position:relative;margin-top:-1.1rem;color:#17120b}
+	.mtn-tab.is-primary .mtn-tab-icon{display:grid;place-items:center;width:52px;height:52px;margin-bottom:.1rem;border-radius:50%;background:var(--mtn-accent,#e7a94b);box-shadow:0 8px 20px rgb(0 0 0 / 28%);font-size:1.5rem}
+	.mtn-tab.is-primary .mtn-tab-label{color:var(--mtn-muted,#b8b4bf)}
+	.mtn-tab.is-primary.is-active .mtn-tab-label{color:var(--mtn-accent,#e7a94b)}
+	.mtn-whatsapp-float{bottom:calc(92px + env(safe-area-inset-bottom,0px))!important}
+	.mtn-install-label{display:none}
+	.mtn-install-button{width:40px;padding:.35rem}
+	.site-header{padding-top:calc(.6rem + env(safe-area-inset-top,0px))}
+}
+:root[data-mtn-theme="light"] .mtn-bottom-nav{background:rgb(255 255 255 / 92%)}
+
+/* Standalone (installed) mode. */
+.is-standalone .site-header{padding-top:calc(.6rem + env(safe-area-inset-top,0px))}
+.is-offline body::before{content:"آفلاین هستید؛ بعضی بخش‌ها کار نمی‌کنند.";position:fixed;inset-inline:0;top:0;z-index:200;padding:.35rem 1rem;background:#8a5a00;color:#fff;text-align:center;font-size:.85rem}
+
+/* Toasts. */
+.mtn-toast-region{position:fixed;inset-inline:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:300;display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none;padding-inline:1rem}
+@media(min-width:701px){.mtn-toast-region{bottom:1.5rem}}
+.mtn-toast{max-width:min(92vw,420px);padding:.7rem 1.1rem;border-radius:14px;background:var(--mtn-surface,#1b1b22);color:var(--mtn-text,#f7f4ef);border:1px solid var(--mtn-border,rgb(255 255 255 / 14%));box-shadow:0 14px 34px rgb(0 0 0 / 30%);font-weight:700;animation:mtn-toast-in .22s ease-out both}
+.mtn-toast.is-success{border-inline-start:4px solid #2fa36b}
+.mtn-toast.is-warning{border-inline-start:4px solid #e0a030}
+.mtn-toast.is-leaving{opacity:0;transform:translateY(8px);transition:opacity .25s ease,transform .25s ease}
+@keyframes mtn-toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* Skeleton loading. */
+.mtn-skeleton{display:block;position:relative;overflow:hidden;background:var(--mtn-surface,#1b1b22);border:1px solid var(--mtn-border,rgb(255 255 255 / 10%));border-radius:var(--mtn-radius,18px)}
+.mtn-skeleton::after{content:"";position:absolute;inset:0;transform:translateX(100%);background:linear-gradient(90deg,transparent,rgb(255 255 255 / 8%),transparent);animation:mtn-shimmer 1.3s infinite}
+.mtn-skeleton-card{min-height:76px;margin-bottom:.6rem}
+@keyframes mtn-shimmer{to{transform:translateX(-100%)}}
+[aria-busy="true"]>button[type="submit"],button[aria-busy="true"]{opacity:.7;pointer-events:none}
+
+/* Home: how it works. */
+.mtn-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:0;padding:0;list-style:none;counter-reset:mtn-step}
+.mtn-steps li{position:relative;padding:1.4rem 1.2rem 1.2rem;background:var(--mtn-surface,#1b1b22);border:1px solid var(--mtn-border,rgb(255 255 255 / 10%));border-radius:var(--mtn-radius,18px);counter-increment:mtn-step}
+.mtn-steps li::before{content:counter(mtn-step,persian);display:grid;place-items:center;width:40px;height:40px;margin-bottom:.75rem;border-radius:50%;background:var(--mtn-accent,#e7a94b);color:#17120b;font-weight:900}
+.mtn-steps h3{margin:0 0 .35rem}.mtn-steps p{margin:0}
+
+/* Home: FAQ. */
+.mtn-faq{display:grid;gap:.6rem}
+.mtn-faq details{background:var(--mtn-surface,#1b1b22);border:1px solid var(--mtn-border,rgb(255 255 255 / 10%));border-radius:calc(var(--mtn-radius,18px) - 4px);overflow:hidden}
+.mtn-faq summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:56px;padding:.8rem 1.1rem;cursor:pointer;font-weight:800;list-style:none}
+.mtn-faq summary::-webkit-details-marker{display:none}
+.mtn-faq summary::after{content:"+";flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgb(255 255 255 / 8%);color:var(--mtn-accent,#e7a94b);font-size:1.2rem;transition:transform .2s ease}
+.mtn-faq details[open] summary::after{transform:rotate(45deg)}
+.mtn-faq details p{margin:0;padding:0 1.1rem 1.1rem;color:var(--mtn-muted,#b8b4bf)}
+
+/* Home: cooperation call to action. */
+.mtn-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;padding:clamp(1.25rem,4vw,2rem);border-radius:var(--mtn-radius,18px);background:linear-gradient(135deg,color-mix(in srgb,var(--mtn-accent,#e7a94b) 24%,var(--mtn-surface,#1b1b22)),var(--mtn-surface,#1b1b22));border:1px solid color-mix(in srgb,var(--mtn-accent,#e7a94b) 40%,transparent)}
+.mtn-cta h2{margin:0 0 .3rem}.mtn-cta p{margin:0;color:var(--mtn-muted,#b8b4bf)}
+@media(max-width:700px){.mtn-cta .button{width:100%;text-align:center}}
+
+/* Footer legal links. */
+.mtn-footer-legal{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin:0;padding:0;list-style:none}
+.mtn-footer-legal a{color:var(--mtn-muted,#b8b4bf)}.mtn-footer-legal a:hover{color:var(--mtn-text,#f7f4ef)}
+
+@media(prefers-reduced-motion:reduce){
+	.mtn-toast,.mtn-skeleton::after,.mtn-tab,.mtn-faq summary::after{animation:none!important;transition:none!important}
+}

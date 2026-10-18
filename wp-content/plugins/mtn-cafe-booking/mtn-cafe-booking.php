@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MTN Cafe Booking
  * Description: Reservation foundation for cafes, live music and night events.
- * Version: 0.18.0
+ * Version: 0.19.0
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Text Domain: mtn-cafe-booking
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MTN_CB_VERSION', '0.18.0' );
+define( 'MTN_CB_VERSION', '0.19.0' );
 define( 'MTN_CB_FILE', __FILE__ );
 define( 'MTN_CB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MTN_CB_URL', plugin_dir_url( __FILE__ ) );
@@ -65,6 +65,7 @@ add_action( 'admin_enqueue_scripts', 'mtn_cb_enqueue_admin_design' );
 register_activation_hook( __FILE__, array( 'MTN_CB_Install', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'MTN_CB_Install', 'deactivate' ) );
 add_action( 'init', array( 'MTN_CB_Install', 'ensure_default_pages' ), 20 );
+add_action( 'init', array( 'MTN_CB_Install', 'ensure_legal_pages' ), 22 );
 
 add_filter(
 	'cron_schedules',

@@ -30,6 +30,12 @@ The repository's CI checks PHP syntax, booking-wizard JavaScript syntax and stat
 - Exclude `/login/` and `/my-account/` from full-page caching; the sign-in forms use nonces and a cached page shows "session expired" errors.
 - Customer registration can be switched off in plugin settings.
 
+## Web app and legal pages
+
+- The site is installable (Chrome/Android: "نصب برنامه"; iOS Safari: Share → Add to Home Screen). HTTPS is required. Turn it off in theme settings if a caching plugin or CDN interferes; the worker then unregisters itself.
+- Give the site an icon in Appearance → Customize → Site Identity (512×512 PNG) for a proper home-screen icon; otherwise an icon is generated from the brand mark.
+- Terms, privacy, cancellation, booking rules, about and contact pages are created as drafts. Review and edit them (they are not legal advice), then publish; the footer links appear automatically.
+
 ## Scheduled expiry
 
 The plugin schedules a five-minute WP-Cron event to expire stale pending bookings and append audit entries. WP-Cron is traffic-driven by default; for production, configure a real system cron to trigger WordPress cron regularly. Follow WordPress's official cron guidance for the hosting environment and disable page caching for authenticated account/dashboard pages.

@@ -57,4 +57,41 @@
 <section class="section container"><div class="notice"><strong><?php echo esc_html( $mtn_n_title ); ?></strong><p><?php echo esc_html( $mtn_n_text ); ?></p></div></section>
 <?php endif; ?>
 <?php endif; ?>
+<?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_howto' ) ) : ?>
+<section class="section container" aria-labelledby="mtn-howto-title">
+  <div class="section-heading"><div><p class="eyebrow"><?php esc_html_e( 'نحوه کار', 'mtn-cafe-theme' ); ?></p><h2 id="mtn-howto-title"><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_howto_title' ) ); ?></h2></div></div>
+  <ol class="mtn-steps">
+    <?php for ( $mtn_i = 1; $mtn_i <= 3; $mtn_i++ ) : $mtn_s_title = mtn_cafe_theme_option_value( 'mtn_cafe_theme_howto_' . $mtn_i . '_title' ); $mtn_s_text = mtn_cafe_theme_option_value( 'mtn_cafe_theme_howto_' . $mtn_i . '_text' ); if ( '' === trim( (string) $mtn_s_title ) ) { continue; } ?>
+    <li><h3><?php echo esc_html( $mtn_s_title ); ?></h3><p class="muted"><?php echo esc_html( $mtn_s_text ); ?></p></li>
+    <?php endfor; ?>
+  </ol>
+</section>
+<?php endif; ?>
+<?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_faq' ) ) :
+  $mtn_faq_items = array();
+  for ( $mtn_i = 1; $mtn_i <= 4; $mtn_i++ ) {
+    $mtn_q = trim( (string) mtn_cafe_theme_option_value( 'mtn_cafe_theme_faq_' . $mtn_i . '_q' ) );
+    $mtn_a = trim( (string) mtn_cafe_theme_option_value( 'mtn_cafe_theme_faq_' . $mtn_i . '_a' ) );
+    if ( '' !== $mtn_q && '' !== $mtn_a ) {
+      $mtn_faq_items[] = array( $mtn_q, $mtn_a );
+    }
+  }
+  if ( $mtn_faq_items ) : ?>
+<section class="section container" aria-labelledby="mtn-faq-title">
+  <div class="section-heading"><div><p class="eyebrow"><?php esc_html_e( 'راهنما', 'mtn-cafe-theme' ); ?></p><h2 id="mtn-faq-title"><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_faq_title' ) ); ?></h2></div></div>
+  <div class="mtn-faq">
+    <?php foreach ( $mtn_faq_items as $mtn_faq ) : ?>
+    <details><summary><?php echo esc_html( $mtn_faq[0] ); ?></summary><p><?php echo esc_html( $mtn_faq[1] ); ?></p></details>
+    <?php endforeach; ?>
+  </div>
+</section>
+<?php endif; endif; ?>
+<?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_cooperation' ) ) : ?>
+<section class="section container">
+  <div class="mtn-cta">
+    <div><h2><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_cooperation_title' ) ); ?></h2><p><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_cooperation_text' ) ); ?></p></div>
+    <a class="button" href="<?php echo esc_url( home_url( '/cooperation/' ) ); ?>"><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_cooperation_label' ) ); ?></a>
+  </div>
+</section>
+<?php endif; ?>
 <?php get_footer(); ?>

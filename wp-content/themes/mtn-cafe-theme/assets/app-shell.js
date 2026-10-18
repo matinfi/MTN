@@ -57,3 +57,52 @@ if(themeToggle)themeToggle.addEventListener('click',function(){
  try{localStorage.setItem(themeKey,next);}catch(e){}
 });
 })();
+
+(function(){
+'use strict';
+const cfg=window.MTNApp||{};
+const region=document.querySelector('[data-mtn-toasts]');
+function toast(message,type){
+ if(!region||!message)return;
+ const item=document.createElement('div');
+ item.className='mtn-toast'+(type?' is-'+type:'');
+ item.textContent=message;
+ region.append(item);
+ window.setTimeout(function(){item.classList.add('is-leaving');window.setTimeout(function(){item.remove();},260);},3600);
+}
+window.MTNApp=Object.assign(window.MTNApp||{},{toast:toast});
+const msg=cfg.messages||{};
+window.addEventListener('offline',function(){toast(msg.offline,'warning');document.documentElement.classList.add('is-offline');});
+window.addEventListener('online',function(){toast(msg.online,'success');document.documentElement.classList.remove('is-offline');});
+if(!navigator.onLine)document.documentElement.classList.add('is-offline');
+
+// Installable web app.
+if(cfg.pwa&&'serviceWorker' in navigator&&window.isSecureContext){
+ window.addEventListener('load',function(){
+  navigator.serviceWorker.register(cfg.swUrl,{scope:cfg.scope}).catch(function(){});
+ });
+}
+const installButton=document.querySelector('[data-mtn-install]');
+let deferred=null;
+window.addEventListener('beforeinstallprompt',function(event){
+ event.preventDefault();deferred=event;
+ if(installButton)installButton.hidden=false;
+});
+if(installButton){
+ installButton.addEventListener('click',function(){
+  if(!deferred)return;
+  deferred.prompt();
+  deferred.userChoice.finally(function(){deferred=null;installButton.hidden=true;});
+ });
+}
+window.addEventListener('appinstalled',function(){if(installButton)installButton.hidden=true;toast(msg.installed,'success');});
+if(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)document.documentElement.classList.add('is-standalone');
+
+// Press feedback on touch devices and in-flight state for forms.
+document.addEventListener('submit',function(event){
+ const form=event.target;
+ if(!form||!form.matches||event.defaultPrevented)return;
+ const button=form.querySelector('button[type="submit"],input[type="submit"]');
+ if(button&&!button.disabled)window.setTimeout(function(){button.setAttribute('aria-busy','true');},0);
+});
+})();

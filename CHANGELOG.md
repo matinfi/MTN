@@ -1,3 +1,19 @@
+## 0.19.0 (plugin) / 0.10.0 (theme) — 2026-10-18
+
+### Added
+- Web-app experience: five-button bottom tab bar on phones (booking as the centre action), installable web app (manifest, service worker, offline page, install button), safe-area insets, toast notifications, offline banner, loading skeletons in home search, press feedback and page transitions where the browser supports them. Everything can be switched off in theme settings (header and sidebar tab).
+- The service worker caches only static theme/plugin assets and the offline page. It never caches HTML, REST responses, wp-admin or form posts.
+- Home page sections controlled from theme settings: how booking works (3 steps), FAQ (4 questions) and a cooperation call to action.
+- Editable starter pages for terms, privacy, cancellation policy, booking rules, about and contact. They are created as drafts (not legal advice); the footer links only to published ones.
+
+### Changed
+- Plugin 0.19.0 and theme 0.10.0; static contracts cover the PWA layer, bottom navigation, home sections and legal pages.
+
+### Validation notes
+- PHP lint, JS syntax and static contracts pass; PWA manifest/service-worker output was checked outside WordPress with stubs. Real-device install, offline behaviour, RTL/mobile visual QA and WordPress integration tests were not run and belong to the staging test. Installability requires HTTPS.
+
+---
+
 ## 0.18.0 (plugin) / 0.9.0 (theme) — 2026-10-18
 
 ### Added

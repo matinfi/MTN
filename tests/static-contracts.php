@@ -170,9 +170,9 @@ if ( false === strpos( $theme_settings, "'sanitize_hex_color'" ) ||
 	false === strpos( $theme_polish, '.mtn-theme-toggle' ) ||
 	false === strpos( $settings_wizard, 'checkValidity()' ) ||
 	false === strpos( $settings_wizard, 'mtn_cb_booking_duration_minutes' ) ||
-	false === strpos( $plugin_main, "Version: 0.18.0" ) ||
-	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.18.0' )" ) ||
-	false === strpos( $theme_style, 'Version: 0.9.0' ) ) {
+	false === strpos( $plugin_main, "Version: 0.19.0" ) ||
+	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.19.0' )" ) ||
+	false === strpos( $theme_style, 'Version: 0.10.0' ) ) {
 	fwrite( STDERR, "Theme preferences, persistent shell controls, settings wizard, or release versions are missing.\n" );
 	exit( 1 );
 }
@@ -220,6 +220,28 @@ foreach ( $setting_keys as $setting_key ) {
 		fwrite( STDERR, "Theme setting {$setting_key} has no field in the settings screen.\n" );
 		exit( 1 );
 	}
+}
+
+$pwa = file_get_contents( $root . '/wp-content/themes/mtn-cafe-theme/inc/pwa.php' );
+$theme_footer = file_get_contents( $root . '/wp-content/themes/mtn-cafe-theme/footer.php' );
+if ( false === $pwa || false === $theme_footer ||
+	false === strpos( $pwa, 'application/manifest+json' ) ||
+	false === strpos( $pwa, "'display'          => 'standalone'" ) ||
+	false === strpos( $pwa, "request.method!=='GET'" ) ||
+	false === strpos( $pwa, 'wp-admin' ) ||
+	false !== strpos( $pwa, 'cache.put(request' ) && false === strpos( $pwa, 'isStatic(url)' ) ||
+	false === strpos( $theme_footer, 'mtn-bottom-nav' ) ||
+	false === strpos( $theme_footer, 'data-mtn-toasts' ) ||
+	false === strpos( $theme_functions, "inc/pwa.php" ) ||
+	false === strpos( $theme_home, 'mtn-faq' ) ||
+	false === strpos( $theme_home, 'mtn-steps' ) ||
+	false === strpos( $theme_polish, '.mtn-bottom-nav' ) ||
+	false === strpos( $theme_polish, '.mtn-skeleton' ) ||
+	false === strpos( $app_shell, 'serviceWorker' ) ||
+	false === strpos( $install, "'post_status' => 'draft'" ) ||
+	false === strpos( $plugin_main, 'ensure_legal_pages' ) ) {
+	fwrite( STDERR, "Web-app layer (PWA, bottom navigation, home sections or legal pages) contract is missing.\n" );
+	exit( 1 );
 }
 
 fwrite( STDOUT, "Static source-contract checks passed. These checks do not replace WordPress integration or concurrency tests.\n" );

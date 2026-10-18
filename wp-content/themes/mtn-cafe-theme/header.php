@@ -56,6 +56,7 @@ $mtn_login  = wp_login_url();
       <button class="mtn-mobile-menu" type="button" data-mtn-mobile-toggle aria-controls="mtn-sidebar" aria-expanded="false" aria-label="<?php esc_attr_e( 'باز کردن منو', 'mtn-cafe-theme' ); ?>">☰</button>
       <div class="mtn-header-title"><span class="mtn-header-kicker"><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_header_tagline' ) ); ?></span><strong><?php echo esc_html( is_front_page() ? $mtn_brand : wp_get_document_title() ); ?></strong></div>
       <div class="mtn-header-actions">
+        <?php if ( mtn_cafe_pwa_enabled() ) : ?><button class="mtn-install-button" type="button" data-mtn-install hidden aria-label="نصب برنامه روی دستگاه"><span aria-hidden="true">⤓</span><span class="mtn-install-label">نصب برنامه</span></button><?php endif; ?>
         <?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_theme_toggle' ) ) : ?><button class="mtn-theme-toggle" type="button" data-mtn-theme-toggle aria-label="فعال‌سازی پوسته روشن" title="تغییر پوسته"><span aria-hidden="true">◐</span><span class="mtn-theme-toggle-label">پوسته روشن</span></button><?php endif; ?>
         <?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_account_button' ) ) : ?><a class="mtn-header-account" href="<?php echo esc_url( $mtn_logged ? home_url( '/my-account/' ) : $mtn_login ); ?>"><?php echo $mtn_logged ? 'حساب کاربری' : 'ورود / ثبت‌نام'; ?></a><?php endif; ?>
       </div>
