@@ -46,6 +46,7 @@
     <?php endwhile; wp_reset_postdata(); ?>
   </div><?php else : ?><div class="mtn-empty-state"><?php esc_html_e( 'فهرست کافه‌ها هنوز خالی است.', 'mtn-cafe-theme' ); ?></div><?php endif; ?>
 </section>
+</section><?php endif; ?>
 <?php if (mtn_cafe_theme_option_value("mtn_cafe_theme_show_benefits")) : ?><section class="section container">
   <div class="cards">
     <article class="card"><h3><?php esc_html_e( 'موزیک زنده', 'mtn-cafe-theme' ); ?></h3><p class="muted"><?php esc_html_e( 'اجراهای زنده و شب‌های موسیقی را پیدا کن.', 'mtn-cafe-theme' ); ?></p></article>
