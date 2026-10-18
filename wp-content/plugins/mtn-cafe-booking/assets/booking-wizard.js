@@ -25,6 +25,149 @@
   function localDateValue(input) {
     return input.value ? input.value.replace('T', ' ') + (input.value.length === 16 ? ':00' : '') : '';
   }
+  function enhanceDateTime(input) {
+    if (!input || input.dataset.calendarReady === '1') return;
+    input.dataset.calendarReady = '1';
+    const field = input.closest('p');
+    if (!field) return;
+    input.classList.add('mtn-datetime-source');
+    input.setAttribute('aria-hidden', 'true');
+    input.tabIndex = -1;
+    const wrap = el('div', 'mtn-date-time-picker');
+    const dateColumn = el('div', 'mtn-date-column');
+    const timeColumn = el('div', 'mtn-time-column');
+    const dateLabel = el('span', 'mtn-picker-label', 'انتخاب تاریخ');
+    const dateButton = el('button', 'mtn-calendar-trigger');
+    dateButton.type = 'button';
+    dateButton.setAttribute('aria-haspopup', 'dialog');
+    dateButton.setAttribute('aria-expanded', 'false');
+    const icon = el('span', 'mtn-calendar-icon', '▦');
+    icon.setAttribute('aria-hidden', 'true');
+    const dateText = el('span', 'mtn-calendar-date-text', 'انتخاب روز');
+    const dateHint = el('small', 'mtn-calendar-date-hint', 'برای باز کردن تقویم بزنید');
+    dateButton.append(icon, el('span', 'mtn-calendar-copy'));
+    dateButton.querySelector('.mtn-calendar-copy').append(dateText, dateHint);
+    const popover = el('div', 'mtn-calendar-popover');
+    popover.hidden = true;
+    popover.setAttribute('role', 'dialog');
+    popover.setAttribute('aria-label', 'تقویم انتخاب تاریخ');
+    const calendarHead = el('div', 'mtn-calendar-head');
+    const prev = el('button', 'mtn-calendar-nav', '‹');
+    const monthTitle = el('strong', 'mtn-calendar-month');
+    const next = el('button', 'mtn-calendar-nav', '›');
+    prev.type = next.type = 'button';
+    prev.setAttribute('aria-label', 'ماه قبل');
+    next.setAttribute('aria-label', 'ماه بعد');
+    calendarHead.append(prev, monthTitle, next);
+    const weekdays = el('div', 'mtn-calendar-weekdays');
+    ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'].forEach(d => weekdays.append(el('span', '', d)));
+    const days = el('div', 'mtn-calendar-days');
+    const calendarFoot = el('div', 'mtn-calendar-foot');
+    const todayBtn = el('button', 'mtn-calendar-today', 'امروز');
+    todayBtn.type = 'button';
+    calendarFoot.append(todayBtn);
+    popover.append(calendarHead, weekdays, days, calendarFoot);
+    dateColumn.append(dateLabel, dateButton, popover);
+    const timeLabel = el('label', 'mtn-picker-label', 'انتخاب ساعت');
+    const timeSelect = el('select', 'mtn-time-select');
+    timeSelect.setAttribute('aria-label', 'انتخاب ساعت رزرو');
+    timeSelect.add(new Option('ساعت را انتخاب کنید', ''));
+    for (let minutes = 9 * 60; minutes <= 23 * 60 + 30; minutes += 30) {
+      const hour = String(Math.floor(minutes / 60)).padStart(2, '0');
+      const minute = String(minutes % 60).padStart(2, '0');
+      timeSelect.add(new Option(hour + ':' + minute, hour + ':' + minute));
+    }
+    timeColumn.append(timeLabel, timeSelect);
+    wrap.append(dateColumn, timeColumn);
+    field.append(wrap);
+    const persian = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { year: 'numeric', month: 'long' });
+    const dateFormat = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const digitFormat = value => new Intl.NumberFormat('fa-IR').format(value);
+    let visibleMonth = new Date();
+    visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+    let selectedDate = '';
+    function isoDate(date) {
+      return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+    }
+    function updateValue() {
+      input.value = selectedDate && timeSelect.value ? selectedDate + 'T' + timeSelect.value : '';
+      dateText.textContent = selectedDate ? dateFormat.format(new Date(selectedDate + 'T12:00:00')) : 'انتخاب روز';
+      dateButton.classList.toggle('has-value', !!selectedDate);
+      dateHint.textContent = selectedDate ? 'تاریخ انتخاب‌شده' : 'برای باز کردن تقویم بزنید';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    function renderCalendar() {
+      monthTitle.textContent = persian.format(visibleMonth);
+      days.replaceChildren();
+      const first = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+      const offset = (first.getDay() + 1) % 7;
+      const count = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth()+1, 0).getDate();
+      const today = isoDate(new Date());
+      for (let i=0; i<offset; i++) days.append(el('span','mtn-calendar-empty'));
+      for (let d=1; d<=count; d++) {
+        const date = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), d);
+        const iso = isoDate(date);
+        const btn = el('button', 'mtn-calendar-day', digitFormat(d));
+        btn.type = 'button';
+        btn.dataset.date = iso;
+        btn.setAttribute('aria-label', dateFormat.format(date));
+        if (iso === selectedDate) btn.classList.add('is-selected');
+        if (iso === today) btn.classList.add('is-today');
+        if (iso < today) { btn.disabled = true; btn.classList.add('is-past'); }
+        btn.addEventListener('click', () => {
+          selectedDate = iso;
+          updateValue();
+          popover.hidden = true;
+          dateButton.setAttribute('aria-expanded', 'false');
+          renderCalendar();
+        });
+        days.append(btn);
+      }
+    }
+    function setFromValue(value) {
+      if (!value) { selectedDate = ''; return; }
+      const parts = value.split('T');
+      selectedDate = parts[0] || '';
+      if (parts[1]) {
+        const normalized = parts[1].slice(0,5);
+        if (![...timeSelect.options].some(option => option.value === normalized)) timeSelect.add(new Option(normalized, normalized));
+        timeSelect.value = normalized;
+      }
+      if (selectedDate) {
+        const d = new Date(selectedDate + 'T12:00:00');
+        visibleMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+      }
+      dateText.textContent = selectedDate ? dateFormat.format(new Date(selectedDate + 'T12:00:00')) : 'انتخاب روز';
+      dateHint.textContent = selectedDate ? 'تاریخ انتخاب‌شده' : 'برای باز کردن تقویم بزنید';
+      renderCalendar();
+    }
+    dateButton.addEventListener('click', () => {
+      popover.hidden = !popover.hidden;
+      dateButton.setAttribute('aria-expanded', String(!popover.hidden));
+      if (!popover.hidden) renderCalendar();
+    });
+    prev.addEventListener('click', () => { visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth()-1, 1); renderCalendar(); });
+    next.addEventListener('click', () => { visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth()+1, 1); renderCalendar(); });
+    todayBtn.addEventListener('click', () => {
+      const now = new Date();
+      selectedDate = isoDate(now);
+      visibleMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      updateValue();
+      renderCalendar();
+      popover.hidden = true;
+      dateButton.setAttribute('aria-expanded', 'false');
+    });
+    timeSelect.addEventListener('change', updateValue);
+    document.addEventListener('click', event => {
+      if (!wrap.contains(event.target)) {
+        popover.hidden = true;
+        dateButton.setAttribute('aria-expanded', 'false');
+      }
+    });
+    setFromValue(input.value);
+    renderCalendar();
+    return { setFromValue };
+  }
   function buildBookingSteps(root) {
     const form = root.querySelector('.mtn-booking-form');
     if (!form || form.dataset.stepsReady === '1') return;
@@ -123,6 +266,7 @@
     const event = form.elements.event_id;
     const party = form.elements.party_size;
     const date = form.elements.booking_at;
+    const datePicker = enhanceDateTime(date);
     const table = form.elements.table_id;
     const tableField = root.querySelector('.mtn-table-field');
     const checkButton = root.querySelector('.mtn-check-availability');
@@ -139,6 +283,7 @@
       const selected = catalog.events.find((item) => String(item.id) === String(event.value));
       if (selected && selected.event_date && selected.event_start_time) {
         date.value = selected.event_date + 'T' + selected.event_start_time.slice(0, 5);
+        if (datePicker) datePicker.setFromValue(date.value);
       }
     }
     function updateEvents() {
