@@ -225,8 +225,10 @@
       for (const field of required) {
         if (!field || !field.reportValidity()) return;
       }
-      if (current === 1 && !date.value) {
+      if (current === 1 && !form.elements.booking_at.value) {
         setStatus(root, 'لطفاً ابتدا تاریخ را انتخاب کنید.', 'error');
+        const calendarButton = root.querySelector('.mtn-calendar-trigger');
+        if (calendarButton) calendarButton.focus();
         return;
       }
       if (current === 2) {
@@ -325,7 +327,7 @@
     form.elements.customer_note.addEventListener('input', () => { idempotencyKey = ''; });
     checkButton.addEventListener('click', async () => {
       if (!form.reportValidity()) return;
-      if (!date.value || !event.value) { setStatus(root, 'تاریخ را انتخاب کنید و سپس برنامه‌ای با ساعت مشخص برگزینید.', 'error'); return; }
+      if (!date.value || !event.value) { setStatus(root, 'تاریخ را انتخاب کنید و سپس برنامه‌ای با ساعت مشخص برگزینید.', 'error'); const calendarButton = root.querySelector('.mtn-calendar-trigger'); if (calendarButton && !date.value) calendarButton.focus(); return; }
       const params = new URLSearchParams({
         cafe_id: cafe.value,
         event_id: event.value,
