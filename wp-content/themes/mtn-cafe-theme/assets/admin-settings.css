@@ -1,0 +1,30 @@
+/* MTN theme settings screen */
+.mtn-theme-admin{max-width:1180px}
+.mtn-theme-admin-lead{max-width:760px;color:#50575e;line-height:1.9}
+.mtn-theme-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;align-items:start;margin-top:18px}
+.mtn-theme-tabs{display:grid;gap:6px;position:sticky;top:44px;padding:10px;background:#fff;border:1px solid #dcdcde;border-radius:14px}
+.mtn-theme-tab{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px;border:1px solid transparent;border-radius:10px;background:transparent;color:#2c3338;font:inherit;text-align:start;cursor:pointer}
+.mtn-theme-tab:hover{background:#f6f7f7}
+.mtn-theme-tab.is-active{background:#2271b1;color:#fff}
+.mtn-theme-tab:focus-visible{outline:2px solid #2271b1;outline-offset:2px}
+.mtn-theme-panels{min-width:0}
+.mtn-theme-panel{background:#fff;border:1px solid #dcdcde;border-radius:14px;padding:6px 24px 22px}
+.mtn-theme-panel[hidden]{display:none}
+.mtn-theme-panel h2{margin:16px 0 10px;padding-bottom:12px;border-bottom:1px solid #eee;font-size:17px}
+.mtn-theme-panel .form-table th{width:220px}
+.mtn-theme-panel input[type=color]{width:64px;height:38px;padding:3px;vertical-align:middle}
+.mtn-theme-panel textarea.code{font-family:Consolas,Monaco,monospace;direction:ltr;text-align:left}
+.mtn-theme-preview{margin-top:16px;padding:20px;border-radius:14px;background:var(--p-bg,#101014)}
+.mtn-theme-preview-card{display:grid;gap:8px;max-width:360px;padding:18px;border-radius:var(--p-radius,18px);background:var(--p-surface,#1b1b22);color:var(--p-text,#f7f4ef);border:1px solid rgba(255,255,255,.1)}
+.mtn-theme-preview-card span{color:var(--p-muted,#b8b4bf)}
+.mtn-theme-preview-button{justify-self:start;padding:8px 18px;border-radius:999px;background:var(--p-accent,#e7a94b);color:#17120b}
+.mtn-theme-reset{margin-top:8px}
+@media(max-width:900px){
+	.mtn-theme-layout{grid-template-columns:1fr}
+	.mtn-theme-tabs{position:static;grid-auto-flow:column;overflow-x:auto}
+	.mtn-theme-tab{white-space:nowrap}
+}
+@media(max-width:782px){
+	.mtn-theme-panel{padding-inline:14px}
+	.mtn-theme-panel .form-table th,.mtn-theme-panel .form-table td{display:block;width:100%;padding:8px 0}
+}

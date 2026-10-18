@@ -170,9 +170,9 @@ if ( false === strpos( $theme_settings, "'sanitize_hex_color'" ) ||
 	false === strpos( $theme_polish, '.mtn-theme-toggle' ) ||
 	false === strpos( $settings_wizard, 'checkValidity()' ) ||
 	false === strpos( $settings_wizard, 'mtn_cb_booking_duration_minutes' ) ||
-	false === strpos( $plugin_main, "Version: 0.17.0" ) ||
-	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.17.0' )" ) ||
-	false === strpos( $theme_style, 'Version: 0.8.0' ) ) {
+	false === strpos( $plugin_main, "Version: 0.18.0" ) ||
+	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.18.0' )" ) ||
+	false === strpos( $theme_style, 'Version: 0.9.0' ) ) {
 	fwrite( STDERR, "Theme preferences, persistent shell controls, settings wizard, or release versions are missing.\n" );
 	exit( 1 );
 }
@@ -184,6 +184,42 @@ if ( false === strpos( $cooperation, 'wp_mail( $admin_email, $subject, $message 
 	false === strpos( $admin_design, '.mtn-admin-metrics' ) ) {
 	fwrite( STDERR, "Cooperation notification, WhatsApp contact, or admin dashboard UI contract is missing.\n" );
 	exit( 1 );
+}
+
+$access = file_get_contents( $root . '/wp-content/plugins/mtn-cafe-booking/includes/class-mtn-cb-access.php' );
+$auth_css = file_get_contents( $root . '/wp-content/plugins/mtn-cafe-booking/assets/auth.css' );
+if ( false === $access || false === $auth_css ||
+	false === strpos( $access, "add_action( 'admin_init', array( __CLASS__, 'restrict_dashboard' )" ) ||
+	false === strpos( $access, "current_user_can( 'manage_options' )" ) ||
+	false === strpos( $access, "add_action( 'login_init', array( __CLASS__, 'redirect_wp_login' )" ) ||
+	false === strpos( $access, "add_filter( 'show_admin_bar'" ) ||
+	false === strpos( $access, "add_filter( 'login_redirect'" ) ||
+	false === strpos( $access, "'pre_option_users_can_register'" ) ||
+	false === strpos( $access, 'self::require_nonce( \'login\'' ) ||
+	false === strpos( $access, 'self::require_nonce( \'register\'' ) ||
+	false === strpos( $access, 'self::require_nonce( \'forgot\'' ) ||
+	false === strpos( $access, "'role' => 'subscriber'" ) ||
+	3 !== substr_count( $access, "wp_nonce_field( 'mtn_cb_auth', '_mtn_auth_nonce' )" ) ||
+	false === strpos( $plugin_main, 'class-mtn-cb-access.php' ) ||
+	false === strpos( $plugin_main, 'MTN_CB_Access::init()' ) ||
+	false === strpos( $auth_css, '.mtn-auth-card' ) ) {
+	fwrite( STDERR, "Dashboard lock-down or front-end sign-in contract is missing.\n" );
+	exit( 1 );
+}
+
+// Every theme setting must be editable from a settings section and used by the theme.
+$setting_keys = array();
+preg_match_all( "/'(mtn_cafe_theme_[a-z0-9_]+)'\\s*=>\\s*array\\(\\s*'(?:string|integer|boolean)'/", $theme_settings, $definitions );
+$setting_keys = array_unique( $definitions[1] );
+if ( count( $setting_keys ) < 45 ) {
+	fwrite( STDERR, "Theme setting definitions are incomplete.\n" );
+	exit( 1 );
+}
+foreach ( $setting_keys as $setting_key ) {
+	if ( false === strpos( substr( $theme_settings, (int) strpos( $theme_settings, 'function mtn_cafe_theme_settings_sections' ) ), "'" . $setting_key . "'" ) ) {
+		fwrite( STDERR, "Theme setting {$setting_key} has no field in the settings screen.\n" );
+		exit( 1 );
+	}
 }
 
 fwrite( STDOUT, "Static source-contract checks passed. These checks do not replace WordPress integration or concurrency tests.\n" );

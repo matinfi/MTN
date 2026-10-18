@@ -1,3 +1,26 @@
+## 0.18.0 (plugin) / 0.9.0 (theme) — 2026-10-18
+
+### Added
+- Dashboard lock-down: only administrators (`manage_options`) can open wp-admin. Every other signed-in user is redirected to `/my-account/`, the admin bar is hidden for them, and classic `wp-login.php` sign-in/registration screens redirect to a themed front-end page. Logout, password-reset links and post-password actions keep working through `wp-login.php`.
+- Front-end sign-in, registration and password recovery (`[mtn_auth]`, page `/login/`) with nonces, honeypot, per-IP and per-account throttling, generic recovery messages, and an on/off switch for customer registration in the plugin settings.
+- Account settings form (`[mtn_account_settings]`) on `/my-account/` for display name and password.
+- Privacy hardening: `/wp/v2/users` REST routes, the users sitemap and author archives are hidden from non-administrators.
+- Complete tabbed theme settings screen (brand, colours, fonts, header/sidebar, home page sections, footer/contact/social, custom CSS) with contrast warnings, live colour preview and reset-to-defaults; bundled Vazirmatn font; primary-menu support; 404 template.
+
+### Changed
+- WordPress' built-in `users_can_register` is forced off while the front-end sign-in page is active, so accounts cannot be created by posting directly to `wp-login.php?action=register`.
+- Static contract tests now cover the dashboard lock-down, auth nonces and that every theme setting has a field on the settings screen.
+
+### Recovery switches (wp-config.php)
+- `define( 'MTN_CB_DISABLE_AUTH_REDIRECT', true );` stops redirecting `wp-login.php`.
+- `define( 'MTN_CB_ALLOW_STAFF_ADMIN', true );` lets every signed-in user keep wp-admin access.
+- `wp-login.php?mtn-admin=1` opens the classic form for administrators.
+
+### Validation notes
+- PHP lint, JS syntax and static contracts were run. WordPress integration tests, real-browser RTL/mobile checks and email delivery were not run and belong to the staging test.
+
+---
+
 ## 0.12.0 — 2026-10-17
 
 ### Added

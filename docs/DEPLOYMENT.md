@@ -19,8 +19,16 @@ The repository's CI checks PHP syntax, booking-wizard JavaScript syntax and stat
 5. Configure brand, currency, fixed commission and commission trigger (`confirmed` by default or `completed`), booking expiry, reservation duration, customer cancellation cutoff, check-in token expiry, statement due days and table-selection mode. Set statement due days to the agreed finance policy and configure a valid statement email in each cafe's metadata. A zero-minute cancellation cutoff allows customer cancellation until the reservation start; positive values block cancellation inside that many minutes. Currency is intentionally locked after the first booking or ledger entry.
 6. Create a cafe and set its city, address, contact details, music genre and optional owner user. Saving an owner assigns the cafe-manager role.
 7. Create and publish active tables. Create and publish events with a cafe, date, start time, optional end time, party limits and capacity.
-8. Verify /cafes/, /events/, /book/, /my-account/ and /cafe-dashboard/.
+8. Verify /cafes/, /events/, /book/, /login/ and /my-account/. The legacy /cafe-dashboard/ page no longer exists.
 9. Run the complete scenario list in docs/TESTING.md, including two or more simultaneous booking requests.
+
+## Dashboard access and customer sign-in
+
+- Only administrators can use wp-admin. Customers and cafe managers sign in on the front-end `/login/` page (created automatically as `/mtn-login/` if `/login/` is already used by another page) and are sent to `/my-account/`.
+- Test as a non-admin user: opening `/wp-admin/` must redirect to `/my-account/`, the admin bar must not show, and `/wp-login.php` must redirect to `/login/`. Test password reset from the e-mail link, logout, and an administrator signing in at `/login/`.
+- Break-glass options in `wp-config.php`: `MTN_CB_DISABLE_AUTH_REDIRECT` (stop redirecting wp-login.php), `MTN_CB_ALLOW_STAFF_ADMIN` (restore wp-admin for every signed-in user). `wp-login.php?mtn-admin=1` opens the classic form for administrators.
+- Exclude `/login/` and `/my-account/` from full-page caching; the sign-in forms use nonces and a cached page shows "session expired" errors.
+- Customer registration can be switched off in plugin settings.
 
 ## Scheduled expiry
 

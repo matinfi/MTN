@@ -3,7 +3,7 @@
 const form=document.querySelector('form[data-mtn-settings-wizard]');
 if(!form)return;
 const steps=[
- {title:'اطلاعات پایه',fields:['mtn_cb_brand_name','mtn_cb_currency','mtn_cb_booking_mode']},
+ {title:'اطلاعات پایه',fields:['mtn_cb_brand_name','mtn_cb_currency','mtn_cb_booking_mode','mtn_cb_allow_registration','mtn_cb_whatsapp_number']},
  {title:'کارمزد و امور مالی',fields:['mtn_cb_commission_trigger_status','mtn_cb_default_commission','mtn_cb_reverse_commission_on_cancellation','mtn_cb_reverse_commission_on_no_show','mtn_cb_reverse_commission_on_event_cancel','mtn_cb_statement_due_days']},
  {title:'قوانین رزرو',fields:['mtn_cb_booking_expiry_minutes','mtn_cb_checkin_token_minutes','mtn_cb_booking_duration_minutes','mtn_cb_customer_cancel_cutoff_minutes']}
 ];

@@ -3,7 +3,7 @@ Theme Name: MTN Cafe
 Theme URI: https://github.com/matinfi/MTN
 Author: MTN Project
 Description: Lightweight Persian RTL theme for cafe discovery and live music reservations.
-Version: 0.8.0
+Version: 0.9.0
 Requires at least: 6.4
 Requires PHP: 8.1
 Text Domain: mtn-cafe-theme
@@ -11,7 +11,7 @@ Text Domain: mtn-cafe-theme
 :root{--mtn-bg:#101014;--mtn-surface:#1b1b22;--mtn-text:#f7f4ef;--mtn-muted:#b8b4bf;--mtn-accent:#e7a94b;--mtn-radius:18px}
 *{box-sizing:border-box}
 html{direction:rtl;scroll-behavior:smooth}
-body{margin:0;background:var(--mtn-bg);color:var(--mtn-text);font-family:Tahoma,Arial,sans-serif;line-height:1.8}
+body{margin:0;background:var(--mtn-bg);color:var(--mtn-text);font-family:var(--mtn-font,Tahoma,Arial,sans-serif);font-size:var(--mtn-base-size,16px);line-height:1.8}
 a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--mtn-accent);outline-offset:3px}
 .skip-link{position:absolute;top:0;right:0;z-index:1000;transform:translateY(-150%);padding:.75rem 1rem;background:var(--mtn-accent);color:#17120b;border-radius:0 0 10px 10px}

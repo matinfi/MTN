@@ -1,0 +1,64 @@
+/* MTN sign-in, registration and account settings. Uses theme tokens when available, with safe fallbacks. */
+.mtn-auth-card{
+	--auth-bg:var(--mtn-surface,#1b1b22);
+	--auth-raised:var(--mtn-surface-raised,#22242d);
+	--auth-border:var(--mtn-border,#34363f);
+	--auth-text:var(--mtn-text,#f7f4ef);
+	--auth-muted:var(--mtn-muted,#b8b4bf);
+	--auth-accent:var(--mtn-accent,#e7a94b);
+	--auth-radius:var(--mtn-radius,18px);
+	width:min(460px,calc(100% - 2rem));
+	margin:clamp(1.5rem,6vw,4rem) auto;
+	padding:clamp(1.25rem,4vw,2.25rem);
+	background:var(--auth-bg);
+	color:var(--auth-text);
+	border:1px solid var(--auth-border);
+	border-radius:var(--auth-radius);
+	box-shadow:0 24px 60px rgb(0 0 0 / 22%);
+	direction:rtl;
+	text-align:right;
+}
+.mtn-account-settings{width:min(640px,calc(100% - 2rem))}
+.mtn-auth-card h2{margin:.25rem 0 .35rem;font-size:1.45rem}
+.mtn-auth-lead{margin:0 0 1.25rem;color:var(--auth-muted);line-height:1.9}
+.mtn-auth-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:.35rem;margin-bottom:1.25rem;padding:.3rem;background:var(--auth-raised);border:1px solid var(--auth-border);border-radius:999px}
+.mtn-auth-tabs a{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:999px;color:var(--auth-muted);font-weight:700;text-decoration:none;transition:background .15s ease,color .15s ease}
+.mtn-auth-tabs a:hover{color:var(--auth-text)}
+.mtn-auth-tabs a.is-active{background:var(--auth-accent);color:#17120b}
+.mtn-auth-form p{margin:0 0 1rem}
+.mtn-auth-form label{display:block;margin-bottom:.35rem;font-weight:700;line-height:1.7}
+.mtn-auth-form input[type="text"],
+.mtn-auth-form input[type="email"],
+.mtn-auth-form input[type="password"]{width:100%;min-height:48px;padding:.7rem .85rem;border:1px solid var(--auth-border);border-radius:12px;background:rgb(255 255 255 / 5%);color:var(--auth-text);font:inherit}
+.mtn-auth-form input[readonly]{opacity:.7;cursor:not-allowed}
+.mtn-auth-form input:focus{border-color:var(--auth-accent);box-shadow:0 0 0 3px rgb(231 169 75 / 22%);outline:none}
+.mtn-auth-password{position:relative;display:block}
+.mtn-auth-password input{padding-inline-end:4.5rem!important}
+.mtn-auth-reveal{position:absolute;inset-block:.35rem;inset-inline-end:.35rem;padding:0 .8rem;border:0;border-radius:9px;background:var(--auth-raised);color:var(--auth-muted);font:inherit;font-size:.85rem;cursor:pointer}
+.mtn-auth-reveal:hover{color:var(--auth-text)}
+.mtn-auth-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.mtn-auth-row a,.mtn-auth-foot a{color:var(--auth-accent);text-decoration:underline;text-underline-offset:3px}
+.mtn-auth-check{display:inline-flex!important;align-items:center;gap:.5rem;margin:0!important;font-weight:400!important}
+.mtn-auth-check input{width:auto;min-height:auto;accent-color:var(--auth-accent)}
+.mtn-auth-submit{width:100%;min-height:48px;border:0;cursor:pointer;font:inherit;font-weight:800}
+.mtn-auth-secondary{background:var(--auth-raised)!important;color:var(--auth-text)!important;border:1px solid var(--auth-border)!important}
+.mtn-auth-links{display:flex;flex-wrap:wrap;gap:.6rem}
+.mtn-auth-foot{margin:1rem 0 0;text-align:center;color:var(--auth-muted)}
+.mtn-auth-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--auth-muted);font-size:.9rem}
+.mtn-auth-divider:before,.mtn-auth-divider:after{content:"";flex:1;height:1px;background:var(--auth-border)}
+.mtn-auth-message{margin:0 0 1rem;padding:.75rem .9rem;border:1px solid var(--auth-border);border-radius:12px;line-height:1.8}
+.mtn-auth-message.is-error{border-color:#a54d4d;background:rgb(255 140 145 / 10%)}
+.mtn-auth-message.is-success{border-color:#477b5c;background:rgb(118 214 160 / 10%)}
+.mtn-auth-fieldset{margin:0 0 1rem;padding:1rem 1rem 0;border:1px solid var(--auth-border);border-radius:14px}
+.mtn-auth-fieldset legend{padding:0 .5rem;font-weight:700}
+.mtn-auth-trap{position:absolute!important;inset-inline-start:-10000px!important;width:1px;height:1px;overflow:hidden}
+.mtn-auth-card [data-mtn-otp-login]{margin:0;padding:0;border:0;box-shadow:none;background:transparent}
+.mtn-auth-card [data-mtn-otp-login] h2{font-size:1.1rem}
+.mtn-auth-card [data-mtn-otp-login] input{width:100%;min-height:48px;padding:.7rem .85rem;border:1px solid var(--auth-border);border-radius:12px;background:rgb(255 255 255 / 5%);color:var(--auth-text);font:inherit;direction:ltr;text-align:left}
+.mtn-auth-card [data-mtn-otp-login] label{display:block;margin-bottom:.35rem;font-weight:700}
+:root[data-mtn-theme="light"] .mtn-auth-card{box-shadow:0 24px 60px rgb(30 45 75 / 12%)}
+:root[data-mtn-theme="light"] .mtn-auth-form input[type="text"],
+:root[data-mtn-theme="light"] .mtn-auth-form input[type="email"],
+:root[data-mtn-theme="light"] .mtn-auth-form input[type="password"]{background:#fff}
+@media(max-width:480px){.mtn-auth-card{margin-block:1rem}.mtn-auth-row{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.mtn-auth-tabs a{transition:none}}

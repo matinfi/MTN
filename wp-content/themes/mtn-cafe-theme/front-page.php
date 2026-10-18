@@ -4,8 +4,8 @@
     <p class="eyebrow"><?php echo esc_html( mtn_cafe_theme_option_value('mtn_cafe_theme_hero_eyebrow') ); ?></p>
     <h1><?php echo esc_html( mtn_cafe_theme_option_value('mtn_cafe_theme_hero_title') ); ?></h1>
     <p><?php echo esc_html( mtn_cafe_theme_option_value('mtn_cafe_theme_hero_description') ); ?></p>
-    <a class="button" href="<?php echo esc_url( mtn_cafe_theme_option_value('mtn_cafe_theme_hero_primary_url') ? (str_starts_with(mtn_cafe_theme_option_value('mtn_cafe_theme_hero_primary_url'),'http') ? mtn_cafe_theme_option_value('mtn_cafe_theme_hero_primary_url') : home_url(mtn_cafe_theme_option_value('mtn_cafe_theme_hero_primary_url'))) : home_url('/cafes/') ); ?>"><?php echo esc_html( mtn_cafe_theme_option_value('mtn_cafe_theme_hero_primary_label') ); ?></a>
-    <a class="button" href="<?php echo esc_url( mtn_cafe_theme_option_value('mtn_cafe_theme_hero_secondary_url') ? (str_starts_with(mtn_cafe_theme_option_value('mtn_cafe_theme_hero_secondary_url'),'http') ? mtn_cafe_theme_option_value('mtn_cafe_theme_hero_secondary_url') : home_url(mtn_cafe_theme_option_value('mtn_cafe_theme_hero_secondary_url'))) : home_url('/book/') ); ?>"><?php echo esc_html( mtn_cafe_theme_option_value('mtn_cafe_theme_hero_secondary_label') ); ?></a>
+    <a class="button" href="<?php echo esc_url( mtn_cafe_theme_link( 'mtn_cafe_theme_hero_primary_url', '/cafes/' ) ); ?>"><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_hero_primary_label' ) ); ?></a>
+    <a class="button mtn-button-secondary" href="<?php echo esc_url( mtn_cafe_theme_link( 'mtn_cafe_theme_hero_secondary_url', '/book/' ) ); ?>"><?php echo esc_html( mtn_cafe_theme_option_value( 'mtn_cafe_theme_hero_secondary_label' ) ); ?></a>
   </div>
 </section>
 <?php if (mtn_cafe_theme_option_value("mtn_cafe_theme_show_search")) : ?><section class="mtn-home-search" data-mtn-home-search aria-labelledby="mtn-home-search-title">
@@ -45,15 +45,16 @@
       </article>
     <?php endwhile; wp_reset_postdata(); ?>
   </div><?php else : ?><div class="mtn-empty-state"><?php esc_html_e( 'فهرست کافه‌ها هنوز خالی است.', 'mtn-cafe-theme' ); ?></div><?php endif; ?>
-</section>
 </section><?php endif; ?>
-<?php if (mtn_cafe_theme_option_value("mtn_cafe_theme_show_benefits")) : ?><section class="section container">
+<?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_benefits' ) ) : ?><section class="section container">
   <div class="cards">
-    <article class="card"><h3><?php esc_html_e( 'موزیک زنده', 'mtn-cafe-theme' ); ?></h3><p class="muted"><?php esc_html_e( 'اجراهای زنده و شب‌های موسیقی را پیدا کن.', 'mtn-cafe-theme' ); ?></p></article>
-    <article class="card"><h3><?php esc_html_e( 'ظرفیت شفاف', 'mtn-cafe-theme' ); ?></h3><p class="muted"><?php esc_html_e( 'پیش از ثبت، ظرفیت و میزهای قابل رزرو بررسی می‌شوند.', 'mtn-cafe-theme' ); ?></p></article>
-    <article class="card"><h3><?php esc_html_e( 'تأیید کافه', 'mtn-cafe-theme' ); ?></h3><p class="muted"><?php esc_html_e( 'رزرو تا زمان پاسخ کافه در انتظار تأیید می‌ماند.', 'mtn-cafe-theme' ); ?></p></article>
+    <?php for ( $mtn_i = 1; $mtn_i <= 3; $mtn_i++ ) : $mtn_b_title = mtn_cafe_theme_option_value( 'mtn_cafe_theme_benefit_' . $mtn_i . '_title' ); $mtn_b_text = mtn_cafe_theme_option_value( 'mtn_cafe_theme_benefit_' . $mtn_i . '_text' ); if ( '' === trim( (string) $mtn_b_title ) && '' === trim( (string) $mtn_b_text ) ) { continue; } ?>
+    <article class="card"><h3><?php echo esc_html( $mtn_b_title ); ?></h3><p class="muted"><?php echo esc_html( $mtn_b_text ); ?></p></article>
+    <?php endfor; ?>
   </div>
 </section>
-<section class="section container"><div class="notice"><strong><?php esc_html_e( 'شفافیت رزرو', 'mtn-cafe-theme' ); ?></strong><p><?php esc_html_e( 'ثبت درخواست به معنی تأیید نهایی نیست و هیچ پرداخت اینترنتی در سایت انجام نمی‌شود. اتصال واقعی پیامک و واتساپ باید جداگانه پیکربندی شود.', 'mtn-cafe-theme' ); ?></p></div></section>
+<?php $mtn_n_title = mtn_cafe_theme_option_value( 'mtn_cafe_theme_notice_title' ); $mtn_n_text = mtn_cafe_theme_option_value( 'mtn_cafe_theme_notice_text' ); if ( '' !== trim( (string) $mtn_n_title . (string) $mtn_n_text ) ) : ?>
+<section class="section container"><div class="notice"><strong><?php echo esc_html( $mtn_n_title ); ?></strong><p><?php echo esc_html( $mtn_n_text ); ?></p></div></section>
+<?php endif; ?>
 <?php endif; ?>
 <?php get_footer(); ?>

@@ -266,3 +266,26 @@ body { background-image: radial-gradient(ellipse at 80% -10%, rgb(231 169 75 / 8
 @media(prefers-reduced-motion:reduce) {
   .mtn-listing-card, .mtn-listing-card .mtn-card-image, .hero .button { transition:none; }
 }
+
+/* MTN 0.9.0 — footer, menu, secondary buttons, 404 and search form polish. */
+.mtn-button-secondary{background:transparent;color:var(--mtn-text);border:1px solid var(--mtn-border)}
+.mtn-button-secondary:hover{border-color:var(--mtn-accent);color:var(--mtn-accent)}
+.mtn-menu{display:grid;gap:.35rem;margin:0;padding:0;list-style:none}
+.mtn-menu li{margin:0}
+.mtn-footer-grid{display:grid;grid-template-columns:minmax(0,2fr) repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;align-items:start}
+.mtn-footer-contact{font-style:normal}
+.mtn-footer-contact p{margin:.25rem 0}
+.mtn-footer-contact span{color:var(--mtn-muted)}
+.mtn-footer-contact a,.mtn-footer-social a{color:var(--mtn-text);text-decoration:underline;text-underline-offset:3px}
+.mtn-footer-contact a:hover,.mtn-footer-social a:hover{color:var(--mtn-accent)}
+.mtn-footer-social{display:flex;flex-wrap:wrap;gap:.6rem 1rem;margin:0;padding:0;list-style:none}
+.mtn-footer-notice{font-size:.9rem}
+.mtn-footer-bottom{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--mtn-border);font-size:.9rem}
+.mtn-footer-bottom p{margin:0}
+.mtn-404{text-align:center}
+.mtn-404 form{display:flex;gap:.5rem;max-width:520px;margin:1.5rem auto}
+.mtn-404 input[type="search"]{flex:1;min-height:48px;padding:.7rem .9rem;border:1px solid var(--mtn-border);border-radius:12px;background:var(--mtn-surface);color:var(--mtn-text);font:inherit}
+.mtn-404 input[type="submit"]{min-height:48px;padding:0 1.2rem;border:0;border-radius:999px;background:var(--mtn-accent);color:#17120b;font:inherit;font-weight:800;cursor:pointer}
+.mtn-404-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem}
+.mtn-sidebar-brand strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:9rem}
+@media(max-width:700px){.mtn-footer-grid{grid-template-columns:1fr}.mtn-404 form{flex-direction:column}}
