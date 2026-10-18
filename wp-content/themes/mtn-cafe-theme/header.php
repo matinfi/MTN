@@ -14,7 +14,7 @@
     <a class="mtn-sidebar-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'صفحه اصلی MTN کافه', 'mtn-cafe-theme' ); ?>">
       <?php if ( has_custom_logo() ) { the_custom_logo(); } else { ?><span class="mtn-brand-mark" aria-hidden="true">M</span><span class="mtn-brand-copy"><strong>MTN</strong><small><?php echo esc_html( mtn_cafe_theme_option_value("mtn_cafe_theme_brand_subtitle") ); ?></small></span><?php } ?>
     </a>
-    <nav class="mtn-side-nav">
+    <?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_sidebar_menu' ) ) : ?><nav class="mtn-side-nav">
       <span class="mtn-nav-label"><?php esc_html_e( 'منوی اصلی', 'mtn-cafe-theme' ); ?></span>
       <a class="mtn-nav-link <?php echo is_front_page() ? 'is-active' : ''; ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'خانه', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">⌂</span><span class="mtn-nav-text">خانه</span></a>
       <a class="mtn-nav-link <?php echo is_post_type_archive( 'mtn_cafe' ) || is_singular( 'mtn_cafe' ) ? 'is-active' : ''; ?>" href="<?php echo esc_url( home_url( '/cafes/' ) ); ?>" aria-label="<?php esc_attr_e( 'کشف کافه‌ها', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">⌕</span><span class="mtn-nav-text">کشف کافه‌ها</span></a>
@@ -24,15 +24,15 @@
       <a class="mtn-nav-link" href="<?php echo esc_url( home_url( '/cooperation/' ) ); ?>" aria-label="<?php esc_attr_e( 'درخواست همکاری', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">＋</span><span class="mtn-nav-text">درخواست همکاری</span></a>
       <a class="mtn-nav-link" href="<?php echo esc_url( home_url( '/artists/' ) ); ?>" aria-label="خواننده‌ها و دی‌جی‌ها"><span class="mtn-nav-icon" aria-hidden="true">♫</span><span class="mtn-nav-text">خواننده‌ها و دی‌جی‌ها</span></a>
       <?php if ( current_user_can( 'manage_options' ) ) : ?><a class="mtn-nav-link" href="<?php echo esc_url( admin_url( 'admin.php?page=mtn-cb-bookings' ) ); ?>" aria-label="<?php esc_attr_e( 'مدیریت مرکزی', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">▤</span><span class="mtn-nav-text">مدیریت مرکزی</span></a><?php endif; ?>
-    </nav>
+    </nav><?php endif; ?>
     <div class="mtn-sidebar-bottom">
       <?php if ( is_user_logged_in() ) : ?><a class="mtn-nav-link" href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>" aria-label="<?php esc_attr_e( 'خروج', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">↪</span><span class="mtn-nav-text">خروج از حساب</span></a><?php else : ?><a class="mtn-nav-link" href="<?php echo esc_url( wp_login_url() ); ?>" aria-label="<?php esc_attr_e( 'ورود', 'mtn-cafe-theme' ); ?>"><span class="mtn-nav-icon" aria-hidden="true">⇥</span><span class="mtn-nav-text">ورود / ثبت‌نام</span></a><?php endif; ?>
-      <button class="mtn-sidebar-toggle" type="button" data-mtn-sidebar-toggle aria-controls="mtn-sidebar" aria-expanded="true"><span class="mtn-nav-icon" aria-hidden="true">⇤</span><span class="mtn-nav-text">جمع کردن منو</span></button>
+      <?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_sidebar_menu' ) ) : ?><button class="mtn-sidebar-toggle" type="button" data-mtn-sidebar-toggle aria-controls="mtn-sidebar" aria-expanded="true"><span class="mtn-nav-icon" aria-hidden="true">⇤</span><span class="mtn-nav-text">جمع کردن منو</span></button><?php endif; ?>
     </div>
   </aside>
   <div class="mtn-app-main">
     <header class="site-header">
-      <button class="mtn-mobile-menu" type="button" data-mtn-mobile-toggle aria-controls="mtn-sidebar" aria-expanded="false" aria-label="<?php esc_attr_e( 'باز کردن منو', 'mtn-cafe-theme' ); ?>">☰</button>
+      <?php if ( mtn_cafe_theme_option_value( 'mtn_cafe_theme_show_sidebar_menu' ) ) : ?><button class="mtn-mobile-menu" type="button" data-mtn-mobile-toggle aria-controls="mtn-sidebar" aria-expanded="false" aria-label="<?php esc_attr_e( 'باز کردن منو', 'mtn-cafe-theme' ); ?>">☰</button><?php endif; ?>
       <div class="mtn-header-title"><span class="mtn-header-kicker"><?php echo esc_html( get_option( 'mtn_cafe_theme_header_tagline', 'کشف تجربه‌های شبانه' ) ); ?></span><strong><?php echo esc_html( is_front_page() ? 'شب بعدی‌ات را پیدا کن' : wp_get_document_title() ); ?></strong></div>
       <div class="mtn-header-actions">
         <button class="mtn-theme-toggle" type="button" data-mtn-theme-toggle aria-label="فعال‌سازی پوسته روشن" title="تغییر پوسته"><span aria-hidden="true">◐</span><span class="mtn-theme-toggle-label">پوسته روشن</span></button>

@@ -172,7 +172,9 @@ if ( false === strpos( $theme_settings, "'sanitize_hex_color'" ) ||
 	false === strpos( $settings_wizard, 'mtn_cb_booking_duration_minutes' ) ||
 	false === strpos( $plugin_main, "Version: 0.17.0" ) ||
 	false === strpos( $plugin_main, "define( 'MTN_CB_VERSION', '0.17.0' )" ) ||
-	false === strpos( $theme_style, 'Version: 0.8.0' ) ) {
+	false === strpos( $theme_style, 'Version: 0.9.0' ) ||
+	false === strpos( $theme_settings, "'mtn_cafe_theme_show_sidebar_menu'" ) ||
+	false === strpos( $theme_header, 'mtn_cafe_theme_show_sidebar_menu' ) ) {
 	fwrite( STDERR, "Theme preferences, persistent shell controls, settings wizard, or release versions are missing.\n" );
 	exit( 1 );
 }

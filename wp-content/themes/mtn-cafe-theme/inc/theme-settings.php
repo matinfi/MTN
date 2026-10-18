@@ -11,6 +11,7 @@ function mtn_cafe_theme_setting_definitions() {
   'mtn_cafe_theme_muted' => array('string','#b8b4bf','sanitize_hex_color'),
   'mtn_cafe_theme_default_mode' => array('string','dark',static function($v){return in_array($v,array('dark','light'),true)?$v:'dark';}),
   'mtn_cafe_theme_sidebar_style' => array('string','solid',static function($v){return in_array($v,array('solid','glass'),true)?$v:'solid';}),
+  'mtn_cafe_theme_show_sidebar_menu' => array('boolean',true,'rest_sanitize_boolean'),
   'mtn_cafe_theme_radius' => array('integer',18,static function($v){return min(28,max(8,absint($v)));}),
   'mtn_cafe_theme_header_tagline' => array('string','کشف تجربه‌های شبانه','sanitize_text_field'),
   'mtn_cafe_theme_brand_subtitle' => array('string','کافه و موسیقی','sanitize_text_field'),
@@ -89,6 +90,7 @@ function mtn_cafe_render_theme_settings() {
  <section class="mtn-theme-settings-card"><h2>۲. سربرگ و سایدبار</h2><table class="form-table" role="presentation">
  <?php mtn_cafe_theme_text_field('mtn_cafe_theme_header_tagline','متن کوچک سربرگ'); ?>
  <?php mtn_cafe_theme_text_field('mtn_cafe_theme_brand_subtitle','زیرعنوان برند در سایدبار'); ?>
+ <?php mtn_cafe_theme_checkbox('mtn_cafe_theme_show_sidebar_menu','نمایش فهرست سایدبار','با غیرفعال کردن، لینک‌های ناوبری سایدبار و دکمه‌های باز و بسته کردن آن پنهان می‌شوند.'); ?>
  <tr><th><label for="mtn_cafe_theme_sidebar_style">سبک سایدبار</label></th><td><select id="mtn_cafe_theme_sidebar_style" name="mtn_cafe_theme_sidebar_style"><option value="solid" <?php selected($sidebar,'solid'); ?>>یکپارچه و ساده</option><option value="glass" <?php selected($sidebar,'glass'); ?>>شیشه‌ای با محوشدگی</option></select></td></tr>
  </table><p class="description">برای لوگوی تصویری، از تنظیمات هویت سایت وردپرس استفاده کنید.</p></section>
  <section class="mtn-theme-settings-card"><h2>۳. محتوای صفحه اصلی</h2><table class="form-table" role="presentation">
