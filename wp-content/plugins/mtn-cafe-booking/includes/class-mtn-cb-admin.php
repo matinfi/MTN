@@ -69,7 +69,8 @@ final class MTN_CB_Admin {
 			$summary['all'] += (int) $summary_row->total;
 			if ( isset( $summary[ $summary_row->status ] ) ) { $summary[ $summary_row->status ] = (int) $summary_row->total; }
 		}
-		$cooperation_count = (int) wp_count_posts( 'mtn_cooperation_request' )->private;
+		$cooperation_statuses = wp_count_posts( 'mtn_cooperation_request' );
+		$cooperation_count = ( is_object( $cooperation_statuses ) && isset( $cooperation_statuses->private ) ) ? (int) $cooperation_statuses->private : 0;
 		$labels = array(
 			'pending_cafe' => 'در انتظار تأیید',
 			'confirmed' => 'تأیید شده',
