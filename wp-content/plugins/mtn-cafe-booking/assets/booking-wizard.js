@@ -112,6 +112,7 @@
         btn.addEventListener('click', () => {
           selectedDate = iso;
           updateValue();
+          input.dispatchEvent(new Event('mtn-date-selected', { bubbles: true }));
           popover.hidden = true;
           dateButton.setAttribute('aria-expanded', 'false');
           renderCalendar();
@@ -144,6 +145,7 @@
       selectedDate = isoDate(now);
       visibleMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       updateValue();
+      input.dispatchEvent(new Event('mtn-date-selected', { bubbles: true }));
       renderCalendar();
       popover.hidden = true;
       dateButton.setAttribute('aria-expanded', 'false');
@@ -317,7 +319,8 @@
     cafe.addEventListener('change', () => { idempotencyKey = ''; updateEvents(); });
     event.addEventListener('change', () => { idempotencyKey = ''; applyEventSchedule(); resetAvailability(); });
     party.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
-    date.addEventListener('change', () => { idempotencyKey = ''; updateEvents(); resetAvailability(); });
+    date.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
+    date.addEventListener('mtn-date-selected', () => { event.value = ''; updateEvents(); resetAvailability(); });
     table.addEventListener('change', () => { idempotencyKey = ''; if (lastAvailability) submitButton.disabled = !lastAvailability.available || (lastAvailability.table_selection_required && !table.value); });
     form.elements.customer_note.addEventListener('input', () => { idempotencyKey = ''; });
     checkButton.addEventListener('click', async () => {
