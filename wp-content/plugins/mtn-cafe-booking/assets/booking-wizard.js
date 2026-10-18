@@ -122,7 +122,13 @@
     const cafe = form.elements.cafe_id;
     const event = form.elements.event_id;
     const party = form.elements.party_size;
-    const date = form.elements.booking_at;
+    const originalDate = form.elements.booking_at;
+    const date = document.createElement('select');
+    date.name = 'booking_at';
+    date.id = originalDate.id || 'mtn-booking-at';
+    date.required = true;
+    date.setAttribute('aria-label', 'تاریخ و ساعت شروع برنامه');
+    originalDate.replaceWith(date);
     const table = form.elements.table_id;
     const tableField = root.querySelector('.mtn-table-field');
     const checkButton = root.querySelector('.mtn-check-availability');
@@ -135,17 +141,34 @@
       select.replaceChildren(new Option(placeholder, ''));
       items.forEach((item) => select.add(new Option(text(item[labelKey]), text(item[valueKey]))));
     }
+    function scheduleLabel(item) {
+      const datePart = item.event_date || '';
+      const timePart = item.event_start_time ? item.event_start_time.slice(0, 5) : '';
+      let readableDate = datePart;
+      if (datePart) {
+        const parsed = new Date(datePart + 'T12:00:00');
+        if (!Number.isNaN(parsed.getTime())) readableDate = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { year: 'numeric', month: 'long', day: 'numeric' }).format(parsed);
+      }
+      return [text(item.name), readableDate, timePart].filter(Boolean).join(' — ');
+    }
     function applyEventSchedule() {
       const selected = catalog.events.find((item) => String(item.id) === String(event.value));
-      if (selected && selected.event_date && selected.event_start_time) {
-        date.value = selected.event_date + 'T' + selected.event_start_time.slice(0, 5);
-      }
+      date.value = selected && selected.event_date && selected.event_start_time
+        ? selected.event_date + 'T' + selected.event_start_time.slice(0, 5)
+        : '';
     }
     function updateEvents() {
       const cafeId = Number(cafe.value || 0);
-      const items = catalog.events.filter((item) => Number(item.cafe_id) === cafeId);
+      const items = catalog.events.filter((item) => Number(item.cafe_id) === cafeId && item.event_date && item.event_start_time);
       options(event, items, 'انتخاب برنامه', 'id', 'name');
+      date.replaceChildren(new Option(items.length ? 'انتخاب تاریخ و ساعت برنامه' : 'برای این کافه برنامه زمان‌بندی‌شده‌ای نیست', ''));
+      items.forEach((item) => {
+        const option = new Option(scheduleLabel(item), item.event_date + 'T' + item.event_start_time.slice(0, 5));
+        option.dataset.eventId = String(item.id);
+        date.add(option);
+      });
       event.disabled = !items.length;
+      date.disabled = !items.length;
       if (root.dataset.defaultEvent && items.some((item) => String(item.id) === root.dataset.defaultEvent)) {
         event.value = root.dataset.defaultEvent;
         root.dataset.defaultEvent = '';
@@ -175,7 +198,12 @@
     cafe.addEventListener('change', () => { idempotencyKey = ''; updateEvents(); });
     event.addEventListener('change', () => { idempotencyKey = ''; applyEventSchedule(); resetAvailability(); });
     party.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
-    date.addEventListener('change', () => { idempotencyKey = ''; resetAvailability(); });
+    date.addEventListener('change', () => {
+      idempotencyKey = '';
+      const selectedOption = date.options[date.selectedIndex];
+      if (selectedOption && selectedOption.dataset.eventId) event.value = selectedOption.dataset.eventId;
+      resetAvailability();
+    });
     table.addEventListener('change', () => { idempotencyKey = ''; if (lastAvailability) submitButton.disabled = !lastAvailability.available || (lastAvailability.table_selection_required && !table.value); });
     form.elements.customer_note.addEventListener('input', () => { idempotencyKey = ''; });
     checkButton.addEventListener('click', async () => {

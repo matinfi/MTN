@@ -266,3 +266,7 @@ body { background-image: radial-gradient(ellipse at 80% -10%, rgb(231 169 75 / 8
 @media(prefers-reduced-motion:reduce) {
   .mtn-listing-card, .mtn-listing-card .mtn-card-image, .hero .button { transition:none; }
 }
+
+/* Reliable navigation layers and laptop sidebar controls */
+@media(max-width:700px){.site-header{position:sticky;top:0;z-index:70}.mtn-mobile-menu{position:relative;z-index:72;flex:0 0 44px;pointer-events:auto}.mtn-app-shell.is-mobile-menu-open:after{z-index:40;pointer-events:auto}.mtn-app-shell.is-mobile-menu-open .mtn-sidebar{z-index:60}.mtn-app-shell.is-mobile-menu-open .site-header{z-index:70}}
+@media(min-width:701px){.mtn-sidebar{z-index:50}.mtn-sidebar-toggle{position:relative;z-index:2;pointer-events:auto}.mtn-app-shell.is-sidebar-collapsed .mtn-sidebar{overflow-x:clip}.mtn-app-shell.is-sidebar-collapsed .mtn-sidebar-toggle{cursor:pointer}}
