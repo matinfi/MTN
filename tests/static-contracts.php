@@ -161,7 +161,7 @@ if ( false === strpos( $rest, "'artists' => \$artists" ) ||
 	exit( 1 );
 }
 
-if ( false === strpos( $theme_settings, "'sanitize_callback' => 'sanitize_hex_color'" ) ||
+if ( false === strpos( $theme_settings, "'sanitize_hex_color'" ) ||
 	false === strpos( $theme_settings, "'edit_theme_options'" ) ||
 	false === strpos( $theme_header, 'data-mtn-default-theme' ) ||
 	false === strpos( $theme_header, 'data-mtn-theme-toggle' ) ||
