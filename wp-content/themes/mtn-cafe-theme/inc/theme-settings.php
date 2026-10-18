@@ -63,7 +63,7 @@ function mtn_cafe_theme_text_field($key,$label,$description='',$type='text') {
  echo '</td></tr>';
 }
 function mtn_cafe_theme_checkbox($key,$label,$description='') {
- echo '<tr><th scope="row">'.esc_html($label).'</th><td><label><input type="checkbox" name="'.esc_attr($key).'" value="1" '.checked((bool)mtn_cafe_theme_option_value($key),true,false).'> نمایش این بخش</label>';
+ echo '<tr><th scope="row">'.esc_html($label).'</th><td><input type="hidden" name="'.esc_attr($key).'" value="0"><label><input type="checkbox" name="'.esc_attr($key).'" value="1" '.checked((bool)mtn_cafe_theme_option_value($key),true,false).'> نمایش این بخش</label>';
  if($description) echo '<p class="description">'.esc_html($description).'</p>';
  echo '</td></tr>';
 }
