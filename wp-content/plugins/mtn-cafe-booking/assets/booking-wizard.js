@@ -25,7 +25,99 @@
   function localDateValue(input) {
     return input.value ? input.value.replace('T', ' ') + (input.value.length === 16 ? ':00' : '') : '';
   }
+  function buildBookingSteps(root) {
+    const form = root.querySelector('.mtn-booking-form');
+    if (!form || form.dataset.stepsReady === '1') return;
+    form.dataset.stepsReady = '1';
+    const grid = form.querySelector('.mtn-form-grid');
+    const cafeField = grid && grid.querySelector('[name="cafe_id"]')?.closest('p');
+    const eventField = grid && grid.querySelector('[name="event_id"]')?.closest('p');
+    const partyField = grid && grid.querySelector('[name="party_size"]')?.closest('p');
+    const dateField = grid && grid.querySelector('[name="booking_at"]')?.closest('p');
+    const tableField = grid && grid.querySelector('.mtn-table-field');
+    const noteField = form.querySelector('[name="customer_note"]')?.closest('p');
+    if (!grid || !cafeField || !eventField || !partyField || !dateField || !noteField) return;
+    const fields = [cafeField, eventField, partyField, dateField, tableField].filter(Boolean);
+    const stepOne = el('section', 'mtn-booking-step');
+    const stepTwo = el('section', 'mtn-booking-step');
+    const stepThree = el('section', 'mtn-booking-step');
+    stepOne.dataset.step = '1'; stepTwo.dataset.step = '2'; stepThree.dataset.step = '3';
+    stepOne.append(el('h3', 'mtn-step-title', '۱. انتخاب کافه و برنامه'));
+    stepTwo.append(el('h3', 'mtn-step-title', '۲. زمان و ظرفیت'));
+    stepThree.append(el('h3', 'mtn-step-title', '۳. اطلاعات و تأیید'));
+    stepOne.append(cafeField, eventField);
+    stepTwo.append(partyField, dateField);
+    if (tableField) stepTwo.append(tableField);
+    stepThree.append(noteField);
+    grid.replaceChildren(stepOne, stepTwo, stepThree);
+    const progress = el('ol', 'mtn-booking-progress');
+    ['کافه و برنامه', 'زمان و میز', 'تأیید'].forEach((label, index) => {
+      const item = el('li', 'mtn-booking-progress-item', label);
+      item.dataset.step = String(index + 1);
+      progress.append(item);
+    });
+    form.insertBefore(progress, grid);
+    const actions = form.querySelector('.mtn-booking-actions');
+    if (!actions) return;
+    const back = el('button', 'button mtn-step-back', 'مرحله قبل');
+    back.type = 'button';
+    const next = el('button', 'button mtn-step-next', 'ادامه');
+    next.type = 'button';
+    const check = form.querySelector('.mtn-check-availability');
+    const submit = form.querySelector('.mtn-submit-booking');
+    actions.prepend(back);
+    actions.append(next);
+    let current = 1;
+    function showStep(step) {
+      current = Math.max(1, Math.min(3, step));
+      form.querySelectorAll('.mtn-booking-step').forEach(panel => {
+        panel.hidden = Number(panel.dataset.step) !== current;
+      });
+      progress.querySelectorAll('.mtn-booking-progress-item').forEach(item => {
+        const n = Number(item.dataset.step);
+        item.classList.toggle('is-current', n === current);
+        item.classList.toggle('is-complete', n < current);
+        if (n === current) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current');
+      });
+      back.hidden = current === 1;
+      next.hidden = current === 3;
+      if (check) check.hidden = current !== 2;
+      if (submit) submit.hidden = current !== 3;
+      actions.classList.toggle('is-final-step', current === 3);
+    }
+    next.addEventListener('click', () => {
+      const required = current === 1 ? [form.elements.cafe_id, form.elements.event_id] : [form.elements.party_size, form.elements.booking_at];
+      for (const field of required) {
+        if (!field.reportValidity()) return;
+      }
+      if (current === 2) {
+        const status = root.querySelector('.mtn-booking-status');
+        if (submit && submit.disabled && status && status.dataset.state !== 'success') {
+          if (check) check.focus();
+          status.textContent = 'برای ادامه ابتدا ظرفیت را بررسی کنید.';
+          status.dataset.state = 'info';
+          return;
+        }
+      }
+      showStep(current + 1);
+      const first = form.querySelector('.mtn-booking-step:not([hidden]) input, .mtn-booking-step:not([hidden]) select, .mtn-booking-step:not([hidden]) textarea');
+      if (first) first.focus({ preventScroll: true });
+    });
+    back.addEventListener('click', () => showStep(current - 1));
+    if (check) check.addEventListener('click', () => {
+      const observer = new MutationObserver(() => {
+        const status = root.querySelector('.mtn-booking-status');
+        if (status && status.dataset.state === 'success') {
+          showStep(3);
+          observer.disconnect();
+        }
+      });
+      observer.observe(root.querySelector('.mtn-booking-status'), { attributes: true, childList: true, subtree: true });
+    });
+    showStep(1);
+  }
   document.querySelectorAll('[data-mtn-booking]').forEach(async (root) => {
+    buildBookingSteps(root);
     const form = root.querySelector('form');
     const cafe = form.elements.cafe_id;
     const event = form.elements.event_id;
