@@ -118,7 +118,7 @@ function mtn_cafe_theme_custom_tokens() {
  $tokens=array();
  foreach($keys as $key=>$fallback){$value=sanitize_hex_color(mtn_cafe_theme_option_value($key));$tokens[]='--'.str_replace('mtn_cafe_theme_','mtn-',$key).':'.($value?$value:$fallback);}
  $radius=min(28,max(8,absint(mtn_cafe_theme_option_value('mtn_cafe_theme_radius'))?:18));
- printf('<style id="mtn-cafe-theme-tokens">:root{%1$s;--mtn-radius:%2$dpx}</style>',esc_html(implode(';',$tokens)),$radius);
+ printf('<style id="mtn-cafe-theme-tokens">:root{%1$s;--mtn-radius:%2$dpx}:root[data-mtn-theme="light"]{--mtn-accent:%3$s}</style>',esc_html(implode(';',$tokens)),$radius,esc_html(sanitize_hex_color(mtn_cafe_theme_option_value('mtn_cafe_theme_accent')) ?: '#e7a94b'));
  if('glass'===mtn_cafe_theme_option_value('mtn_cafe_theme_sidebar_style')) echo '<style id="mtn-cafe-sidebar-style">.mtn-sidebar{background:rgba(18,20,26,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}:root[data-mtn-theme="light"] .mtn-sidebar{background:rgba(255,255,255,.82)}</style>';
 }
 add_action('wp_head','mtn_cafe_theme_custom_tokens',20);
